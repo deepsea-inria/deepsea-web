@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Theory and practice of chunked sequences</title>
+ 
+</head>
+ 
+<body id="index" class="body">
+
+<div style="width:640px; margin:0 auto;">
+
+<center><font size="10">Theory and practice of chunked sequences</font></center>
+<center><font size="4">A project of <a href="../index.html">DEEPSEA</a></font></center>
+
+<h1>Overview</h1>
+
+In this work, we address the question: <br><br>
+
+<div align="center">
+<div style="width:600px">
+<em>
+Can we design asymptotically and practically efficient data structures
+for sequences that can support a broad range of operations, including
+push/pop operations on both ends, concatenation, and split at a
+specified position?
+</em>
+</div>
+</div>
+
+<br>
+In our paper, we present two new algorithms for which we use
+adaptations of the classic chunking technique for accelerating
+tree-based representations of sequences by representing sequences as
+trees of small, fixed-capacity arrays (i.e., chunks). We prove that
+our algorithms deliver tight amortized, worst-case bounds with small
+constant factors. We present two C++ implementations of our two
+algorithms and a number of experiments comparing our implementations
+to highly tuned and specialized sequence data structures, such as STL
+deque and STL rope. This work presents the first data structures for
+shared memory that simultaneously match the semantic and asymptotic
+profile of
+the <a href="http://www.soi.city.ac.uk/~ross/papers/FingerTree.html">Finger
+Tree</a> of Hinze and Patterson, deliver strong guarantees with
+respect to constant-factor performance (as well as asymptotic
+performance), and compete well with highly tuned but more specialized
+data structures.
+
+<ul>
+<li> Umut A. Acar, Arthur Chargueraud, and Mike Rainey. <br> 
+     <a href="chunkedseq.pdf">Theory and Practice of Chunked Sequences</a>. <br>
+     Under submission. April 2014.
+</ul>
+
+<h1>Accessing and benchmarking our code</h1>
+
+We encourage others to evaluate the findings of our empirical
+study. To this end, we provide the source code of
+our benchmarks along with the following instructions that show
+what steps a reviewer can take to repeat our experiments and 
+to interpret the data.
+
+<br><br> If you have trouble completing this process, please send
+email describing the failure
+to <a href="mailto:mike.rainey@inria.fr">Mike Rainey</a>.
+
+<h2>1. Prerequisites</h2>
+
+To be safe, your filesystem should have about 80GB of free space and
+your machine at least 8GB or RAM. These space requirements are so
+large because, for our graph-search benchmarks, we use a few very
+large graphs. The following packages should be installed on your test
+machine.
+
+<ul>
+<li> <a href="http://www.ocaml.org/">ocaml</a> (version >= 4.00)
+<li> <a href="http://www.php.net">php</a> (version >= 5.3.10)
+<li> <a href="http://gcc.gnu.org/">GCC</a> (version >= 4.8.0)
+<li> <a href="http://www.r-project.org/">R</a> (version >= 2.4.1)
+<li> <a href="http://www.gnu.org/software/wget/">wget</a> (any recent version)
+<li> <a href="http://www.latex-project.org/">latex</a> (any recent version)
+<li> <a href="http://www.gzip.org/">gzip</a> (any recent version)
+</ul>
+
+<h2>2. Getting the source code</h2>
+
+You can either download our source
+files <a href="chunkedseq.tar.gz">here</a> or, if you prefer to
+use <tt>wget</tt>, you can skip to the next stage.
+
+<br><br>
+You can find relevant files in the following places:
+<ul>
+<li>
+Implementation files stored in: <tt>chunkedseq/include/*.hpp</tt>
+<li>
+Sequence-specific benchmarking code in: <tt>chunkedseq/bench/bench.cpp</tt>
+</li>
+<li>
+Graph-search benchmarking code in: <tt>graph/bench/search.cpp</tt>
+and <tt>graph/include/*.hpp</tt>
+</li>
+<li>
+Experiment on STL deque worst case in: <tt>chunkedseq/stl/pushpop.cpp</tt>
+</li>
+</ul>
+
+<h2>3. Running experiments</h2>
+
+The following commands start the process. You may need to wait a few
+hours for the process to complete.
+
+<br><br>
+<tt>$ wget http://deepsea.inria.fr/chunkedseq/chunkedseq.tar.gz</tt><br>
+<tt>$ tar -xvzf chunkedseq.tar.gz</tt><br>
+<tt>$ cd chunkedseq/benchtools</tt><br>
+<tt>$ make chunkedseq_bench</tt>
+<br><br>
+
+During the initialization phase, our script builds several binaries
+and generates input data required by the graph-search experiments. The
+input data may take about 30GB in total. Our script puts the input
+data into the folder <tt>~/graphdata</tt>. After initialization
+completes, the experiments run. During this time, be careful to ensure
+that the machine is quiet (except for the currently running
+experiment). Results from the experiments go into a new folder that is
+created by the script. The name of this folder is reported by the
+script, and should be of the
+form <tt>chunkedseq/benchtools/results_</tt><em>id</em>, where
+<em>id</em> is a unique identifier that is generated for the current
+run by our script.
+
+<h2>4. Interpreting results</h2>
+
+In the results folder, you can find several types of files. For each
+experiment, there is a PDF containing the plot output by the plot
+tool, there is an R file that was used by the tool to generate the
+plot, and there is a plaintext file that contains the raw results of
+the program runs. All run times are reported in seconds. Data
+structure names postfixed by <tt>ftree</tt> refer to our chunked
+finger tree and <tt>bootstrapped</tt> to our bootstrapped chunked
+structure. Data structure names containing <tt>deque</tt>
+or <tt>vector</tt> refer to STL deque and STL vector,
+respectively. The data structure labelled <tt>ls_bag</tt> refers to
+Leiserson and Shardl's bag data structure.
+
+<h1>People</h1>
+
+<ul>
+<li><a href="http://www.umut-acar.org/site/umutacar/">Umut Acar</font></a></li>
+<li><a href="http://www.chargueraud.org/">Arthur Chargueraud</a></li>
+<li><a href="http://gallium.inria.fr/~rainey/">Mike Rainey</a></li>
+</ul>
+
+</body>
+</html>
