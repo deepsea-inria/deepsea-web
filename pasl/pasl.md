@@ -2,13 +2,20 @@
 % [Umut Acar](http://www.umut-acar.org/); 
   [Arthur Charguéraud](http://www.chargueraud.org/); 
   [Mike Rainey](http://gallium.inria.fr/~rainey/)
-% 15 September 2014
+% 9 October 2014
 
 Overview
 ========
 
-Getting started
-===============
+Research publications
+=====================
+
+
+
+Software
+========
+
+https://github.com/deepsea-inria/pasl
 
 References
 ==========

@@ -63,3 +63,20 @@ dt code {
 dd p {
         margin-top: 0;
 }
+
+td, th /* Table cells and table header cells */
+    { 
+    vertical-align: top; /* Word */
+    vertical-align: baseline; /* Others */
+    padding-left:   1.1em;
+    padding-right:  1.1em;
+    padding-top:    0.3em;
+    padding-bottom: 0.3em;
+   } 
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+ 
+    }
