@@ -1,8 +1,6 @@
+% chunkedseq
 % Theory and practice of chunked sequences
-% [Umut Acar](http://www.umut-acar.org/); 
-  [Arthur Charguéraud](http://www.chargueraud.org/); 
-  [Mike Rainey](http://gallium.inria.fr/~rainey/)
-% 7 October 2014
+% [Deepsea project](http://deepsea.inria.fr/)
 
 Overview
 ========
@@ -209,6 +207,13 @@ not discussed here. Refer to the following documentation for details:
 - [PDF](experiments/chunkedseq.pdf) 
 - [HTML](experiments/chunkedseq.html) 
 - [Markdown](experiments/chunkedseq.md)
+
+Team
+====
+
+- [Umut Acar](http://www.umut-acar.org/site/umutacar/)
+- [Arthur Charguéraud](http://www.chargueraud.org/)
+- [Mike Rainey](http://gallium.inria.fr/~rainey/)
 
 References
 ==========

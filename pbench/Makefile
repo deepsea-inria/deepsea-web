@@ -1,18 +1,29 @@
 PROJECT_NAME=pbench
-PROJECT_STYLE_SHEET=-c ../deepsea.css
+
+### web page
+
+PROJECT_STYLE_SHEET=$(PROJECT_NAME).css
+PROJECT_STYLE_SHEET_OPT=-c $(PROJECT_STYLE_SHEET)
 PROJECT_SSH_TARGET=yquem.inria.fr:/net/yquem/infosystems/www/gallium/deepsea
+REMOTE_DEST=$(PROJECT_SSH_TARGET)/$(PROJECT_NAME)
 GENERATED_FILES=$(PROJECT_NAME).html $(PROJECT_NAME).pdf
-PROJECT_FILES=$(GENERATED_FILES) $(PROJECT_NAME).bib $(PROJECT_NAME).tar.gz
+PNG_FILES=barplots.png speedup.png tables.png
+TALK_FILES=
+PAPER_FILES=work-inflation.pdf
+PROJECT_FILES=$(PROJECT_NAME).bib $(PNG_FILES)
 PROJECT_BIBS=--biblio $(PROJECT_NAME).bib
 
-pdf:
-	pandoc $(PROJECT_NAME).md -s -S $(PROJECT_BIBS) -o $(PROJECT_NAME).pdf
+%.pdf : %.md
+	pandoc $< -s -S $(PROJECT_BIBS) -o $@
+%.html : %.md
+	pandoc $< -s -S $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET_OPT) -o $@
 
-html:
-	pandoc $(PROJECT_NAME).md -s -S $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET) -o $(PROJECT_NAME).html
-
-publish:
-	scp $(PROJECT_FILES) $(PROJECT_SSH_TARGET)/$(PROJECT_NAME)/index.html
-
-clean:
+clean: 
 	rm -f $(GENERATED_FILES)
+
+### push to server (important: must first run `make clean`)
+
+publish: $(PROJECT_FILES)
+	scp $(PROJECT_STYLE_SHEET) $(REMOTE_DEST)
+	scp $(PROJECT_FILES) $(REMOTE_DEST)
+	scp $(PROJECT_NAME).html $(REMOTE_DEST)/index.html
