@@ -1,4 +1,4 @@
-% Oracular Scheduling
+% oracular scheduling
 % Controlling granularity automatically in implicitly parallel languages
 % [Deepsea project](http://deepsea.inria.fr/)
 
@@ -13,19 +13,19 @@ used.
 
 The traditional approach to granularity control consists in deciding
 whether to sequentialize subtasks or not based on a cutoff value
-hard-coded in the source code, however this approach is not portable
-at all. Another approach is auto-tuning, which consists in
+hard-coded in the source code. Unfortunately, this approach is not
+portable. Another approach is auto-tuning, which consists in
 automatically trying various possible values for the cutoff on a given
-hardware, but this takes time and requires samples of input data. The
-goal is thus to come up with a portable, online approach to
-granularity control.
+hardware. But this approach takes time and usually involves collecting
+samples offline of input data. The goal of our work is thus to come up
+with a portable, online approach to granularity control.
 
 Contribution
 ============
 
 We have developed a new approach to granularity control that combines
 asymptotic complexity annotations with runtime profiling. We require
-the programmer to annotate his parallel functions with an asymptotic
+the programmer to annotate their parallel functions with an asymptotic
 complexity expression. We then use runtime profiling for deducing the
 constant factors that apply. Using this information, we are able to
 predict execution time and enforce our scheduling policy: any subtask
@@ -36,6 +36,16 @@ algorithm whose worst-case complexity matches its average complexity.
 We have proved bounds showing that our granularity control strategy
 leads to provably-good parallel run times. Moreover, we have
 implemented our approach and shown that it works well in practice.
+
+Implementation
+==============
+
+We first implemented these ideas in the [Manticore
+compiler](http://manticore.cs.uchicago.edu/) (SML syntax), as a
+source-to-source translation. We later re-implemented them in our C++
+library [pasl](http://deepsea.inria.fr/pasl/), where asymptotic cost
+annotations are to be provided in the form of member functions of the
+closure objects.
 
 Related research publications
 =============================
