@@ -197,7 +197,7 @@ Finally, we can create a barplot from this data, we can simply issue
 the following command.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pplot bar -x infile -y exectime -series algo --xtitles-vertical
+$ pplot bar -x infile -y exectime -series algo --xtitles-vertical
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The plot that we get shows us bars grouped together by the input
@@ -215,7 +215,7 @@ Using the same data as above, we can easily generate a table reporting
 on the running times. 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pplot table -row infile -col algo -cell exectime
+$ pplot table -row infile -col algo -cell exectime
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The table that is generated is a latex table, and when rendered, looks
