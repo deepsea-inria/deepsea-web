@@ -40,7 +40,7 @@ Book and associated materials
 [@intro-parallelism-cpp]
 
 [pdf](book.pdf)
-[html](book.html)
+[html](http://www.umut-acar.org/minicourse-parallelism.html?attredirects=0)
 [sources](https://github.com/deepsea-inria/pasl/tree/edu)
 
 Credits
