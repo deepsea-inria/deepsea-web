@@ -6,35 +6,35 @@ Overview
 ========
 
 Benchmarking parallel programs is fraught with pitfalls. One often
-finds that understanding performance requires running multiple
-experiments with varying configurations and subsequently analyzing the
-data. One must deal with factors such as randomness in measurements,
-program faults, data collection and analysis. To cope with the
-complexity, one often writes a brand new, custom set of scripts, often
-in a scripting language such as python, perl or bash. It is all too
-easy for mistakes to creep into these scripts and for the errors to go
-undetected and lead to confusion or false conclusions. While this
-problem is inherent to any significant experimental study involving
-complex scripts, we believe that much can be done to reduce this
-problem in the particular case of studies which concern parallel codes
-on shared-memory machines. In 2013, we began to develop a set of
-scripts, named pbench and written in the [Caml](https://ocaml.org/)
-programming language, that we could use to benchmark our parallel
-programs. Since then, we have generalized our scripts and have studied
-in detail a number of techniques to automate and ease the execution of
-experimental studies on parallel codes.
+finds that understanding the performance of their program requires
+running multiple experiments with varying configurations and
+subsequently analyzing the data. One must deal with factors such as
+randomness in measurements, program faults, data collection and
+analysis. To cope with the complexity, one often writes a brand new,
+custom set of scripts, often in a scripting language such as python,
+perl or bash. It is all too easy for mistakes to creep into these
+scripts and for the errors to go undetected and lead to confusion or
+false conclusions. While this problem is inherent to any significant
+experimental study involving complex scripts, we believe that much can
+be done to reduce this problem in the particular case of studies which
+concern parallel codes on shared-memory machines. In 2013, we began to
+develop a set of scripts, named pbench and written in the
+[Caml](https://ocaml.org/) programming language, that we could use to
+benchmark our parallel programs. Since then, we have generalized our
+scripts and have studied in detail a number of techniques to automate
+and ease the execution of experimental studies on parallel codes.
 
 We have a few reasons to believe that others may find pbench
-useful. First, the scripts enjoy the type-system guarantees that are
-enforced by Caml. Second, we have carefully designed a set of
-conventions and data structures for storing and processing
-experimental data. Third, as we continue to develop these scripts, we
-are finding that we can systematically eliminate, or at least discover
-after the fact, certain types of mistakes by recording experimental
-setup in script form and by logging system conditions along with
-experimental data. We believe that, provided additional effort from
-others, these scripts can become a powerful tool to increase the rigor
-with which we analyze the performance of our parallel codes.
+useful. First, the scripts enjoy the correctness guarantees, such as
+type safety, that are enforced by Caml. Second, we have carefully
+designed a set of conventions and data structures for storing and
+processing experimental data. Third, we have designed the scripts to
+gracefully deal with program faults and timeouts. Fourth, we have
+implemented generators for several types of output formats, such as
+speedup plots, scatter and bar plots, and tables. We believe that,
+provided additional effort from others, these scripts can become a
+powerful tool to increase the rigor with which we analyze the
+performance of our parallel codes.
 
 The software produced from these efforts consists of a pair of
 command-line tools, namely `prun` and `pplot`, and a library for
@@ -42,10 +42,10 @@ writing custom experimental evaluations. The aim of the `prun` and
 `pplot` is to enable rapid experimentation with parallel codes in the
 early stages of an experimental study. In addition, we implemented a
 library to play the complementary role: that is, to provide a set of
-core functions that we could use to write scritps to automate complex
-experimental evaluations of parallel codes. Our goal for these scripts
-is to make it as pain free as we could for us and others to repeat
-experiments that we report in our research papers.
+core functions that we could use to write Caml scripts to automate
+complex experimental evaluations of parallel codes. Our goal for these
+scripts is to make it as pain free as we could for us and others to
+repeat experiments that we report in our research papers.
 
 In [a related research effort](#wi), we have studied a lightweight
 performance-analysis technique for understanding the speedups obtained
@@ -91,7 +91,7 @@ processor, and four parallel runs, using ten, twenty, thirty, and
 forty processors.
  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ prun speedup -baseline "fib -proc 1 -parallel "fib -proc 10,20,30,
+$ prun speedup -baseline "fib -proc 1" -parallel "fib -proc 10,20,30,
 40" -n 47
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -139,7 +139,10 @@ The plot that we see should look like this one.
 ![](speedup.png)
 
 Our `pplot` depends on the [R](http://www.r-project.org/) tool and
-LaTeX for generating plots.
+LaTeX for generating plots. When `pplot` generates new plots, all
+intermediate R and latex sources that were generated by `pplot` are
+written to the `_results` folder. It is not hard to customize the look
+of the plots by editing these files individually.
 
 Comparing multiple algorithms with a bar plot
 ---------------------------------------------
@@ -198,8 +201,9 @@ pplot bar -x infile -y exectime -series algo --xtitles-vertical
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The plot that we get shows us bars grouped together by the input
-graph. We can see which algorithms are faster and, thanks to the error
-bars, how much noise there is in our measurements.
+graph. On the y axis is the average of the three running times that we
+collected for each bar. We can see which algorithms are faster and,
+thanks to the error bars, how much noise there is in our measurements.
 
 ![](barplots.png)
 
