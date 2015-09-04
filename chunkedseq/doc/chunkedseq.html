@@ -70,9 +70,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li><a href="#member-types"><span class="toc-section-number">2.2</span> Member types</a><ul>
 <li><a href="#deque-iter"><span class="toc-section-number">2.2.1</span> Iterator</a></li>
-<li><a href="#iterator-size"><span class="toc-section-number">2.2.2</span> Iterator size</a></li>
-<li><a href="#iterator-search-by"><span class="toc-section-number">2.2.3</span> Search by predicate</a></li>
-<li><a href="#iterator-get-segment"><span class="toc-section-number">2.2.4</span> Get enclosing segment</a></li>
 </ul></li>
 <li><a href="#constructors-and-destructors"><span class="toc-section-number">2.3</span> Constructors and destructors</a><ul>
 <li><a href="#deque-e-c-c"><span class="toc-section-number">2.3.1</span> Empty container constructor</a></li>
@@ -393,16 +390,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </tr>
 </tbody>
 </table>
-<h3 id="iterator-size"><span class="header-section-number">2.2.2</span> Iterator size</h3>
+<h4 id="iterator-size"><span class="header-section-number">2.2.1.1</span> Iterator size</h4>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">size_type size() <span class="dt">const</span>;</code></pre></div>
 <p>Returns the number of items preceding and including the item pointed to by the iterator.</p>
 <p><strong><em>Complexity.</em></strong> Constant time.</p>
-<h3 id="iterator-search-by"><span class="header-section-number">2.2.3</span> Search by predicate</h3>
+<h4 id="iterator-search-by"><span class="header-section-number">2.2.1.2</span> Search by predicate</h4>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Predicate&gt;
 <span class="dt">void</span> search_by(<span class="dt">const</span> Predicate&amp; p);</code></pre></div>
 <p>Moves the iterator to the first position <code>i</code> in the sequence for which the call <code>p(m_i)</code> returns <code>true</code>, where <code>m_i</code> denotes the accumulated cached measurement at position <code>i</code>.</p>
 <p><strong><em>Complexity.</em></strong> Logarithmic time.</p>
-<h3 id="iterator-get-segment"><span class="header-section-number">2.2.4</span> Get enclosing segment</h3>
+<h4 id="iterator-get-segment"><span class="header-section-number">2.2.1.3</span> Get enclosing segment</h4>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">segment_type get_segment() <span class="dt">const</span>;</code></pre></div>
 <p>Returns the segment that encloses the iterator.</p>
 <p><strong><em>Complexity.</em></strong> Constant time.</p>
