@@ -57,7 +57,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a><ul>
 <li><a href="#provided-container-types"><span class="toc-section-number">1.1</span> Provided container types</a></li>
 <li><a href="#advanced-features"><span class="toc-section-number">1.2</span> Advanced features</a></li>
-<li><a href="#credits"><span class="toc-section-number">1.3</span> Credits</a></li>
+<li><a href="#compatibility"><span class="toc-section-number">1.3</span> Compatibility</a></li>
+<li><a href="#credits"><span class="toc-section-number">1.4</span> Credits</a></li>
 </ul></li>
 <li><a href="#deque"><span class="toc-section-number">2</span> Double-ended queue</a><ul>
 <li><a href="#template-parameters"><span class="toc-section-number">2.1</span> Template parameters</a><ul>
@@ -192,7 +193,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#segments">Segments</a></li>
 <li><a href="#cached-measurement">Derived data structures by cached measurement</a></li>
 </ul>
-<h2 id="credits"><span class="header-section-number">1.3</span> Credits</h2>
+<h2 id="compatibility"><span class="header-section-number">1.3</span> Compatibility</h2>
+<p>This codebase makes extensive use of C++11 features, such as lambda expressions. Therefore, we recommend a recent version of GCC or Clang. We have tested the code on GCC v4.9.</p>
+<h2 id="credits"><span class="header-section-number">1.4</span> Credits</h2>
 <p>The <a href="http://deepsea.inria.fr/chunkedseq">chunkedseq</a> package is maintained by the members of the <a href="http://deepsea.inria.fr/">Deepsea Project</a>. Primary authors include:</p>
 <ul>
 <li><a href="http://umut-acar.org">Umut Acar</a></li>
