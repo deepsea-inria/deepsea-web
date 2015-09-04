@@ -7,16 +7,6 @@ CHUNKEDSEQ=$(PACKAGES)/chunkedseq/
 CHUNKEDSEQ_CODE=$(CHUNKEDSEQ)/chunkedseq/
 CHUNKEDSEQ_CODE_DOC=$(CHUNKEDSEQ_CODE)/doc/
 
-chunkedseq_doc: packages/chunkedseq.tar.gz
-	(cd $(PACKAGES) && tar -xvzf chunkedseq.tar.gz)
-	(cd $(CHUNKEDSEQ_CODE) && doxygen)
-	mv $(CHUNKEDSEQ_CODE_DOC) .
-	make -C doc/latex
-	rm -rf $(CHUNKEDSEQ)
-
-clean_chunkedseq_doc:
-	rm -rf doc
-
 ### experiments package
 
 EXPERIMENTS=experiments/
@@ -49,12 +39,12 @@ PROJECT_BIBS=--biblio $(PROJECT_NAME).bib
 %.html : %.md
 	pandoc $< -s -S $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET_OPT) -o $@
 
-clean: clean_chunkedseq_doc clean_experiments_doc
+clean: clean_experiments_doc
 	rm -f $(GENERATED_FILES)
 
 ### push to server (important: must first run `make clean`)
 
-publish: chunkedseq.html chunkedseq.pdf experiments_doc chunkedseq_doc
+publish: chunkedseq.html chunkedseq.pdf experiments_doc 
 	scp $(PROJECT_STYLE_SHEET) $(REMOTE_DEST)
 	scp $(PROJECT_FILES) $(REMOTE_DEST)
 	scp -r doc $(REMOTE_DEST)

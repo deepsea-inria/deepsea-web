@@ -1,0 +1,2206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Deepsea project" />
+  <title>Chunked sequence</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="chunkedseq.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title">Chunked sequence</h1>
+<h2 class="author"><a href="http://deepsea.inria.fr/">Deepsea project</a></h2>
+<h3 class="date">3 September 2015</h3>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a><ul>
+<li><a href="#provided-container-types"><span class="toc-section-number">1.1</span> Provided container types</a></li>
+<li><a href="#advanced-features"><span class="toc-section-number">1.2</span> Advanced features</a></li>
+<li><a href="#credits"><span class="toc-section-number">1.3</span> Credits</a></li>
+</ul></li>
+<li><a href="#deque"><span class="toc-section-number">2</span> Double-ended queue</a><ul>
+<li><a href="#template-parameters"><span class="toc-section-number">2.1</span> Template parameters</a><ul>
+<li><a href="#deque-item"><span class="toc-section-number">2.1.1</span> Item type</a></li>
+<li><a href="#deque-capacity"><span class="toc-section-number">2.1.2</span> Chunk capacity</a></li>
+<li><a href="#deque-cache"><span class="toc-section-number">2.1.3</span> Cache type</a></li>
+<li><a href="#deque-chunk-struct"><span class="toc-section-number">2.1.4</span> Chunk-struct type</a></li>
+<li><a href="#deque-alloc"><span class="toc-section-number">2.1.5</span> Allocator type</a></li>
+</ul></li>
+<li><a href="#member-types"><span class="toc-section-number">2.2</span> Member types</a><ul>
+<li><a href="#deque-iter"><span class="toc-section-number">2.2.1</span> Iterator</a></li>
+<li><a href="#iterator-size"><span class="toc-section-number">2.2.2</span> Iterator size</a></li>
+<li><a href="#iterator-search-by"><span class="toc-section-number">2.2.3</span> Search by predicate</a></li>
+<li><a href="#iterator-get-segment"><span class="toc-section-number">2.2.4</span> Get enclosing segment</a></li>
+</ul></li>
+<li><a href="#constructors-and-destructors"><span class="toc-section-number">2.3</span> Constructors and destructors</a><ul>
+<li><a href="#deque-e-c-c"><span class="toc-section-number">2.3.1</span> Empty container constructor</a></li>
+<li><a href="#deque-e-f-c"><span class="toc-section-number">2.3.2</span> Fill container</a></li>
+<li><a href="#deque-e-cp-c"><span class="toc-section-number">2.3.3</span> Copy constructor</a></li>
+<li><a href="#deque-i-l-c"><span class="toc-section-number">2.3.4</span> Initializer-list constructor</a></li>
+<li><a href="#deque-m-c"><span class="toc-section-number">2.3.5</span> Move constructor</a></li>
+<li><a href="#deque-destr"><span class="toc-section-number">2.3.6</span> Destructor</a></li>
+</ul></li>
+<li><a href="#item-access"><span class="toc-section-number">2.4</span> Item access</a><ul>
+<li><a href="#deque-frontback"><span class="toc-section-number">2.4.1</span> Front and back</a></li>
+<li><a href="#deque-i-o"><span class="toc-section-number">2.4.2</span> Indexing operator</a></li>
+</ul></li>
+<li><a href="#capacity"><span class="toc-section-number">2.5</span> Capacity</a><ul>
+<li><a href="#deque-empty"><span class="toc-section-number">2.5.1</span> Empty operator</a></li>
+<li><a href="#deque-size"><span class="toc-section-number">2.5.2</span> Size operator</a></li>
+</ul></li>
+<li><a href="#iterators"><span class="toc-section-number">2.6</span> Iterators</a><ul>
+<li><a href="#deque-beg"><span class="toc-section-number">2.6.1</span> Iterator begin</a></li>
+<li><a href="#deque-end"><span class="toc-section-number">2.6.2</span> Iterator end</a></li>
+<li><a href="#deque-pushfrontback"><span class="toc-section-number">2.6.3</span> Push</a></li>
+<li><a href="#deque-popfrontback"><span class="toc-section-number">2.6.4</span> Pop</a></li>
+<li><a href="#deque-split"><span class="toc-section-number">2.6.5</span> Split</a></li>
+<li><a href="#deque-concat"><span class="toc-section-number">2.6.6</span> Concatenate</a></li>
+<li><a href="#deque-clear"><span class="toc-section-number">2.6.7</span> Clear</a></li>
+<li><a href="#deque-resize"><span class="toc-section-number">2.6.8</span> Resize</a></li>
+<li><a href="#deque-swap"><span class="toc-section-number">2.6.9</span> Exchange operation</a></li>
+</ul></li>
+<li><a href="#example-push-and-pop"><span class="toc-section-number">2.7</span> Example: push and pop</a></li>
+<li><a href="#example-split-and-concat"><span class="toc-section-number">2.8</span> Example: split and concat</a></li>
+</ul></li>
+<li><a href="#stack"><span class="toc-section-number">3</span> Stack</a><ul>
+<li><a href="#template-interface"><span class="toc-section-number">3.1</span> Template interface</a></li>
+<li><a href="#example"><span class="toc-section-number">3.2</span> Example</a></li>
+</ul></li>
+<li><a href="#bag"><span class="toc-section-number">4</span> Bag</a><ul>
+<li><a href="#template-interface-1"><span class="toc-section-number">4.1</span> Template interface</a></li>
+<li><a href="#example-1"><span class="toc-section-number">4.2</span> Example</a></li>
+</ul></li>
+<li><a href="#associative-map"><span class="toc-section-number">5</span> Associative map</a><ul>
+<li><a href="#example-insert"><span class="toc-section-number">5.1</span> Example: <code>insert</code></a></li>
+<li><a href="#example-erase"><span class="toc-section-number">5.2</span> Example: <code>erase</code></a></li>
+</ul></li>
+<li><a href="#parallel-processing"><span class="toc-section-number">6</span> Parallel processing</a><ul>
+<li><a href="#example-pkeep_if"><span class="toc-section-number">6.1</span> Example: <code>pkeep_if</code></a></li>
+<li><a href="#example-pcopy"><span class="toc-section-number">6.2</span> Example: <code>pcopy</code></a></li>
+<li><a href="#example-pcopy_if"><span class="toc-section-number">6.3</span> Example: <code>pcopy_if</code></a></li>
+</ul></li>
+<li><a href="#weighted-container"><span class="toc-section-number">7</span> Weighted container</a><ul>
+<li><a href="#example-split-sequence-of-strings-by-length"><span class="toc-section-number">7.1</span> Example: split sequence of strings by length</a></li>
+</ul></li>
+<li><a href="#stl-iterator"><span class="toc-section-number">8</span> STL-style iterator</a><ul>
+<li><a href="#example-2"><span class="toc-section-number">8.1</span> Example</a></li>
+</ul></li>
+<li><a href="#segments"><span class="toc-section-number">9</span> Segments</a><ul>
+<li><a href="#example-3"><span class="toc-section-number">9.1</span> Example</a></li>
+</ul></li>
+<li><a href="#cached-measurement"><span class="toc-section-number">10</span> Cached measurement</a><ul>
+<li><a href="#taking-measurements"><span class="toc-section-number">10.1</span> Taking measurements</a><ul>
+<li><a href="#measuring-items-individually"><span class="toc-section-number">10.1.1</span> Measuring items individually</a></li>
+<li><a href="#example-the-size-measure"><span class="toc-section-number">10.1.2</span> Example: the &quot;size&quot; measure</a></li>
+<li><a href="#example-the-string-size-measure"><span class="toc-section-number">10.1.3</span> Example: the &quot;string-size&quot; measure</a></li>
+<li><a href="#measuring-items-in-contiguous-regions-of-memory"><span class="toc-section-number">10.1.4</span> Measuring items in contiguous regions of memory</a></li>
+<li><a href="#the-measure-descriptor"><span class="toc-section-number">10.1.5</span> The measure descriptor</a></li>
+<li><a href="#example-weight-one-uniformly-sized-items"><span class="toc-section-number">10.1.6</span> Example: weight-one (uniformly sized) items</a></li>
+</ul></li>
+<li><a href="#using-algebras-to-combine-measurements"><span class="toc-section-number">10.2</span> Using algebras to combine measurements</a><ul>
+<li><a href="#the-algebra-descriptor"><span class="toc-section-number">10.2.1</span> The algebra descriptor</a></li>
+<li><a href="#example-combining-algebras"><span class="toc-section-number">10.2.2</span> Example: combining algebras</a></li>
+<li><a href="#scans"><span class="toc-section-number">10.2.3</span> Scans</a></li>
+<li><a href="#why-associativity-is-necessary"><span class="toc-section-number">10.2.4</span> Why associativity is necessary</a></li>
+<li><a href="#why-the-inverse-operation-can-improve-performance"><span class="toc-section-number">10.2.5</span> Why the inverse operation can improve performance</a></li>
+</ul></li>
+<li><a href="#defining-custom-cached-measurement-policies"><span class="toc-section-number">10.3</span> Defining custom cached-measurement policies</a><ul>
+<li><a href="#the-cached-measurement-descriptor"><span class="toc-section-number">10.3.1</span> The cached-measurement descriptor</a></li>
+<li><a href="#example-trivial-cached-measurement"><span class="toc-section-number">10.3.2</span> Example: trivial cached measurement</a></li>
+<li><a href="#example-weight-one-uniformly-sized-items-1"><span class="toc-section-number">10.3.3</span> Example: weight-one (uniformly sized) items</a></li>
+<li><a href="#example-weighted-items"><span class="toc-section-number">10.3.4</span> Example: weighted items</a></li>
+<li><a href="#example-combining-cached-measurements-1"><span class="toc-section-number">10.3.5</span> Example: combining cached measurements</a></li>
+</ul></li>
+<li><a href="#splitting-by-predicate-functions"><span class="toc-section-number">10.4</span> Splitting by predicate functions</a><ul>
+<li><a href="#the-predicate-function-descriptor"><span class="toc-section-number">10.4.1</span> The predicate function descriptor</a></li>
+<li><a href="#example-weighted-splits"><span class="toc-section-number">10.4.2</span> Example: weighted splits</a></li>
+</ul></li>
+<li><a href="#example-using-cached-measurement-to-implement-associative-maps"><span class="toc-section-number">10.5</span> Example: using cached measurement to implement associative maps</a><ul>
+<li><a href="#optional-values"><span class="toc-section-number">10.5.1</span> Optional values</a></li>
+<li><a href="#the-measure-descriptor-1"><span class="toc-section-number">10.5.2</span> The measure descriptor</a></li>
+<li><a href="#the-monoid-descriptor"><span class="toc-section-number">10.5.3</span> The monoid descriptor</a></li>
+<li><a href="#the-descriptor-of-the-cached-measurement-policy"><span class="toc-section-number">10.5.4</span> The descriptor of the cached measurement policy</a></li>
+<li><a href="#the-associative-map"><span class="toc-section-number">10.5.5</span> The associative map</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="introduction"><span class="header-section-number">1</span> Introduction</h1>
+<p>This package provides a C++ template library that implements ordered, in-memory containers that are based on a B-tree-like data structure.</p>
+<p>Like STL deque, our chunkedseq data structure supports fast constant-time update operations on the two ends of the sequence, and like balanced tree structures, such as STL rope, our chunkedseq structure supports efficient logarithmic-time split (at a specified position) and merge operations. However, unlike prior data structures, ours provides all of these operations simultaneously. Our <a href="http://deepsea.inria.fr/chunkedseq">research paper</a> presents evidence to back these claims.</p>
+<p>Key features of chunkedseq are:</p>
+<ul>
+<li>Fast constant-time push and pop operations on the two ends of the sequence.</li>
+<li>Logarithmic-time split at a specified position.</li>
+<li>Logarithmic-time concatenation.</li>
+<li>Familiar STL-style container interface.</li>
+<li>A <em>segment</em> abstraction to expose to clients of the chunked sequence the contiguous regions of memory that exist inside chunks.</li>
+</ul>
+<h2 id="provided-container-types"><span class="header-section-number">1.1</span> Provided container types</h2>
+<ul>
+<li><a href="#deque">Double-ended queue</a></li>
+<li><a href="#stack">Stack</a></li>
+<li><a href="#bag">Bag</a></li>
+<li><a href="#associative-map">Associative map</a></li>
+</ul>
+<h2 id="advanced-features"><span class="header-section-number">1.2</span> Advanced features</h2>
+<ul>
+<li><a href="#parallel-processing">Parallel processing</a></li>
+<li><a href="#weighted-container">Weighted container</a></li>
+<li><a href="#stl-iterator">STL-style iterator</a></li>
+<li><a href="#segments">Segments</a></li>
+<li><a href="#cached-measurement">Derived data structures by cached measurement</a></li>
+</ul>
+<h2 id="credits"><span class="header-section-number">1.3</span> Credits</h2>
+<p>The <a href="http://deepsea.inria.fr/chunkedseq">chunkedseq</a> package is maintained by the members of the <a href="http://deepsea.inria.fr/">Deepsea Project</a>. Primary authors include:</p>
+<ul>
+<li><a href="http://umut-acar.org">Umut Acar</a></li>
+<li><a href="http://chargueraud.org">Arthur Chargueraud</a></li>
+<li><a href="http://gallium.inria.fr/~rainey">Michael Rainey</a>.</li>
+</ul>
+<h1 id="deque"><span class="header-section-number">2</span> Double-ended queue</h1>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> chunkedseq {
+<span class="kw">namespace</span> bootstrapped {
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Item&gt;
+<span class="kw">class</span> deque;
+
+}}}}</code></pre></div>
+<p>The <code>deque</code> class implements a double-ended queue that, in addition to fast access to both ends, provides logarithmic-time operations for both weighted split and concatenation.</p>
+<p>The deque interface implements much of the interface of the <a href="http://www.cplusplus.com/reference/deque/deque/">STL deque</a>. All operations for accessing the front and back of the container (e.g., <code>front</code>, <code>push_front</code>, <code>pop_front</code>, etc.) are supported. Additionally, the deque supports splitting and concatenation in logarithmic time and provides a random-access iterator.</p>
+<h2 id="template-parameters"><span class="header-section-number">2.1</span> Template parameters</h2>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> chunkedseq {
+<span class="kw">namespace</span> bootstrapped {
+
+<span class="kw">template</span> &lt;
+  <span class="kw">class</span> Item,
+  <span class="dt">int</span> Chunk_capacity = <span class="dv">512</span>,
+  <span class="kw">class</span> Cache = cachedmeasure::trivial&lt;Item, size_t&gt;,
+  <span class="kw">template</span> &lt;
+    <span class="kw">class</span> Chunk_item,
+    <span class="dt">int</span> Capacity,
+    <span class="kw">class</span> Chunk_item_alloc=std::allocator&lt;Item&gt;
+  &gt;
+  <span class="kw">class</span> Chunk_struct = fixedcapacity::heap_allocated::ringbuffer_ptrx,
+  <span class="kw">class</span> Item_alloc = std::allocator&lt;Item&gt;
+&gt;
+<span class="kw">class</span> deque;
+
+}}}}</code></pre></div>
+<p>The signature above gives the complete list of the template parameters of the <code>deque</code> class and the table below the meanings of each one.</p>
+<table>
+<caption>Template parameters for the <code>deque</code> class (short version).</caption>
+<colgroup>
+<col width="52%" />
+<col width="48%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Template parameter</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#deque-item"><code>Item</code></a></p></td>
+<td align="left"><p>Type of the objects to be stored in the container</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-capacity"><code>Chunk_capacity</code></a></p></td>
+<td align="left"><p>Specifies capacity of chunks.</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-cache"><code>Cache</code></a></p></td>
+<td align="left"><p>Specifies the policy by which to cache measurements on interior chunks.</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-chunk-struct"><code>Chunk_struct</code></a></p></td>
+<td align="left"><p>Specifies the type of the chunks.</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-alloc"><code>Item_alloc</code></a></p></td>
+<td align="left"><p>Allocator to be used by the container to construct and destruct objects of type <code>Item</code></p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-item"><span class="header-section-number">2.1.1</span> Item type</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">class</span> Item;</code></pre></div>
+<p>Type of the elements. Only if <code>Item</code> is guaranteed to not throw while moving, implementations can optimize to move elements instead of copying them during reallocations. Aliased as member type <code>deque::value_type</code>.</p>
+<h3 id="deque-capacity"><span class="header-section-number">2.1.2</span> Chunk capacity</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">int</span> Chunk_capacity = <span class="dv">512</span>;</code></pre></div>
+<p>The <code>Chunk_capacity</code> specifies the maximum number of items that can fit in each chunk.</p>
+<p>Although each chunk can store <em>at most</em> <code>Chunk_capacity</code> items, the container can only guarantee that at most half of the cells of any given chunk are filled.</p>
+<h3 id="deque-cache"><span class="header-section-number">2.1.3</span> Cache type</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">class</span> Cache = cachedmeasure::trivial&lt;Item, size_t&gt;;</code></pre></div>
+<p>The <code>Cache</code> type specifies the strategy to be used internally by the deque to maintain monoid-cached measurements of groups of items (see <a href="#cached_measurement">Cached measurement</a>).</p>
+<h3 id="deque-chunk-struct"><span class="header-section-number">2.1.4</span> Chunk-struct type</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;
+  <span class="kw">class</span> Chunk_item,
+  <span class="dt">int</span> Capacity,
+  <span class="kw">class</span> Chunk_item_alloc=std::allocator&lt;Item&gt;
+&gt;
+<span class="kw">class</span> Chunk_struct = fixedcapacity::heap_allocated::ringbuffer_ptrx;</code></pre></div>
+<p>The <code>Chunk_struct</code> type specifies the fixed-capacity ring-buffer representation to be used for storing items (see <a href="#fixedcapacity">Fixed-capacity buffers</a>).</p>
+<h3 id="deque-alloc"><span class="header-section-number">2.1.5</span> Allocator type</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">class</span> Item_alloc = std::allocator&lt;Item&gt;;</code></pre></div>
+<p>Type of the allocator object used to define the storage allocation model. By default, the allocator class template is used, which defines the simplest memory allocation model and is value-independent. Aliased as member type <code>deque::allocator_type</code>.</p>
+<h2 id="member-types"><span class="header-section-number">2.2</span> Member types</h2>
+<table>
+<caption>Member types of the <code>deque</code> class.</caption>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><code>self_type</code></p></td>
+<td align="left"><p>Alias for the type of this container (e.g., <code>deque</code>, <code>stack</code>, <code>bag</code>)</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><code>value_type</code></p></td>
+<td align="left"><p>Alias for template parameter <code>Item</code></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><code>reference</code></p></td>
+<td align="left"><p>Alias for <code>value_type&amp;</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><code>const_reference</code></p></td>
+<td align="left"><p>Alias for <code>const value_type&amp;</code></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><code>pointer</code></p></td>
+<td align="left"><p>Alias for <code>value_type*</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><code>const_pointer</code></p></td>
+<td align="left"><p>Alias for <code>const value_type*</code></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><code>size_type</code></p></td>
+<td align="left"><p>Alias for <code>size_t</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><code>segment_type</code></p></td>
+<td align="left"><p>Alias for <code>pasl::data::segment&lt;pointer&gt;</code></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><code>cache_type</code></p></td>
+<td align="left"><p>Alias for template parameter <code>Cache</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><code>measured_type</code></p></td>
+<td align="left"><p>Alias for <code>cache_type::measured_type</code></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><code>algebra_type</code></p></td>
+<td align="left"><p>Alias for <code>cache_type::algebra_type</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><code>measure_type</code></p></td>
+<td align="left"><p>Alias for <code>cache_type::measure_type</code></p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-iter"><code>iterator</code></a></p></td>
+<td align="left"><p>Iterator</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-iter"><code>const_iterator</code></a></p></td>
+<td align="left"><p>Const iterator</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-iter"><span class="header-section-number">2.2.1</span> Iterator</h3>
+<p>The types <code>iterator</code> and <code>const_iterator</code> are instances of the <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">random-access iterator</a> concept. In addition to providing standard methods, our iterator provides the methods that are specified in the following table.</p>
+<table>
+<caption>Additional methods provided by the random-access iterator.</caption>
+<colgroup>
+<col width="52%" />
+<col width="47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#iterator-size"><code>size</code></a></p></td>
+<td align="left"><p>Returns the number of preceding items</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#iterator-search-by"><code>search_by</code></a></p></td>
+<td align="left"><p>Search to some position guided by a given predicate</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#iterator-get-segment"><code>get_segment</code></a></p></td>
+<td align="left"><p>Returns the current segment</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="iterator-size"><span class="header-section-number">2.2.2</span> Iterator size</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">size_type size() <span class="dt">const</span>;</code></pre></div>
+<p>Returns the number of items preceding and including the item pointed to by the iterator.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="iterator-search-by"><span class="header-section-number">2.2.3</span> Search by predicate</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Predicate&gt;
+<span class="dt">void</span> search_by(<span class="dt">const</span> Predicate&amp; p);</code></pre></div>
+<p>Moves the iterator to the first position <code>i</code> in the sequence for which the call <code>p(m_i)</code> returns <code>true</code>, where <code>m_i</code> denotes the accumulated cached measurement at position <code>i</code>.</p>
+<p><strong><em>Complexity.</em></strong> Logarithmic time.</p>
+<h3 id="iterator-get-segment"><span class="header-section-number">2.2.4</span> Get enclosing segment</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">segment_type get_segment() <span class="dt">const</span>;</code></pre></div>
+<p>Returns the segment that encloses the iterator.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h2 id="constructors-and-destructors"><span class="header-section-number">2.3</span> Constructors and destructors</h2>
+<table>
+<caption>Constructors of the <code>deque</code> class.</caption>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Constructor</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#deque-e-c-c">empty container constructor</a> (default constructor)</p></td>
+<td align="left"><p>constructs an empty container with no items</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-e-f-c">fill constructor</a></p></td>
+<td align="left"><p>constructs a container with a specified number of copies of a given item</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-e-cp-c">copy constructor</a></p></td>
+<td align="left"><p>constructs a container with a copy of each of the items in the given container, in the same order</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-i-l-c">initializer list</a></p></td>
+<td align="left"><p>constructs a container with the items specified in a given initializer list</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-m-c">move constructor</a></p></td>
+<td align="left"><p>constructs a container that acquires the items of a given container</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-destr">destructor</a></p></td>
+<td align="left"><p>destructs a container</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-e-c-c"><span class="header-section-number">2.3.1</span> Empty container constructor</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">deque();</code></pre></div>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<p>Constructs an empty container with no items;</p>
+<h3 id="deque-e-f-c"><span class="header-section-number">2.3.2</span> Fill container</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">deque(<span class="dt">long</span> n, <span class="dt">const</span> value_type&amp; val);</code></pre></div>
+<p>Constructs a container with <code>n</code> copies of <code>val</code>.</p>
+<p><strong><em>Complexity.</em></strong> Time is linear in the size of the resulting container.</p>
+<h3 id="deque-e-cp-c"><span class="header-section-number">2.3.3</span> Copy constructor</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">deque(<span class="dt">const</span> deque&amp; other);</code></pre></div>
+<p>Constructs a container with a copy of each of the items in <code>other</code>, in the same order.</p>
+<p><strong><em>Complexity.</em></strong> time is linear in the size of the resulting container.</p>
+<h3 id="deque-i-l-c"><span class="header-section-number">2.3.4</span> Initializer-list constructor</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">deque(initializer_list&lt;value_type&gt; il);</code></pre></div>
+<p>Constructs a container with the items in <code>il</code>.</p>
+<p><strong><em>Complexity.</em></strong> Time is linear in the size of the resulting container.</p>
+<h3 id="deque-m-c"><span class="header-section-number">2.3.5</span> Move constructor</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">deque(deque&amp;&amp; x);</code></pre></div>
+<p>Constructs a container that acquires the items of <code>other</code>.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="deque-destr"><span class="header-section-number">2.3.6</span> Destructor</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">~deque();</code></pre></div>
+<p>Destructs the container.</p>
+<p><strong><em>Complexity.</em></strong> Time is linear and logarithmic in the size of the container.</p>
+<h2 id="item-access"><span class="header-section-number">2.4</span> Item access</h2>
+<table>
+<caption>Item accessors of the <code>deque</code> class.</caption>
+<colgroup>
+<col width="40%" />
+<col width="54%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Operation</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#deque-frontback"><code>front</code></a> <a href="#deque-frontback"><code>back</code></a></p></td>
+<td align="left"><p>Access item on end.</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-i-o"><code>operator[]</code></a></p></td>
+<td align="left"><p>Access member item</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-frontback"><span class="header-section-number">2.4.1</span> Front and back</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">value_type front() <span class="dt">const</span>;
+value_type back() <span class="dt">const</span>;</code></pre></div>
+<p>Returns a reference to the last item in the container.</p>
+<p>Calling this method on an empty container causes undefined behavior.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="deque-i-o"><span class="header-section-number">2.4.2</span> Indexing operator</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">reference <span class="kw">operator</span>[](size_type i);
+const_reference <span class="kw">operator</span>[](size_type i) <span class="dt">const</span>;</code></pre></div>
+<p>Returns a reference at the specified location <code>i</code>. No bounds check is performed.</p>
+<p><strong><em>Complexity.</em></strong> Logarithmic time.</p>
+<h2 id="capacity"><span class="header-section-number">2.5</span> Capacity</h2>
+<table>
+<caption>Capacity methods of the <code>deque</code> class.</caption>
+<colgroup>
+<col width="40%" />
+<col width="54%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Operation</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#deque-empty"><code>empty</code></a></p></td>
+<td align="left"><p>Checks whether the container is empty.</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-size"><code>size</code></a></p></td>
+<td align="left"><p>Returns the number of items.</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-empty"><span class="header-section-number">2.5.1</span> Empty operator</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">bool</span> empty() <span class="dt">const</span>;</code></pre></div>
+<p>Returns <code>true</code> if the container is empty, <code>false</code> otherwise.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="deque-size"><span class="header-section-number">2.5.2</span> Size operator</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">size_type size() <span class="dt">const</span>;</code></pre></div>
+<p>Returns the size of the container.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h2 id="iterators"><span class="header-section-number">2.6</span> Iterators</h2>
+<table>
+<caption>Iterators of the <code>deque</code> class.</caption>
+<colgroup>
+<col width="40%" />
+<col width="54%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Operation</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#deque-frontback"><code>front</code></a> <a href="#deque-frontback"><code>back</code></a></p></td>
+<td align="left"><p>Access item on end.</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-i-o"><code>operator[]</code></a></p></td>
+<td align="left"><p>Access member item</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-beg"><code>begin</code></a> <a href="#deque-beg"><code>cbegin</code></a></p></td>
+<td align="left"><p>Returns an iterator to the beginning</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-end"><code>end</code></a> <a href="#deque-end"><code>cend</code></a></p></td>
+<td align="left"><p>Returns an iterator to the end</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-beg"><span class="header-section-number">2.6.1</span> Iterator begin</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">iterator begin() <span class="dt">const</span>;
+const_iterator cbegin() <span class="dt">const</span>;</code></pre></div>
+<p>Returns an iterator to the first item of the container.</p>
+<p>If the container is empty, the returned iterator will be equal to end().</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="deque-end"><span class="header-section-number">2.6.2</span> Iterator end</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">iterator end() <span class="dt">const</span>;
+const_iterator cend() <span class="dt">const</span>;</code></pre></div>
+<p>Returns an iterator to the element following the last item of the container.</p>
+<p>This element acts as a placeholder; attempting to access it results in undefined behavior.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<table>
+<caption>Modifiers of the <code>deque</code> class.</caption>
+<colgroup>
+<col width="49%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Operation</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><a href="#deque-pushfrontback"><code>push_front</code></a> <a href="#deque-pushfrontback"><code>push_back</code></a></p></td>
+<td align="left"><p>Adds items to the end</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-popfrontback"><code>pop_front</code></a> <a href="#deque-popfrontback"><code>pop_back</code></a></p></td>
+<td align="left"><p>Removes items from the end</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-split"><code>split</code></a></p></td>
+<td align="left"><p>Splits off part of the container</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-concat"><code>concat</code></a></p></td>
+<td align="left"><p>Merges contents of another container</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-clear"><code>clear</code></a></p></td>
+<td align="left"><p>Erases contents</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><a href="#deque-resize"><code>resize</code></a></p></td>
+<td align="left"><p>Changes number of items stored</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><a href="#deque-swap"><code>swap</code></a></p></td>
+<td align="left"><p>Swaps contents</p></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deque-pushfrontback"><span class="header-section-number">2.6.3</span> Push</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> push_front(<span class="dt">const</span> value_type&amp; value);
+<span class="dt">void</span> push_back(<span class="dt">const</span> value_type&amp; value);</code></pre></div>
+<p>Prepends the given element <code>value</code> to the beginning of the container.</p>
+<p><strong><em>Iterator validity.</em></strong> All iterators, including the past-the-end iterator, are invalidated. No references are invalidated.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="deque-popfrontback"><span class="header-section-number">2.6.4</span> Pop</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">value_type pop_back();
+value_type pop_front();</code></pre></div>
+<p>Removes the last element of the container and returns the element.</p>
+<p>Calling <code>pop_back</code> or <code>pop_front</code> on an empty container is undefined.</p>
+<p>Returns the removed element.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h3 id="deque-split"><span class="header-section-number">2.6.5</span> Split</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> split(iterator position, self_type&amp; other);    <span class="co">// (1)</span>
+<span class="dt">void</span> split(size_type position, self_type&amp; other);   <span class="co">// (2)</span>
+<span class="kw">template</span> &lt;<span class="kw">class</span> Predicate&gt;
+<span class="dt">void</span> split(<span class="dt">const</span> Predicate&amp; p, self_type&amp; other);   <span class="co">// (3)</span>
+<span class="kw">template</span> &lt;<span class="kw">class</span> Predicate&gt;
+<span class="dt">void</span> split(<span class="dt">const</span> Predicate&amp; p,                      <span class="co">// (4)</span>
+           reference middle_item,
+           self_type&amp; other);</code></pre></div>
+<ol style="list-style-type: decimal">
+<li><p>The container is erased after and including the item at the specified position.</p></li>
+<li><p>The container is erased after and including the item at (zero-based) index <code>position</code>.</p></li>
+<li><p>The container is erased after and including the item at the first position <code>i</code> for which <code>p(m_i)</code> returns <code>true</code>, where <code>m_i</code> denotes the accumulated cached measurement at position <code>i</code>.</p></li>
+<li><p>The container is erased after the item at the first position <code>i</code> for which <code>p(m_i)</code> returns <code>true</code>, where <code>m_i</code> denotes the accumulated cached measurement at position <code>i</code>. The item at position <code>i</code> is also erased, but in this case, the item is copied into the reference <code>middle_item</code>.</p></li>
+</ol>
+<p>The erased items are moved to the other container.</p>
+<p><strong><em>Precondition.</em></strong> The <code>other</code> container is empty.</p>
+<p><strong><em>Complexity.</em></strong> Time is logarithmic in the size of the container.</p>
+<p><strong><em>Iterator validity.</em></strong> Invalidates all iterators.</p>
+<h3 id="deque-concat"><span class="header-section-number">2.6.6</span> Concatenate</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> concat(self_type other);</code></pre></div>
+<p>Removes all items from <code>other</code>, effectively reducing its size to zero.</p>
+<p>Adds items removed from <code>other</code> to the back of this container, after its current last item.</p>
+<p><strong><em>Complexity.</em></strong> Time is logarithmic in the size of the container.</p>
+<p><strong><em>Iterator validity.</em></strong> Invalidates all iterators.</p>
+<h3 id="deque-clear"><span class="header-section-number">2.6.7</span> Clear</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> clear();</code></pre></div>
+<p>Erases the contents of the container, which becomes an empty container.</p>
+<p><strong><em>Complexity.</em></strong> Time is linear in the size of the container.</p>
+<p><strong><em>Iterator validity.</em></strong> Invalidates all iterators, if the size before the operation differs from the size after.</p>
+<h3 id="deque-resize"><span class="header-section-number">2.6.8</span> Resize</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> resize(size_type n, <span class="dt">const</span> value_type&amp; val); <span class="co">// (1)</span>
+<span class="dt">void</span> resize(size_type n) {                       <span class="co">// (2)</span>
+  value_type val;
+  resize(n, val);
+}</code></pre></div>
+<p>Resizes the container to contain <code>n</code> items.</p>
+<p>If the current size is greater than <code>n</code>, the container is reduced to its first <code>n</code> elements.</p>
+<p>If the current size is less than <code>n</code>,</p>
+<ol style="list-style-type: decimal">
+<li><p>additional copies of <code>val</code> are appended</p></li>
+<li><p>additional default-inserted elements are appended</p></li>
+</ol>
+<p><strong><em>Complexity.</em></strong> Let <span class="math inline"><em>m</em></span> be the size of the container just before and <span class="math inline"><em>n</em></span> just after the resize operation. Then, the time is linear in <span class="math inline">max(<em>m</em>, <em>n</em>)</span>.</p>
+<p><strong><em>Iterator validity.</em></strong> Invalidates all iterators, if the size before the operation differs from the size after.</p>
+<h3 id="deque-swap"><span class="header-section-number">2.6.9</span> Exchange operation</h3>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> swap(deque&amp; other);</code></pre></div>
+<p>Exchanges the contents of the container with those of <code>other</code>. Does not invoke any move, copy, or swap operations on individual items.</p>
+<p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h2 id="example-push-and-pop"><span class="header-section-number">2.7</span> Example: push and pop</h2>
+<div class="sourceCode" include="../examples/chunkedseq_2.example.deque_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="kw">using</span> mydeque_type = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">int</span>&gt;;
+
+  <span class="dt">const</span> <span class="dt">int</span> nb = <span class="dv">5</span>;
+  
+  mydeque_type mydeque;
+  
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; nb; i++)
+    mydeque.push_back(i);
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; nb; i++)
+    mydeque.push_front(nb+i);
+  
+  assert(mydeque.size() == <span class="dv">2</span>*nb);
+  
+  std::cout &lt;&lt; <span class="st">&quot;mydeque contains:&quot;</span>;
+  <span class="kw">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; <span class="dv">2</span>*nb; i++) {
+    <span class="dt">int</span> v = (i % <span class="dv">2</span>) ? mydeque.pop_front() : mydeque.pop_back();
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; v;
+  }
+  std::cout &lt;&lt; std::endl;
+  
+  assert(mydeque.empty());
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_2.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mydeque contains: 4 9 3 8 2 7 1 6 0 5</code></pre>
+<h2 id="example-split-and-concat"><span class="header-section-number">2.8</span> Example: split and concat</h2>
+<div class="sourceCode" include="../examples/chunkedseq_5.example.split_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="kw">using</span> mydeque_type = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">int</span>&gt;;
+
+<span class="dt">static</span>
+<span class="dt">void</span> myprint(mydeque_type&amp; mydeque) {
+  <span class="kw">auto</span> it = mydeque.begin();
+  <span class="kw">while</span> (it != mydeque.end())
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; *it++;
+  std::cout &lt;&lt; std::endl;
+}
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  mydeque_type mydeque = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span> };
+  mydeque_type mydeque2;
+  
+  mydeque.split(size_t(<span class="dv">3</span>), mydeque2);
+  
+  mydeque.pop_back();
+  mydeque.push_back(<span class="dv">8888</span>);
+  
+  mydeque2.pop_front();
+  mydeque2.push_front(<span class="dv">9999</span>);
+  
+  std::cout &lt;&lt; <span class="st">&quot;Just after split:&quot;</span> &lt;&lt; std::endl;
+  std::cout &lt;&lt; <span class="st">&quot;contents of mydeque:&quot;</span>;
+  myprint(mydeque);
+  std::cout &lt;&lt; <span class="st">&quot;contents of mydeque2:&quot;</span>;
+  myprint(mydeque2);
+  
+  mydeque.concat(mydeque2);
+  
+  std::cout &lt;&lt; <span class="st">&quot;Just after merge:&quot;</span> &lt;&lt; std::endl;
+  std::cout &lt;&lt; <span class="st">&quot;contents of mydeque:&quot;</span>;
+  myprint(mydeque);
+  std::cout &lt;&lt; <span class="st">&quot;contents of mydeque2:&quot;</span>;
+  myprint(mydeque2);
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_5.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>Just after split:
+contents of mydeque: 0 1 8888
+contents of mydeque2: 9999 4 5
+Just after merge:
+contents of mydeque: 0 1 8888 9999 4 5
+contents of mydeque2:</code></pre>
+<h1 id="stack"><span class="header-section-number">3</span> Stack</h1>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> chunkedseq {
+<span class="kw">namespace</span> bootstrapped {
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Item&gt;
+<span class="kw">class</span> stack;
+
+}}}}</code></pre></div>
+<p>The stack is a container that supports the same set of operations as the <a href="#deque">deque</a>, but has two key differences:</p>
+<ul>
+<li>Thanks to using a simpler stack structure to represent the chunks, the stack offers faster access to the back of the container and faster indexing operations than deque.</li>
+<li>Unlike deque, the stack cannot guarantee fast updates to the front of the container: each update operation performed on the front position can require at most <code>Chunk_capacity</code> items to be shifted toward to back.</li>
+</ul>
+<h2 id="template-interface"><span class="header-section-number">3.1</span> Template interface</h2>
+<p>The complete template interface of the stack constructor is the same as that of the deque constructor, except that the chunk structure is not needed.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> chunkedseq {
+<span class="kw">namespace</span> bootstrapped {
+
+<span class="kw">template</span> &lt;
+  <span class="kw">class</span> Item,
+  <span class="dt">int</span> Chunk_capacity = <span class="dv">512</span>,
+  <span class="kw">class</span> Cache = cachedmeasure::trivial&lt;Item, size_t&gt;,
+  <span class="kw">class</span> Item_alloc = std::allocator&lt;Item&gt;
+&gt;
+<span class="kw">class</span> stack;
+
+}}}}</code></pre></div>
+<h2 id="example"><span class="header-section-number">3.2</span> Example</h2>
+<div class="sourceCode" include="../examples/chunkedseq_3.example.stack_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="kw">using</span> mystack_type = pasl::data::chunkedseq::bootstrapped::stack&lt;<span class="dt">int</span>&gt;;
+  
+  mystack_type mystack = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span> };
+  
+  std::cout &lt;&lt; <span class="st">&quot;mystack contains:&quot;</span>;
+  <span class="kw">while</span> (! mystack.empty())
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; mystack.pop_back();
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_3.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mystack contains: 4 3 2 1 0</code></pre>
+<h1 id="bag"><span class="header-section-number">4</span> Bag</h1>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> chunkedseq {
+<span class="kw">namespace</span> bootstrapped {
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Item&gt;
+<span class="kw">class</span> bagopt;
+
+}}}}</code></pre></div>
+<p>Our bag container is a generic container that trades the guarantee of order among its items for stronger guarantees on space usage and faster push and pop operations than the corresponding properties of the stack structure. In particular, the bag guarantees that there are no empty spaces in between consecutive items of the sequence, whereas stack and deque can guarantee only that no more than half of the cells of the chunks are empty.</p>
+<p>Although our bag is unordered in general, in particular use cases, order among items is guaranteed. Order of insertion and removal of the items is guaranteed by the bag under any sequence of push or pop operations that affect the back of the container. The split and concatenation operations typically reorder items.</p>
+<p>The container supports <code>front</code>, <code>push_front</code> and <code>pop_front</code> operations for the sole purpose of interface compatibility. These operations simply perform the corresponding actions on the back of the container.</p>
+<h2 id="template-interface-1"><span class="header-section-number">4.1</span> Template interface</h2>
+<p>The complete template interface of the bag is similar to that of stack.</p>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> chunkedseq {
+<span class="kw">namespace</span> bootstrapped {
+
+<span class="kw">template</span> &lt;
+  <span class="kw">class</span> Item,
+  <span class="dt">int</span> Chunk_capacity = <span class="dv">512</span>,
+  <span class="kw">class</span> Cache = cachedmeasure::trivial&lt;Item, size_t&gt;,
+  <span class="kw">class</span> Item_alloc = std::allocator&lt;Item&gt;
+&gt;
+<span class="kw">class</span> bagopt;
+
+}}}}</code></pre></div>
+<h2 id="example-1"><span class="header-section-number">4.2</span> Example</h2>
+<div class="sourceCode" include="../examples/chunkedseq_4.example.bag_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+
+<span class="ot">#include &quot;chunkedbag.hpp&quot;</span>
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="kw">using</span> mybag_type = pasl::data::chunkedseq::bootstrapped::bagopt&lt;<span class="dt">int</span>&gt;;
+  
+  mybag_type mybag = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span> };
+
+  std::cout &lt;&lt; <span class="st">&quot;mybag contains:&quot;</span>;
+  <span class="kw">while</span> (! mybag.empty())
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; mybag.pop();
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_4.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mybag contains: 4 3 2 1 0</code></pre>
+<h1 id="associative-map"><span class="header-section-number">5</span> Associative map</h1>
+<div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">namespace</span> pasl {
+<span class="kw">namespace</span> data {
+<span class="kw">namespace</span> map {
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Key,
+          <span class="kw">class</span> Item,
+          <span class="kw">class</span> Compare = std::less&lt;Key&gt;,
+          <span class="kw">class</span> Key_swap = std_swap&lt;Key&gt;,
+          <span class="kw">class</span> Alloc = std::allocator&lt;std::pair&lt;<span class="dt">const</span> Key, Item&gt; &gt;,
+          <span class="dt">int</span> chunk_capacity = <span class="dv">8</span>
+&gt;
+<span class="kw">class</span> map;
+
+}}}</code></pre></div>
+<p>Using the <a href="#cached-measurement">cached-measurement feature</a> of our chunked sequence structure, we have implemented asymptotically efficient associative maps in the style of <a href="http://www.cplusplus.com/reference/map/map/">STL map</a>. Our implementation is, however, not designed to compete with highly optimized implementations, such as that of STL. Rather, the main purpose of our implementation is to provide an example of advanced use of cached measurement so that others can apply similar techniques to build their own custom data structures.</p>
+<p>Our map interface implements only a subset of the <a href="http://www.cplusplus.com/reference/map/map/">STL interface</a>. The operations that we do implement have the same time and space complexity as do the operations implemented by the STL container. However, the constant factors imposed by our container may be significantly larger than those of the STL container because our structure is not specifically optimized for this use case.</p>
+<h2 id="example-insert"><span class="header-section-number">5.1</span> Example: <code>insert</code></h2>
+<div class="sourceCode" include="../examples/map_1.example.map_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// accessing mapped values</span>
+<span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+
+<span class="ot">#include &quot;map.hpp&quot;</span>
+
+<span class="dt">int</span> main () {
+  pasl::data::map::map&lt;<span class="dt">char</span>,std::string&gt; mymap;
+  
+  mymap[<span class="st">&#39;a&#39;</span>]=<span class="st">&quot;an element&quot;</span>;
+  mymap[<span class="st">&#39;b&#39;</span>]=<span class="st">&quot;another element&quot;</span>;
+  mymap[<span class="st">&#39;c&#39;</span>]=mymap[<span class="st">&#39;b&#39;</span>];
+  
+  std::cout &lt;&lt; <span class="st">&quot;mymap[&#39;a&#39;] is &quot;</span> &lt;&lt; mymap[<span class="st">&#39;a&#39;</span>] &lt;&lt; <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>;
+  std::cout &lt;&lt; <span class="st">&quot;mymap[&#39;b&#39;] is &quot;</span> &lt;&lt; mymap[<span class="st">&#39;b&#39;</span>] &lt;&lt; <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>;
+  std::cout &lt;&lt; <span class="st">&quot;mymap[&#39;c&#39;] is &quot;</span> &lt;&lt; mymap[<span class="st">&#39;c&#39;</span>] &lt;&lt; <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>;
+  std::cout &lt;&lt; <span class="st">&quot;mymap[&#39;d&#39;] is &quot;</span> &lt;&lt; mymap[<span class="st">&#39;d&#39;</span>] &lt;&lt; <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>;
+  
+  std::cout &lt;&lt; <span class="st">&quot;mymap now contains &quot;</span> &lt;&lt; mymap.size() &lt;&lt; <span class="st">&quot; elements.</span><span class="ch">\n</span><span class="st">&quot;</span>;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+}</code></pre></div>
+<p><a href="../examples/map_1.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mymap[&#39;a&#39;] is an element
+mymap[&#39;b&#39;] is another element
+mymap[&#39;c&#39;] is another element
+mymap[&#39;d&#39;] is 
+mymap now contains 4 elements.</code></pre>
+<h2 id="example-erase"><span class="header-section-number">5.2</span> Example: <code>erase</code></h2>
+<div class="sourceCode" include="../examples/map_2.example.map_example2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="co">// accessing mapped values</span>
+<span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+
+<span class="ot">#include &quot;map.hpp&quot;</span>
+
+<span class="dt">int</span> main ()
+{
+  pasl::data::map::map&lt;<span class="dt">char</span>,<span class="dt">int</span>&gt; mymap;
+  pasl::data::map::map&lt;<span class="dt">char</span>,<span class="dt">int</span>&gt;::iterator it;
+  
+  <span class="co">// insert some values:</span>
+  mymap[<span class="st">&#39;a&#39;</span>]=<span class="dv">10</span>;
+  mymap[<span class="st">&#39;b&#39;</span>]=<span class="dv">20</span>;
+  mymap[<span class="st">&#39;c&#39;</span>]=<span class="dv">30</span>;
+  mymap[<span class="st">&#39;d&#39;</span>]=<span class="dv">40</span>;
+  mymap[<span class="st">&#39;e&#39;</span>]=<span class="dv">50</span>;
+  mymap[<span class="st">&#39;f&#39;</span>]=<span class="dv">60</span>;
+  
+  it=mymap.find(<span class="st">&#39;b&#39;</span>);
+  mymap.erase (it);                   <span class="co">// erasing by iterator</span>
+  
+  mymap.erase (<span class="st">&#39;c&#39;</span>);                  <span class="co">// erasing by key</span>
+  
+  <span class="co">// show content:</span>
+  <span class="kw">for</span> (it=mymap.begin(); it!=mymap.end(); ++it)
+    std::cout &lt;&lt; (*it).first &lt;&lt; <span class="st">&quot; =&gt; &quot;</span> &lt;&lt; (*it).second &lt;&lt; <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+}</code></pre></div>
+<p><a href="../examples/map_2.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>f =&gt; 60
+e =&gt; 50
+d =&gt; 40
+a =&gt; 10</code></pre>
+<h1 id="parallel-processing"><span class="header-section-number">6</span> Parallel processing</h1>
+<p>The containers of the chunkedseq package are well suited to applications which use fork-join parallelism: thanks to the logarithmic-time split operations, chunkedseq containers can be divided efficiently, and thanks to the logarithmic-time concatenate operations, chunkedseq containers can be merged efficiently. Moreover, chunkedseq containers can be processed efficiently in a sequential fashion, thereby enabling a liberal programming style in which sequential and parallel processing styles are combined synergistically. The following example programs deomonstrate this style.</p>
+<p>Remark:</p>
+<blockquote>
+<p>The data structures of the chunkedseq package are <em>not</em> concurrent data structures, or, put differently, chunkedseq data structures admit only single-threaded update operations.</p>
+</blockquote>
+<p>Remark:</p>
+<blockquote>
+<p>The following examples are evidence that this single-threading restriction does <em>not</em> necessarily limit parallelism.</p>
+</blockquote>
+<h2 id="example-pkeep_if"><span class="header-section-number">6.1</span> Example: <code>pkeep_if</code></h2>
+<p>To see how our deque can be used for parallel processing, let us consider the following program, which constructs the subsequence of a given sequence, based on selections taken by a client-supplied predicate function. Assuming fork-join parallel constructs, such as Cilk's <code>spawn</code> and <code>sync</code>, the selection and build process of the <code>pkeep_if</code> function can achieve a large (in fact, unbounded) amount of parallelism thanks to the fact that the span of the computation is logarithmic in the size of the input sequence. Moreover, <code>pkeep_if</code> is <em>work efficient</em> thanks to the fact that the algorithm takes linear time in the size of the input sequence (assuming, of course, that the client-supplied predicate takes constant time).</p>
+<div class="sourceCode" include="../examples/chunkedseq_1.example.chunkedseq_example1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="kw">using</span> cbdeque = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">long</span>&gt;;
+
+<span class="co">// moves items which satisfy a given predicate p from src to dst</span>
+<span class="co">// preserving original order of items in src</span>
+<span class="kw">template</span> &lt;<span class="kw">class</span> Predicate_function&gt;
+<span class="dt">void</span> pkeep_if(cbdeque&amp; dst, cbdeque&amp; src, <span class="dt">const</span> Predicate_function&amp; p) {
+
+  <span class="dt">const</span> <span class="dt">int</span> cutoff = <span class="dv">8096</span>;
+  
+  <span class="dt">long</span> sz = src.size();
+
+  <span class="kw">if</span> (sz &lt;= cutoff) {
+
+    <span class="co">// compute result in a sequential fashion</span>
+    <span class="kw">while</span> (sz-- &gt; <span class="dv">0</span>) {
+      <span class="dt">long</span> item = src.pop_back();
+      <span class="kw">if</span> (p(item))
+        dst.push_front(item);
+    }
+
+  } <span class="kw">else</span> {
+
+    cbdeque src2;
+    cbdeque dst2;
+
+    <span class="co">// divide the input evenly in two halves</span>
+    size_t mid = sz / <span class="dv">2</span>;
+    src.split(mid, src2);
+
+    <span class="co">// recurse on subproblems</span>
+    <span class="co">// calls can execute in parallel</span>
+    pkeep_if(dst,  src,  p);
+    pkeep_if(dst2, src2, p);
+
+    <span class="co">// combine results (after parallel calls complete)</span>
+    dst.concat(dst2);
+
+  }
+}
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+
+  cbdeque src;
+  cbdeque dst;
+
+  <span class="dt">const</span> <span class="dt">long</span> n = <span class="dv">1000000</span>;
+
+  <span class="co">// fill the source container with [1, ..., 2n]</span>
+  <span class="kw">for</span> (<span class="dt">long</span> i = <span class="dv">1</span>; i &lt;= <span class="dv">2</span>*n; i++)
+    src.push_back(i);
+
+  <span class="co">// leave src empty and dst = [1, 3, 5, ... n-1]</span>
+  pkeep_if(dst, src, [] (<span class="dt">long</span> x) { <span class="kw">return</span> x%<span class="dv">2</span> == <span class="dv">1</span>; });
+
+  assert(src.empty());
+  assert(dst.size() == n);
+
+  <span class="co">// calculate the sum</span>
+  <span class="dt">long</span> sum = <span class="dv">0</span>;
+  <span class="kw">while</span> (! dst.empty())
+    sum += dst.pop_front();
+
+  <span class="co">// the sum of n consecutive odd integers starting from 1 equals n^2</span>
+  assert(sum == n*n);
+  std::cout &lt;&lt; <span class="st">&quot;sum = &quot;</span> &lt;&lt; sum &lt;&lt; std::endl;
+
+  <span class="kw">return</span> <span class="dv">0</span>;
+
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_1.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>sum = 1000000000000</code></pre>
+<h2 id="example-pcopy"><span class="header-section-number">6.2</span> Example: <code>pcopy</code></h2>
+<p>This algorithm implements a parallel version of <a href="http://en.cppreference.com/w/cpp/algorithm/copy">std::copy</a>. Note, however, that the two versions differ slightly: in our version, the type of the destination parameter is a reference to the destination, whereas the corresponding type in std::copy is instead an iterator that points to the beginning of the destination container.</p>
+<div class="sourceCode" include="../examples/chunkedseq_6.example.pcopy_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Chunkedseq&gt;
+<span class="dt">void</span> pcopy(<span class="kw">typename</span> Chunkedseq::iterator first,
+           <span class="kw">typename</span> Chunkedseq::iterator last,
+           Chunkedseq&amp; destination) {
+  <span class="kw">using</span> iterator = <span class="kw">typename</span> Chunkedseq::iterator;
+  <span class="kw">using</span> ptr = <span class="kw">typename</span> Chunkedseq::const_pointer;
+  
+  <span class="dt">const</span> <span class="dt">long</span> cutoff = <span class="dv">8192</span>;
+  
+  <span class="dt">long</span> sz = last.size() - first.size();
+  
+  <span class="kw">if</span> (sz &lt;= cutoff) {
+    
+    <span class="co">// compute result in a sequential fashion</span>
+    Chunkedseq::for_each_segment(first, last, [&amp;] (ptr lo, ptr hi) {
+      destination.pushn_back(lo, hi-lo);
+    });
+    
+  } <span class="kw">else</span> {
+    
+    <span class="co">// select split position to be the median</span>
+    iterator mid = first + (sz/<span class="dv">2</span>);
+    
+    Chunkedseq destination2;
+    
+    <span class="co">// recurse on subproblems</span>
+    <span class="co">// calls can execute in parallel</span>
+    pcopy(first, mid,  destination);
+    pcopy(mid,   last, destination2);
+    
+    <span class="co">// combine results</span>
+    destination.concat(destination2);
+    
+  }
+}
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="dt">const</span> <span class="dt">int</span> chunk_size = <span class="dv">2</span>;
+  <span class="kw">using</span> mydeque_type = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">int</span>, chunk_size&gt;;
+  
+  mydeque_type mydeque = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span> };
+  mydeque_type mydeque2;
+  
+  pcopy(mydeque.begin(), mydeque.end(), mydeque2);
+  
+  std::cout &lt;&lt; <span class="st">&quot;mydeque2 contains:&quot;</span>;
+  <span class="kw">auto</span> p = mydeque2.begin();
+  <span class="kw">while</span> (p != mydeque2.end())
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; *p++;
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_6.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mydeque2 contains: 0 1 2 3 4 5</code></pre>
+<h2 id="example-pcopy_if"><span class="header-section-number">6.3</span> Example: <code>pcopy_if</code></h2>
+<p>This algorithm implements a parallel version of <a href="http://en.cppreference.com/w/cpp/algorithm/copy">std::copy_if</a>. Just as before, our implementation uses a type for the third parameter that is different from the corresponding third parameter of the STL version.</p>
+<div class="sourceCode" include="../examples/chunkedseq_7.example.pcopy_if_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Chunkedseq, <span class="kw">class</span> UnaryPredicate&gt;
+<span class="dt">void</span> pcopy_if(<span class="kw">typename</span> Chunkedseq::iterator first,
+              <span class="kw">typename</span> Chunkedseq::iterator last,
+              Chunkedseq&amp; destination,
+              <span class="dt">const</span> UnaryPredicate&amp; pred) {
+  <span class="kw">using</span> iterator = <span class="kw">typename</span> Chunkedseq::iterator;
+  <span class="kw">using</span> value_type = <span class="kw">typename</span> Chunkedseq::value_type;
+  <span class="kw">using</span> ptr = <span class="kw">typename</span> Chunkedseq::const_pointer;
+  
+  <span class="dt">const</span> <span class="dt">long</span> cutoff = <span class="dv">8192</span>;
+  
+  <span class="dt">long</span> sz = last.size() - first.size();
+  
+  <span class="kw">if</span> (sz &lt;= cutoff) {
+    
+    <span class="co">// compute result in a sequential fashion</span>
+    Chunkedseq::for_each_segment(first, last, [&amp;] (ptr lo, ptr hi) {
+      <span class="kw">for</span> (ptr p = lo; p &lt; hi; p++) {
+        value_type v = *p;
+        <span class="kw">if</span> (pred(v))
+          destination.push_back(v);
+      }
+    });
+    
+  } <span class="kw">else</span> {
+    
+    <span class="co">// select split position to be the median</span>
+    iterator mid = first + (sz/<span class="dv">2</span>);
+    
+    Chunkedseq destination2;
+    
+    <span class="co">// recurse on subproblems</span>
+    <span class="co">// calls can execute in parallel</span>
+    pcopy_if(first, mid,  destination,  pred);
+    pcopy_if(mid,   last, destination2, pred);
+    
+    destination.concat(destination2);
+  }
+}
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="dt">const</span> <span class="dt">int</span> chunk_size = <span class="dv">2</span>;
+  <span class="kw">using</span> mydeque_type = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">int</span>, chunk_size&gt;;
+  
+  mydeque_type mydeque = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span> };
+  mydeque_type mydeque2;
+  
+  pcopy_if(mydeque.begin(), mydeque.end(), mydeque2, [] (<span class="dt">int</span> i) { <span class="kw">return</span> i%<span class="dv">2</span>==<span class="dv">0</span>; });
+  
+  std::cout &lt;&lt; <span class="st">&quot;mydeque2 contains:&quot;</span>;
+  <span class="kw">auto</span> p = mydeque2.begin();
+  <span class="kw">while</span> (p != mydeque2.end())
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; *p++;
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/chunkedseq_7.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mydeque2 contains: 0 2 4</code></pre>
+<h1 id="weighted-container"><span class="header-section-number">7</span> Weighted container</h1>
+<p>The <code>chunkedseq</code> containers can easily generalize to <em>weighted containers</em>. A weighted container is a container that assigns to each item in the container an integral weight value. The weight value is typically expressed as a weight function that is defined by the client and passed to the container via template argument.</p>
+<p>The purpose of the weight is to enable the client to use the weighted-split operation, which divides the container into two pieces by a specified weight. The split operation takes only logarithmic time.</p>
+<h2 id="example-split-sequence-of-strings-by-length"><span class="header-section-number">7.1</span> Example: split sequence of strings by length</h2>
+<p>The following example program demonstrates how one can use weighted split to split a sequence of string values based on the number of even-length strings. In this case, our split divides the sequence into two pieces so that the first piece goes into <code>d</code> and the second to <code>f</code>. The split function specifies that <code>d</code> is to receive the first half of the original sequence of strings that together contain half of the total number of even-length strings in the original sequence; <code>f</code> is to receive the remaining strings. Because the lengths of the strings are cached internally by the weighted container, the split operation takes logarithmic time in the number of strings.</p>
+<div class="sourceCode" include="../examples/weighted_split.example.weighted_split_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="kw">namespace</span> cachedmeasure = pasl::data::cachedmeasure;
+<span class="kw">namespace</span> chunkedseq = pasl::data::chunkedseq::bootstrapped;
+
+<span class="dt">const</span> <span class="dt">int</span> chunk_capacity = <span class="dv">512</span>;
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="kw">using</span> value_type = std::string;
+  <span class="kw">using</span> weight_type = <span class="dt">int</span>;
+  
+  <span class="kw">class</span> my_weight_fct {
+  <span class="kw">public</span>:
+    <span class="co">// returns 1 if the length of the string is an even number; 0 otherwise</span>
+    weight_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type&amp; str) <span class="dt">const</span> {
+      <span class="kw">return</span> (str.size() % <span class="dv">2</span> == <span class="dv">0</span>) ? <span class="dv">1</span> : <span class="dv">0</span>;
+    }
+  };
+  
+  <span class="kw">using</span> my_cachedmeasure_type =
+    cachedmeasure::weight&lt;value_type, weight_type, size_t, my_weight_fct&gt;;
+
+  <span class="kw">using</span> my_weighted_deque_type =
+    chunkedseq::deque&lt;value_type, chunk_capacity, my_cachedmeasure_type&gt;;
+  
+  my_weighted_deque_type d = { <span class="st">&quot;Let&#39;s&quot;</span>, <span class="st">&quot;divide&quot;</span>, <span class="st">&quot;this&quot;</span>, <span class="st">&quot;sequence&quot;</span>, <span class="st">&quot;of&quot;</span>,
+                               <span class="st">&quot;strings&quot;</span>, <span class="st">&quot;into&quot;</span>, <span class="st">&quot;two&quot;</span>, <span class="st">&quot;pieces&quot;</span> };  
+  
+  weight_type nb_even_length_strings = d.get_cached();
+  std::cout &lt;&lt; <span class="st">&quot;nb even-length strings: &quot;</span> &lt;&lt; nb_even_length_strings &lt;&lt; std::endl;
+  
+  my_weighted_deque_type f;
+  
+  d.split([=] (weight_type v) { <span class="kw">return</span> v &gt;= nb_even_length_strings/<span class="dv">2</span>; }, f);
+  
+  std::cout &lt;&lt; <span class="st">&quot;d = &quot;</span> &lt;&lt; std::endl;
+  d.for_each([] (value_type&amp; s) { std::cout &lt;&lt; s &lt;&lt; <span class="st">&quot; &quot;</span>; });
+  std::cout &lt;&lt; std::endl;
+  std::cout &lt;&lt; std::endl;
+  
+  std::cout &lt;&lt; <span class="st">&quot;f = &quot;</span> &lt;&lt; std::endl;
+  f.for_each([] (value_type&amp; s) { std::cout &lt;&lt; s &lt;&lt; <span class="st">&quot; &quot;</span>; });
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/weighted_split.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>nb even strings: 6
+d =
+Let&#39;s divide this
+
+f =
+sequence of strings into two pieces</code></pre>
+<h1 id="stl-iterator"><span class="header-section-number">8</span> STL-style iterator</h1>
+<p>Our deque, stack and bag containers implement the <a href="#deque-iterator">random-access iterators</a> in the style of <a href="http://www.cplusplus.com/reference/iterator/RandomAccessIterator/">STL's random-access iterators</a>.</p>
+<h2 id="example-2"><span class="header-section-number">8.1</span> Example</h2>
+<div class="sourceCode" include="../examples/iterator_1.example.iterator_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="kw">using</span> mydeque_type = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">int</span>&gt;;
+  <span class="kw">using</span> iterator = <span class="kw">typename</span> mydeque_type::iterator;
+  
+  mydeque_type mydeque = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span> };
+  
+  std::cout &lt;&lt; <span class="st">&quot;mydeque contains:&quot;</span>;
+  iterator it = mydeque.begin();
+  <span class="kw">while</span> (it != mydeque.end())
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; *it++;
+  
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/iterator_1.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mydeque contains: 0 1 2 3 4</code></pre>
+<h1 id="segments"><span class="header-section-number">9</span> Segments</h1>
+<p>In this package, we use the term segment to refer to pointer values which reference a range in memory. We define two particular forms of segments:</p>
+<ul>
+<li>A <em>basic segment</em> is a value which consists of two pointers, namely <code>begin</code> and <code>end</code>, that define the right-open interval, <code>(begin,   end]</code>.</li>
+<li>An <em>enriched segment</em> is a value which consists of a basic segment, along with a pointer, namely <code>middle</code>, which points at some location in between <code>begin</code> and <code>end</code>, such that <code>begin &lt;= middle &lt; end</code>.</li>
+</ul>
+<p>The following class defines a representation for enriched segments.</p>
+<div class="sourceCode" include="../include/segment.example.segment"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Pointer&gt;
+<span class="kw">class</span> segment {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> pointer_type = Pointer;
+  
+  <span class="co">// points to the first cell of the interval</span>
+  pointer_type begin;
+  <span class="co">// points to a cell contained in the interval</span>
+  pointer_type middle;
+  <span class="co">// points to the cell that is one cell past the last cell of interval</span>
+  pointer_type end;
+  
+  segment()
+  : begin(<span class="kw">nullptr</span>), middle(<span class="kw">nullptr</span>), end(<span class="kw">nullptr</span>) { }
+  
+  segment(pointer_type begin, pointer_type middle, pointer_type end)
+  : begin(begin), middle(middle), end(end) { }
+  
+};</code></pre></div>
+<p><a href="../examples/segment.hpp">source</a></p>
+<h2 id="example-3"><span class="header-section-number">9.1</span> Example</h2>
+<div class="sourceCode" include="../examples/segment_1.example.segment_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
+<span class="ot">#include &lt;string&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
+
+<span class="ot">#include &quot;chunkedseq.hpp&quot;</span>
+
+<span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">const</span> <span class="dt">char</span> * argv[]) {
+  
+  <span class="dt">const</span> <span class="dt">int</span> chunk_size = <span class="dv">2</span>;
+  <span class="kw">using</span> mydeque_type = pasl::data::chunkedseq::bootstrapped::deque&lt;<span class="dt">int</span>, chunk_size&gt;;
+  
+  mydeque_type mydeque = { <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span> };
+  
+  std::cout &lt;&lt; <span class="st">&quot;mydeque contains:&quot;</span>;
+  <span class="co">// iterate over the segments in mydeque</span>
+  mydeque.for_each_segment([&amp;] (<span class="dt">int</span>* begin, <span class="dt">int</span>* end) {
+    <span class="co">// iterate over the items in the current segment</span>
+    <span class="dt">int</span>* p = begin;
+    <span class="kw">while</span> (p != end)
+      std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; *p++;
+  });
+  std::cout &lt;&lt; std::endl;
+  
+  <span class="kw">using</span> iterator = <span class="kw">typename</span> mydeque_type::iterator;
+  <span class="kw">using</span> segment_type = <span class="kw">typename</span> mydeque_type::segment_type;
+  
+  <span class="co">// iterate over the items in the segment which contains the item at position 3</span>
+  iterator it = mydeque.begin() + <span class="dv">3</span>;
+  segment_type seg = it.get_segment();
+  
+  std::cout &lt;&lt; <span class="st">&quot;the segment which contains mydeque[3] contains:&quot;</span>;
+  <span class="dt">int</span>* p = seg.begin;
+  <span class="kw">while</span> (p != seg.end)
+    std::cout &lt;&lt; <span class="st">&quot; &quot;</span> &lt;&lt; *p++;
+  std::cout &lt;&lt; std::endl;
+  
+  std::cout &lt;&lt; <span class="st">&quot;mydeque[3]=&quot;</span> &lt;&lt; *seg.middle &lt;&lt; std::endl;
+  
+  <span class="kw">return</span> <span class="dv">0</span>;
+  
+}</code></pre></div>
+<p><a href="../examples/segment_1.cpp">source</a></p>
+<p><strong><em>Output</em></strong></p>
+<pre><code>mydeque contains: 0 1 2 3 4 5
+the segment which contains mydeque[3] contains: 2 3
+mydeque[3]=3</code></pre>
+<h1 id="cached-measurement"><span class="header-section-number">10</span> Cached measurement</h1>
+<p>This documentation covers essential concepts that are needed to implement custom data structures out of various instantiations of the chunkedseq structure. Just like the Finger Tree of Hinze and Patterson, the chunkedseq can be instantiated in certain ways to yield asymptotically efficient data structures, such as associative maps, priority queues, weighted sequences, interval trees, etc. A summary of these ideas that is presented in greater detail can be find in the <a href="http://www.soi.city.ac.uk/~ross/papers/FingerTree.html">original publication on finger trees</a> and in a <a href="http://apfelmus.nfshost.com/articles/monoid-fingertree.html">blog post</a>.</p>
+<p>In this tutorial, we present the key mechanism for building derived data structures: <em>monoid-cached measurement</em>. We show how to use monoid-cached measurements to implement a powerful form of split operation that affects chunkedseq containers. Using this split operation, we then show how to apply our cached measurement scheme to build two new data structures:</p>
+<ul>
+<li>weighted containers with weighted splits</li>
+<li>asymptotically efficient associative map containers in the style of <a href="http://www.cplusplus.com/reference/map/map/">std::map</a></li>
+</ul>
+<h2 id="taking-measurements"><span class="header-section-number">10.1</span> Taking measurements</h2>
+<p>Let <span class="math inline"><em>S</em></span> denote the type of the items contained by the chunkedseq container and <span class="math inline"><em>T</em></span> the type of the cached measurements. For example, suppose that we want to define a weighted chunkedseq container of <code>std::string</code>s for which the weights have type <code>weight_type</code>. Then we have: <span class="math inline"><em>S</em> = <code>s</code><code>t</code><code>d</code> <code>:</code>  <code>:</code> <code>s</code><code>t</code><code>r</code><code>i</code><code>n</code><code>g</code></span> and <span class="math inline"><em>T</em> = <code>w</code><code>e</code><code>i</code><code>g</code><code>h</code><code>t</code><code>_</code><code>t</code><code>y</code><code>p</code><code>e</code></span>. How exactly are cached measurements obtained? The following two methods are the ones that are used by our C++ package.</p>
+<h3 id="measuring-items-individually"><span class="header-section-number">10.1.1</span> Measuring items individually</h3>
+<p>A <em>measure function</em> is a function <span class="math inline"><em>m</em></span> that is provided by the client; the function takes a single item and returns a single measure value: <span class="math inline"><em>m</em>(<em>s</em>) : <em>S</em> → <em>T</em></span>.</p>
+<h3 id="example-the-size-measure"><span class="header-section-number">10.1.2</span> Example: the &quot;size&quot; measure</h3>
+<p>Suppose we want to use our measurement to represent the number of items that are stored in the container. We call this measure the <em>size measure</em>. The measure of any individual item always equals one: <span class="math inline"><code>s</code><code>i</code><code>z</code><code>e</code>(<em>s</em>) : <em>S</em> → <code>l</code><code>o</code><code>n</code><code>g</code> = 1</span>.</p>
+<h3 id="example-the-string-size-measure"><span class="header-section-number">10.1.3</span> Example: the &quot;string-size&quot; measure</h3>
+<p>The string-size measurement assigns to each item the weight equal to the number of characters in the given string: <span class="math inline"><code>s</code><code>t</code><code>r</code><code>i</code><code>n</code><code>g</code><code>_</code><code>s</code><code>i</code><code>z</code><code>e</code>(<em>s</em><em>t</em><em>r</em>) : <code>s</code><code>t</code><code>r</code><code>i</code><code>n</code><code>g</code> → <code>l</code><code>o</code><code>n</code><code>g</code> = <em>s</em><em>t</em><em>r</em>.<code>s</code><code>i</code><code>z</code><code>e</code>()</span>.</p>
+<h3 id="measuring-items-in-contiguous-regions-of-memory"><span class="header-section-number">10.1.4</span> Measuring items in contiguous regions of memory</h3>
+<p>Sometimes it is convenient to have the ability to compute, all at once, the combined measure of a group of items that is referenced by a given &quot;basic&quot; <a href="@ref%20segments">segment</a>. For this reason, we require that, in addition to <span class="math inline"><em>m</em></span>, each measurement scheme provides a segment-wise measure operation, namely <span class="math inline">𝕞</span>, which takes the pair of pointer arguments <span class="math inline"><em>b</em><em>e</em><em>g</em><em>i</em><em>n</em></span> and <span class="math inline"><em>e</em><em>n</em><em>d</em></span> which correspond to a basic segment, and returns a single measured value: <span class="math inline">𝕞(<em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>, <em>e</em><em>n</em><em>d</em>) : (<em>S</em><sup> <code>*</code> </sup>, <em>S</em><sup> <code>*</code> </sup>) → <em>T</em></span>.</p>
+<p>The first and second arguments correspond to the range in memory defined by the segment <span class="math inline">(<em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>, <em>e</em><em>n</em><em>d</em>]</span>. The value returned by <span class="math inline">𝕞(<em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>, <em>e</em><em>n</em><em>d</em>)</span> should equal the sum of the values <span class="math inline"><em>m</em>( <code>*</code> <em>p</em>)</span> for each pointer <span class="math inline"><em>p</em></span> in the range <span class="math inline">(<em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>, <em>e</em><em>n</em><em>d</em>]</span>.</p>
+<h4 id="example-segmented-version-of-our-size-measurement"><span class="header-section-number">10.1.4.1</span> Example: segmented version of our size measurement</h4>
+<p>This operation is simply <span class="math inline">𝕞(<em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>, <em>e</em><em>n</em><em>d</em>) = |<em>e</em><em>n</em><em>d</em> − <em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>|</span>, where our segment is defined by the sequence of items represented by the range of pointers <span class="math inline">(<em>b</em><em>e</em><em>g</em><em>i</em><em>n</em>, <em>e</em><em>n</em><em>d</em>]</span>.</p>
+<h3 id="the-measure-descriptor"><span class="header-section-number">10.1.5</span> The measure descriptor</h3>
+<p>The <em>measure descriptor</em> is the name that we give to the C++ class that describes a given measurement scheme. This interface exports deinitions of the following types:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>value_type</code></td>
+<td align="left">type <span class="math inline"><em>S</em></span> of items stored in the container</td>
+</tr>
+<tr class="even">
+<td align="left"><code>measured_type</code></td>
+<td align="left">type <span class="math inline"><em>T</em></span> of item-measure values</td>
+</tr>
+</tbody>
+</table>
+<p>And this interface exports definitions of the following methods:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Members</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>measured_type operator()(const value_type&amp; v)</code></td>
+<td align="left">returns <span class="math inline"><em>m</em>(<code>v</code>)</span></td>
+</tr>
+<tr class="even">
+<td align="left"><code>measured_type operator()(const value_type* begin, const value_type* end)</code></td>
+<td align="left">returns <span class="math inline">𝕞(<code>b</code><code>e</code><code>g</code><code>i</code><code>n</code>, <code>e</code><code>n</code><code>d</code>)</span></td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-trivial-measurement"><span class="header-section-number">10.1.5.1</span> Example: trivial measurement</h4>
+<p>Our first kind of measurement is one that does nothing except make fresh values whose type is the same as the type of the second template argument of the class.</p>
+<div class="sourceCode" include="../include/measure.example.trivial"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Measured&gt;
+<span class="kw">class</span> trivial {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> measured_type = Measured;
+
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type&amp; v) <span class="dt">const</span> {
+    <span class="kw">return</span> measured_type();
+  }
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type* lo, <span class="dt">const</span> value_type* hi) <span class="dt">const</span> {
+    <span class="kw">return</span> measured_type();
+  }
+    
+};</code></pre></div>
+<p><a href="../include/measure.hpp">source</a></p>
+<p>The trivial measurement is useful in situations where cached measurements are not needed by the client of the chunkedseq. Trivial measurements have the advantage of being (almost) zero overhead annotations.</p>
+<h3 id="example-weight-one-uniformly-sized-items"><span class="header-section-number">10.1.6</span> Example: weight-one (uniformly sized) items</h3>
+<p>This kind of measurement is useful for maintaining fast access to the count of the number of items stored in the container.</p>
+<div class="sourceCode" include="../include/measure.example.uniform"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Measured, <span class="dt">int</span> Item_weight=<span class="dv">1</span>&gt;
+<span class="kw">class</span> uniform {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> measured_type = Measured;
+  <span class="dt">const</span> <span class="dt">int</span> item_weight = Item_weight;
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type&amp; v) <span class="dt">const</span> {
+    <span class="kw">return</span> measured_type(item_weight);
+  }
+    
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type* lo, <span class="dt">const</span> value_type* hi) <span class="dt">const</span> {
+    <span class="kw">return</span> measured_type(hi - lo);
+  }
+};</code></pre></div>
+<p><a href="../include/measure.hpp">source</a></p>
+<h4 id="example-dynamically-weighted-items"><span class="header-section-number">10.1.6.1</span> Example: dynamically weighted items</h4>
+<p>This technique allows the client to supply to the internals of the chunkedseq container an arbitrary weight function. This client-supplied weight function is passed to the following class by the third template argument.</p>
+<div class="sourceCode" include="../include/measure.example.weight"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Weight, <span class="kw">class</span> Client_weight_fct&gt;
+<span class="kw">class</span> weight {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> measured_type = Weight;
+  <span class="kw">using</span> client_weight_fct_type = Client_weight_fct;
+  
+<span class="kw">private</span>:
+  
+  client_weight_fct_type client_weight_fct;
+  
+  <span class="co">// for debugging purposes</span>
+  <span class="dt">bool</span> initialized;
+  
+<span class="kw">public</span>:
+  
+  weight() : initialized(<span class="kw">false</span>) { }
+  
+  weight(<span class="dt">const</span> client_weight_fct_type&amp; env)
+  : client_weight_fct(env), initialized(<span class="kw">true</span>) { }
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type&amp; v) <span class="dt">const</span> {
+    <span class="kw">return</span> client_weight_fct(v);
+  }
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type* lo, <span class="dt">const</span> value_type* hi) <span class="dt">const</span> {
+    measured_type m = <span class="dv">0</span>;
+    <span class="kw">for</span> (<span class="kw">auto</span> p = lo; p &lt; hi; p++)
+      m += <span class="kw">operator</span>()(*p);
+    <span class="kw">return</span> m;
+  }
+  
+  client_weight_fct_type get_env() <span class="dt">const</span> {
+    assert(initialized);
+    <span class="kw">return</span> client_weight_fct;
+  }
+  
+  <span class="dt">void</span> set_env(client_weight_fct_type wf) {
+    client_weight_fct = wf;
+    initialized = <span class="kw">true</span>;
+  }
+  
+};</code></pre></div>
+<p><a href="../include/measure.hpp">source</a></p>
+<h4 id="example-combining-cached-measurements"><span class="header-section-number">10.1.6.2</span> Example: combining cached measurements</h4>
+<p>Often it is useful to combine meaurements in various configurations. For this purpose, we define the measured pair, which is just a structure that has space for two values of two given measured types, namely <code>Measured1</code> and <code>Measured2</code>.</p>
+<div class="sourceCode" include="../include/measure.example.measured_pair"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Measured1, <span class="kw">class</span> Measured2&gt;
+<span class="kw">class</span> measured_pair {
+<span class="kw">public</span>:
+  Measured1 value1;
+  Measured2 value2;
+  measured_pair() { }
+  measured_pair(<span class="dt">const</span> Measured1&amp; value1, <span class="dt">const</span> Measured2&amp; value2)
+  : value1(value1), value2(value2) { }
+};
+
+<span class="kw">template</span> &lt;<span class="kw">class</span> Measured1, <span class="kw">class</span> Measured2&gt;
+measured_pair&lt;Measured1,Measured2&gt; make_measured_pair(Measured1 m1, Measured2 m2) {
+  measured_pair&lt;Measured1,Measured2&gt; m(m1, m2);
+  <span class="kw">return</span> m;
+}</code></pre></div>
+<p><a href="../include/measure.hpp">source</a></p>
+<p>The combiner measurement just combines the measurement strategies of two given measures by pairing measured values.</p>
+<div class="sourceCode" include="../include/measure.example.combiner"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Measure1, <span class="kw">class</span> Measure2&gt;
+<span class="kw">class</span> combiner {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> measure1_type = Measure1;
+  <span class="kw">using</span> measure2_type = Measure2;
+  
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> measured_type = measured_pair&lt;measure1_type, measure2_type&gt;;
+  
+  measure1_type meas1;
+  measure2_type meas2;
+  
+  combiner() { }
+  
+  combiner(<span class="dt">const</span> measure1_type meas1)
+  : meas1(meas1) { }
+  
+  combiner(<span class="dt">const</span> measure2_type meas2)
+  : meas2(meas2) { }
+  
+  combiner(<span class="dt">const</span> measure1_type meas1, <span class="dt">const</span> measure2_type meas2)
+  : meas1(meas1), meas2(meas2) { }
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type&amp; v) <span class="dt">const</span> {
+    <span class="kw">return</span> make_measured_pair(meas1(v), meas2(v));
+  }
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type* lo, <span class="dt">const</span> value_type* hi) <span class="dt">const</span> {
+    <span class="kw">return</span> make_measured_pair(meas1(lo, hi), meas2(lo, hi));
+  }
+  
+};</code></pre></div>
+<p><a href="../include/measure.hpp">source</a></p>
+<h2 id="using-algebras-to-combine-measurements"><span class="header-section-number">10.2</span> Using algebras to combine measurements</h2>
+<p>Recall that a <em>monoid</em> is an algebraic structure that consists of a set <span class="math inline"><em>T</em></span>, an associative binary operation <span class="math inline"> ⊕ </span> and an identity element <span class="math inline"><strong>I</strong></span>. That is, <span class="math inline">(<em>T</em>,  ⊕ , <strong>I</strong>)</span> is a monoid if:</p>
+<ul>
+<li><span class="math inline"> ⊕ </span> is associative: for every <span class="math inline"><em>x</em></span>, <span class="math inline"><em>y</em></span> and <span class="math inline"><em>z</em></span> in <span class="math inline"><em>T</em></span>, <span class="math inline"><em>x</em> ⊕ (<em>y</em> ⊕ <em>z</em>) = (<em>x</em> ⊕ <em>y</em>) ⊕ <em>z</em></span>.</li>
+<li><span class="math inline"><strong>I</strong></span> is the identity for <span class="math inline"> ⊕ </span>: for every <span class="math inline"><em>x</em></span> in <span class="math inline"><em>T</em></span>, <span class="math inline"><em>x</em> ⊕ <strong>I</strong> = <strong>I</strong> ⊕ <em>x</em></span>.</li>
+</ul>
+<p>Examples of monoids include the following:</p>
+<ul>
+<li><span class="math inline"><em>T</em></span> = the set of all integers; <span class="math inline"> ⊕ </span> = addition; <span class="math inline"><strong>I</strong></span> = 0</li>
+<li><span class="math inline"><em>T</em></span> = the set of 32-bit unsigned integers; <span class="math inline"> ⊕ </span> = addition modulo <span class="math inline">2<sup>32</sup></span>; <span class="math inline"><strong>I</strong></span> = 0</li>
+<li><span class="math inline"><em>T</em></span> = the set of all strings; <span class="math inline"> ⊕ </span> = concatenation; <span class="math inline"><strong>I</strong></span> = the empty string</li>
+</ul>
+<p>A <em>group</em> is a closely related algebraic structure. Any monoid is also a group if the monoid has an inverse operation <span class="math inline"> ⊖ </span>:</p>
+<ul>
+<li><span class="math inline"> ⊖ </span> is inverse for <span class="math inline"> ⊕ </span>: for every <span class="math inline"><em>x</em></span> in <span class="math inline"><em>T</em></span>, there is an item <span class="math inline"><em>y</em> =  ⊖ <em>x</em></span> in <span class="math inline"><em>T</em></span>, such that <span class="math inline"><em>x</em> ⊕ <em>y</em> = <strong>I</strong></span>.</li>
+</ul>
+<h3 id="the-algebra-descriptor"><span class="header-section-number">10.2.1</span> The algebra descriptor</h3>
+<p>We require that the descriptor export a binding to the type of the measured values that are related by the algebra.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>value_type</code></td>
+<td align="left">type of measured values <span class="math inline"><em>T</em></span> to be related by the algebra</td>
+</tr>
+</tbody>
+</table>
+<p>We require that the descriptor export the following members. If <code>has_inverse</code> is false, then it should be safe to assume that the <code>inverse(x)</code> operation is never called.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Static members</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">const bool has_inverse</td>
+<td align="left"><code>true</code>, iff the algebra is a group</td>
+</tr>
+<tr class="even">
+<td align="left">value_type identity()</td>
+<td align="left">returns <span class="math inline"><strong>I</strong></span></td>
+</tr>
+<tr class="odd">
+<td align="left">value_type combine(value_type x, value_type y)</td>
+<td align="left">returns <code>x</code> <span class="math inline"> ⊕ </span> <code>y</code></td>
+</tr>
+<tr class="even">
+<td align="left">value_type inverse(value_type x)</td>
+<td align="left">returns <span class="math inline"> ⊖ </span> <code>x</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-trivial-algebra"><span class="header-section-number">10.2.1.1</span> Example: trivial algebra</h4>
+<p>The trivial algebra does nothing except construct new identity elements.</p>
+<div class="sourceCode" include="../include/algebra.example.trivial"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">class</span> trivial {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = <span class="kw">struct</span> { };
+  
+  <span class="dt">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> has_inverse = <span class="kw">true</span>;
+  
+  <span class="dt">static</span> value_type identity() {
+    <span class="kw">return</span> value_type();
+  }
+  
+  <span class="dt">static</span> value_type combine(value_type, value_type) {
+    <span class="kw">return</span> identity();
+  }
+  
+  <span class="dt">static</span> value_type inverse(value_type) {
+    <span class="kw">return</span> identity();
+  }
+  
+};</code></pre></div>
+<p><a href="../include/algebra.hpp">source</a></p>
+<h4 id="example-algebra-for-integers"><span class="header-section-number">10.2.1.2</span> Example: algebra for integers</h4>
+<p>The algebra that we use for integers is a group in which the identity element is zero, the plus operator is integer addition, and the minus operator is integer negation.</p>
+<div class="sourceCode" include="../include/algebra.example.int_group_under_addition_and_negation"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Int&gt;
+<span class="kw">class</span> int_group_under_addition_and_negation {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = Int;
+  
+  <span class="dt">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> has_inverse = <span class="kw">true</span>;
+
+  <span class="dt">static</span> value_type identity() {
+    <span class="kw">return</span> value_type(<span class="dv">0</span>);
+  }
+  
+  <span class="dt">static</span> value_type combine(value_type x, value_type y) {
+    <span class="kw">return</span> x + y;
+  }
+  
+  <span class="dt">static</span> value_type inverse(value_type x) {
+    <span class="kw">return</span> value_type(<span class="dv">-1</span>) * x;
+  }
+  
+};</code></pre></div>
+<p><a href="../include/algebra.hpp">source</a></p>
+<h3 id="example-combining-algebras"><span class="header-section-number">10.2.2</span> Example: combining algebras</h3>
+<p>Just like with the measurement descriptor, an algebra descriptor can be created by combining two given algebra descriptors pairwise.</p>
+<div class="sourceCode" include="../include/algebra.example.combiner"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Algebra1, <span class="kw">class</span> Algebra2&gt;
+<span class="kw">class</span> combiner {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> algebra1_type = Algebra1;
+  <span class="kw">using</span> algebra2_type = Algebra2;
+  
+  <span class="kw">using</span> value1_type = <span class="kw">typename</span> Algebra1::value_type;
+  <span class="kw">using</span> value2_type = <span class="kw">typename</span> Algebra2::value_type;
+  
+  <span class="kw">using</span> value_type = measure::measured_pair&lt;value1_type, value2_type&gt;;
+  
+  <span class="dt">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> has_inverse =
+                   algebra1_type::has_inverse
+                &amp;&amp; algebra2_type::has_inverse;
+  
+  <span class="dt">static</span> value_type identity() {
+    <span class="kw">return</span> measure::make_measured_pair(algebra1_type::identity(),
+                                       algebra2_type::identity());
+  }
+  
+  <span class="dt">static</span> value_type combine(value_type x, value_type y) {
+    <span class="kw">return</span> measure::make_measured_pair(algebra1_type::combine(x.value1, y.value1),
+                                       algebra2_type::combine(x.value2, y.value2));
+  }
+  
+  <span class="dt">static</span> value_type inverse(value_type x) {
+    <span class="kw">return</span> measure::make_measured_pair(algebra1_type::inverse(x.value1),
+                                       algebra2_type::inverse(x.value2));
+  }
+
+};</code></pre></div>
+<p><a href="../include/algebra.hpp">source</a></p>
+<h3 id="scans"><span class="header-section-number">10.2.3</span> Scans</h3>
+<p>A <em>scan</em> is an iterated reduction that maps to each item <span class="math inline"><em>v</em><sub><em>i</em></sub></span> in a given sequences of items <span class="math inline"><em>S</em> = [<em>v</em><sub>1</sub>, <em>v</em><sub>2</sub>, …, <em>v</em><sub><em>n</em></sub>]</span> a single measured value <span class="math inline"><em>c</em><sub><em>i</em></sub> = <strong>I</strong> ⊕ <em>m</em>(<em>v</em><sub>1</sub>) ⊕ <em>m</em>(<em>v</em><sub>2</sub>) ⊕ … ⊕ <em>m</em>(<em>v</em><sub><em>i</em></sub>)</span>, where <span class="math inline"><em>m</em>(<em>v</em>)</span> is a given measure function. For example, consider the &quot;size&quot; (i.e., weight-one) scan, which is specified by the use of a particular measure function: <span class="math inline"><em>m</em>(<em>v</em>) = 1</span>. Observe that the size scan gives the positions of the items in the sequence, thereby enabling us later on to index and to split the chunkedseq at a given position.</p>
+<p>For convenience, we define scan formally as follows. The operator returns the combined measured values of the items in the range of positions <span class="math inline">[<em>i</em>, <em>j</em>)</span> in the given sequence <span class="math inline"><em>s</em></span>.</p>
+<p><span class="math inline"><em>M</em><sub><em>i</em>, <em>j</em></sub> : <code>S</code><code>e</code><code>q</code><code>u</code><code>e</code><code>n</code><code>c</code><code>e</code>(<em>S</em>) → <em>T</em></span></p>
+<p><span class="math inline"><em>M</em><sub><em>i</em>, <em>i</em></sub>(<em>s</em>) = <strong>I</strong></span></p>
+<p><span class="math inline"><em>M</em><sub><em>i</em>, <em>j</em></sub>(<em>s</em>) = <em>m</em>(<em>s</em><sub><em>i</em></sub>) ⊕ <em>m</em>(<em>s</em><sub><em>i</em> + 1</sub>) ⊕ … ⊕ <em>m</em>(<em>s</em><sub><em>j</em></sub>) <em>i</em><em>f</em> <em>i</em> &lt; <em>j</em></span></p>
+<h3 id="why-associativity-is-necessary"><span class="header-section-number">10.2.4</span> Why associativity is necessary</h3>
+<p>The cached value of an internal tree node <span class="math inline"><em>k</em></span> in the chunkedseq structure is computed by <span class="math inline"><em>M</em><sub><em>i</em>, <em>j</em></sub>(<em>s</em>)</span>, where <span class="math inline"><em>s</em> = [<em>v</em><sub><em>i</em></sub>, …, <em>v</em><sub><em>j</em></sub>]</span> represents a subsequence of values contained in the chunks of the subtree below node <span class="math inline"><em>k</em></span>. When this reduction is performed by the internal operations of the chunkedseq, this expression is broken up into a set of subexpressions, for example: <span class="math inline">((<em>m</em>(<em>v</em><sub><em>i</em></sub>) ⊕ <em>m</em>(<em>v</em><sub><em>i</em> + 1</sub>)) ⊕ (<em>m</em>(<em>v</em><sub><em>i</em> + 2</sub>) ⊕ <em>m</em>(<em>v</em><sub><em>i</em> + 3</sub>) ⊕ (<em>m</em>(<em>v</em><sub><em>i</em> + 4</sub>) ⊕ <em>m</em>(<em>v</em><sub><em>i</em> + 5</sub>)))... ⊕ <em>m</em>(<em>v</em><sub><em>j</em></sub>))</span>. The partitioning into subexpressions and the order in which the subexpressions are combined depends on the particular shape of the underlying chunkedseq. Moreover, the particular shape is determined uniquely by the history of update operations that created the finger tree. As such, we could build two chunkedseqs by, for example, using different sequences of push and pop operations and end up with two different chunkedseq structures that represent the same sequence of items. Even though the two chunkedseqs represent the same sequence, the cached measurements of the two chunkedseqs are combined up to the root of the chunkedseq by two different partitionings of combining operations. However, if <span class="math inline"> ⊕ </span> is associative, it does not matter: regardless of how the expression are broken up, the cached measurement at the root of the chunkedseq is guaranteed to be the same for any two chunkedseqs that represent the same sequence of items. Commutativity is not necessary, however, because the ordering of the items of the sequence is respected by the combining operations performed by the chunkedseq.</p>
+<h3 id="why-the-inverse-operation-can-improve-performance"><span class="header-section-number">10.2.5</span> Why the inverse operation can improve performance</h3>
+<p>Suppose we have a cached measurement <span class="math inline"><em>C</em> = <em>M</em><sub><em>i</em>, <em>j</em></sub>(<em>s</em>)</span> , where <span class="math inline"><em>s</em> = [<em>v</em><sub><em>i</em></sub>, …, <em>v</em><sub><em>j</em></sub>]</span> represents a subsequence of values contained in the same chunk somewhere inside our chunkedseq structure. Now, suppose that we wish to remove the first item from our sequence of measurements, namely <span class="math inline"><em>v</em><sub><em>i</em></sub></span>. On the one hand, without an inverse operation, and assuming that we have not cached partial sums of <span class="math inline"><em>C</em></span>, the only way to compute the new cached value is to recompute <span class="math inline">(<em>m</em>(<em>v</em><sub><em>i</em> + 1</sub>) ⊕ ... ⊕ <em>m</em>(<em>v</em><sub><em>j</em></sub>))</span>. On the other hand, if the inverse operation is cheap, it may be much more efficient to instead compute <span class="math inline"> ⊖ <em>m</em>(<em>v</em><sub><em>i</em></sub>) ⊕ <em>C</em></span>.</p>
+<p>Therefore, it should be clear that using the inverse operation can greatly improve efficiency in situations where the combined cached measurement of a group of items needs to be recomputed on a regular basis. For example, the same situation is triggered by the pop operations of the chunks stored inside the chunkedseq structure. On the one hand, by using inverse, each pop operation requires only a few additional operations to reset the cached measured value of the chunk. On the other, if inverse is not available, each pop operation requires recomputing the combined measure of the chunk, which although constant time, takes time proportion with the chunk size, which can be a fairly large fixed constant, such as 512 items. As such, internally, the chunkedseq operations use inverse operations whenever permitted by the algebra (i.e., when the algebra is identified as a group) but otherwise fall back to the most general strategy when the algebra is just a monoid.</p>
+<h2 id="defining-custom-cached-measurement-policies"><span class="header-section-number">10.3</span> Defining custom cached-measurement policies</h2>
+<p>The cached-measurement policy binds both the measurement scheme and the algebra for a given instantiation of chunkedseq. For example, the following are cached-measurement policies:</p>
+<ul>
+<li>nullary cached measurement: <span class="math inline"><em>m</em>(<em>s</em>) = ∅</span>; <span class="math inline">𝕞(<em>v</em>) = ∅</span>; <span class="math inline"><em>A</em><sub><em>T</em></sub> = (𝒫(∅),  ∪ , ∅,  ⊖ )</span>, where <span class="math inline"> ⊖ ∅ = ∅</span></li>
+<li>size cached measurement: <span class="math inline"><em>m</em>(<em>s</em>) = 1</span>; <span class="math inline">𝕞(<em>v</em>) = |<em>v</em>|</span>; <span class="math inline"><em>A</em><sub><em>T</em></sub> = (<code>l</code><code>o</code><code>n</code><code>g</code>,  + , 0,  ⊖ )</span></li>
+<li>pairing policies (monoid): for any two cached-measurement policies <span class="math inline"><em>m</em><sub>1</sub></span>; <span class="math inline">𝕞<sub>𝟙</sub></span>; <span class="math inline"><em>A</em><sub><em>T</em><sub>1</sub></sub> = (<em>T</em><sub>1</sub>,  ⊕ <sub>1</sub>, <code>I</code><sub>1</sub>)</span> and <span class="math inline"><em>m</em><sub>2</sub></span>; <span class="math inline">𝕞<sub>𝟚</sub></span>; <span class="math inline"><em>A</em><sub><em>T</em><sub>2</sub></sub> = (<em>T</em><sub>2</sub>,  ⊕ <sub>2</sub>, <code>I</code><sub>2</sub>)</span>, <span class="math inline"><em>m</em>(<em>s</em><sub>1</sub>, <em>s</em><sub>2</sub>) = (<em>m</em><sub>1</sub>(<em>s</em><sub>1</sub>), <em>m</em><sub>2</sub>(<em>s</em><sub>2</sub>))</span>; <span class="math inline">𝕞(<em>v</em><sub>1</sub>, <em>v</em><sub>2</sub>) = (𝕞<sub>𝟙</sub>(<em>v</em><sub>1</sub>), 𝕞<sub>𝟚</sub>(<em>v</em><sub>2</sub>))</span>; <span class="math inline"><em>A</em> = (<em>T</em><sub>1</sub> × <em>T</em><sub>2</sub>,  ⊕ , (<code>I</code><sub>1</sub>, <code>I</code><sub>2</sub>))</span> is also a cached-measurement policy, where <span class="math inline">(<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>) ⊕ (<em>y</em><sub>1</sub>, <em>y</em><sub>2</sub>) = (<em>x</em><sub>1</sub> ⊕ <em>y</em><sub>1</sub>, <em>x</em><sub>2</sub> ⊕ <em>y</em><sub>2</sub>)</span></li>
+<li>pairing policies (group): for any two cached-measurement policies <span class="math inline"><em>m</em><sub>1</sub></span>; <span class="math inline">𝕞<sub>𝟙</sub></span>; <span class="math inline"><em>A</em><sub><em>T</em><sub>1</sub></sub> = (<em>T</em><sub>1</sub>,  ⊕ <sub>1</sub>, <code>I</code><sub>1</sub>,  ⊖ <sub>1</sub>)</span> and <span class="math inline"><em>m</em><sub>2</sub></span>; <span class="math inline">𝕞<sub>𝟚</sub></span>; <span class="math inline"><em>A</em><sub><em>T</em><sub>2</sub></sub> = (<em>T</em><sub>2</sub>,  ⊕ <sub>2</sub>, <code>I</code><sub>2</sub>,  ⊖ <sub>2</sub>)</span>, <span class="math inline"><em>m</em>(<em>s</em><sub>1</sub>, <em>s</em><sub>2</sub>) = (<em>m</em><sub>1</sub>(<em>s</em><sub>1</sub>), <em>m</em><sub>2</sub>(<em>s</em><sub>2</sub>))</span>; <span class="math inline">𝕞(<em>v</em><sub>1</sub>, <em>v</em><sub>2</sub>) = (𝕞<sub>𝟙</sub>(<em>v</em><sub>1</sub>), 𝕞<sub>𝟚</sub>(<em>v</em><sub>2</sub>))</span>; <span class="math inline"><em>A</em> = (<em>T</em><sub>1</sub> × <em>T</em><sub>2</sub>,  ⊕ , (<code>I</code><sub>1</sub>, <code>I</code><sub>2</sub>),  ⊖ )</span> is also a cached-measurement policy, where <span class="math inline">(<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>) ⊕ (<em>y</em><sub>1</sub>, <em>y</em><sub>2</sub>) = (<em>x</em><sub>1</sub> ⊕ <em>y</em><sub>1</sub>, <em>x</em><sub>2</sub> ⊕ <em>y</em><sub>2</sub>)</span> and <span class="math inline"> ⊖ (<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>) = ( ⊖ <sub>1</sub><em>x</em><sub>1</sub>,  ⊖ <sub>2</sub><em>x</em><sub>2</sub>)</span></li>
+<li>pairing policies (mixed): if only one of two given cached-measurement policies is a group, we demote the group to a monoid and apply the pairing policy for two monoids</li>
+</ul>
+<p>Remark:</p>
+<blockquote>
+<p>To save space, the chunkedseq structure can be instantiated with the nullary cached measurement alone. No space is taken by the cached measurements in this configuration because the nullary measurement takes zero bytes. However, the only operations supported in this configuration are push, pop, and concatenate. The size cached measurement is required by the indexing and split operations. The various instantiations of chunkedseq, namely deque, stack and bag all use the size measure for exactly this reason.</p>
+</blockquote>
+<h3 id="the-cached-measurement-descriptor"><span class="header-section-number">10.3.1</span> The cached-measurement descriptor</h3>
+<p>The interface exports four key components: the type of the items in the container, the type of the measured values, the measure function to gather the measurements, and the algebra to combine measured values.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>measure_type</code></td>
+<td align="left">type of the measure descriptor</td>
+</tr>
+<tr class="even">
+<td align="left"><code>algebra_type</code></td>
+<td align="left">type of the algebra descriptor</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>value_type</code></td>
+<td align="left">type <span class="math inline"><em>S</em></span> of items to be stored in the container</td>
+</tr>
+<tr class="even">
+<td align="left"><code>measured_type</code></td>
+<td align="left">type <span class="math inline"><em>T</em></span> of measured values</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>size_type</code></td>
+<td align="left"><code>size_t</code></td>
+</tr>
+</tbody>
+</table>
+<p>The only additional function that is required by the policy is a swap operation.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Static members</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>void swap(measured_type&amp; x, measured_type&amp; y)</code></td>
+<td align="left">exchanges the values of <code>x</code> and <code>y</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-trivial-cached-measurement"><span class="header-section-number">10.3.2</span> Example: trivial cached measurement</h3>
+<p>This trivial cached measurement is, by itself, completely inert: no computation is required to maintain cached values and only a minimum of space is required to store cached measurements on internal tree nodes of the chunkedseq.</p>
+<div class="sourceCode" include="../include/cachedmeasure.example.trivial"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Size&gt;
+<span class="kw">class</span> trivial {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> size_type = Size;
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> algebra_type = algebra::trivial;
+  <span class="kw">using</span> measured_type = <span class="kw">typename</span> algebra_type::value_type;
+  <span class="kw">using</span> measure_type = measure::trivial&lt;value_type, measured_type&gt;;
+  
+  <span class="dt">static</span> <span class="dt">void</span> swap(measured_type&amp; x, measured_type&amp; y) {
+    <span class="co">// nothing to do</span>
+  }
+  
+};</code></pre></div>
+<p><a href="../include/cachedmeasure.hpp">source</a></p>
+<h3 id="example-weight-one-uniformly-sized-items-1"><span class="header-section-number">10.3.3</span> Example: weight-one (uniformly sized) items</h3>
+<p>In our implementation, we use this cached measurement policy to maintain the size information of the container. The <code>size()</code> methods of the different chunkedseq containers obtain the size information by referencing values cached inside the tree by this policy.</p>
+<div class="sourceCode" include="../include/cachedmeasure.example.size"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Size&gt;
+<span class="kw">class</span> size {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> size_type = Size;
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> algebra_type = algebra::int_group_under_addition_and_negation&lt;size_type&gt;;
+  <span class="kw">using</span> measured_type = <span class="kw">typename</span> algebra_type::value_type;
+  <span class="kw">using</span> measure_type = measure::uniform&lt;value_type, measured_type&gt;;
+  
+  <span class="dt">static</span> <span class="dt">void</span> swap(measured_type&amp; x, measured_type&amp; y) {
+    std::swap(x, y);
+  }
+  
+};</code></pre></div>
+<p><a href="../include/cachedmeasure.hpp">source</a></p>
+<h3 id="example-weighted-items"><span class="header-section-number">10.3.4</span> Example: weighted items</h3>
+<p>Arbitrary weights can be maintained using a slight generalization of the <code>size</code> measurement above.</p>
+<div class="sourceCode" include="../include/cachedmeasure.example.weight"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Weight, <span class="kw">class</span> Size, <span class="kw">class</span> Measure_environment&gt;
+<span class="kw">class</span> weight {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> size_type = Size;
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> algebra_type = algebra::int_group_under_addition_and_negation&lt;Weight&gt;;
+  <span class="kw">using</span> measured_type = <span class="kw">typename</span> algebra_type::value_type; <span class="co">// = Weight</span>
+  <span class="kw">using</span> measure_env_type = Measure_environment;
+  <span class="kw">using</span> measure_type = measure::weight&lt;value_type, measured_type, measure_env_type&gt;;
+  
+  <span class="dt">static</span> <span class="dt">void</span> swap(measured_type&amp; x, measured_type&amp; y) {
+    std::swap(x, y);
+  }
+  
+};</code></pre></div>
+<p><a href="../include/cachedmeasure.hpp">source</a></p>
+<h3 id="example-combining-cached-measurements-1"><span class="header-section-number">10.3.5</span> Example: combining cached measurements</h3>
+<p>Using the same combiner pattern we alredy presented for measures and algebras, we can use the following template class to build combinations of any two given cached-measurement policies.</p>
+<div class="sourceCode" include="../include/cachedmeasure.example.combiner"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Cache1, <span class="kw">class</span> Cache2&gt;
+<span class="kw">class</span> combiner {
+<span class="kw">public</span>:
+
+  <span class="kw">using</span> algebra1_type = <span class="kw">typename</span> Cache1::algebra_type;
+  <span class="kw">using</span> algebra2_type = <span class="kw">typename</span> Cache2::algebra_type;
+  <span class="kw">using</span> measure1_type = <span class="kw">typename</span> Cache1::measure_type;
+  <span class="kw">using</span> measure2_type = <span class="kw">typename</span> Cache2::measure_type;
+  
+  <span class="kw">using</span> size_type = <span class="kw">typename</span> Cache1::size_type;
+  <span class="kw">using</span> value_type = <span class="kw">typename</span> Cache1::value_type;
+  <span class="kw">using</span> algebra_type = algebra::combiner&lt;algebra1_type, algebra2_type&gt;;
+  <span class="kw">using</span> measured_type = <span class="kw">typename</span> algebra_type::value_type;
+  <span class="kw">using</span> measure_type = measure::combiner&lt;value_type, measure1_type, measure2_type&gt;;
+  
+  <span class="dt">static</span> <span class="dt">void</span> swap(measured_type&amp; x, measured_type&amp; y) {
+    Cache1::swap(x.value1, y.value1);
+    Cache2::swap(x.value2, y.value2);
+  }
+  
+};</code></pre></div>
+<p><a href="../include/cachedmeasure.hpp">source</a></p>
+<h2 id="splitting-by-predicate-functions"><span class="header-section-number">10.4</span> Splitting by predicate functions</h2>
+<p>Logically, the split operation on a chunkedseq container divides the underlying sequence into two pieces, leaving the first piece in the container targeted by the split and moving the other piece to another given container. The position at which the split occurs is determined by a search process that is guided by a <em>predicate function</em>. What carries out the search process? That job is the job of the internals of the chunkedseq class; the client is responsible only to provide the predicate function that is used by the search process. Formally, a predicate function is simply a function <span class="math inline"><em>p</em></span> which takes a measured value and returns either <code>true</code> or <code>false</code>: <span class="math inline"><em>p</em>(<em>m</em>) : <em>T</em> → <code>b</code><code>o</code><code>o</code><code>l</code></span>.</p>
+<p>The search process guarantees that the position at which the split occurs is the position <span class="math inline"><em>i</em></span> in the target sequence, <span class="math inline"><em>s</em> = [<em>v</em><sub>1</sub>, …, <em>v</em><sub><em>i</em></sub>, …<em>v</em><sub><em>n</em></sub>]</span>, at which the value returned by <span class="math inline"><em>p</em>(<em>M</em><sub>0, <em>i</em></sub>(<em>s</em>))</span> first switches from false to true. The first part of the split equals <span class="math inline">[<em>v</em><sub>1</sub>, …, <em>v</em><sub><em>i</em> − 1</sub>]</span> and the second <span class="math inline">[<em>v</em><sub><em>i</em></sub>, …, <em>v</em><sub><em>n</em></sub>]</span>.</p>
+<h3 id="the-predicate-function-descriptor"><span class="header-section-number">10.4.1</span> The predicate function descriptor</h3>
+<p>In our C++ package, we represent predicate functions as classes which export the following public method.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Members</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>bool operator()(measured_type m)</code></td>
+<td align="left">returns <span class="math inline"><em>p</em>(<code>m</code>)</span></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-weighted-splits"><span class="header-section-number">10.4.2</span> Example: weighted splits</h3>
+<p>Let us first consider the small example which is given already for the <a href="@ref%20weighted_container">weighted container</a>. The action performed by the example program is to divide a given sequence of strings so that the first piece of the split contains approximately half of the even-length strings and the second piece the second half. In our example code (see the page linked above), we assign to each item a certain weight as follows: if the length of the given string is an even number, return a 1; else, return a 0.</p>
+<p><span class="math inline"><em>m</em>(<em>s</em><em>t</em><em>r</em>) : <code>s</code><code>t</code><code>r</code><code>i</code><code>n</code><code>g</code> → <code>i</code><code>n</code><code>t</code> = 1 <em>i</em><em>f</em> <em>s</em><em>t</em><em>r</em>.<code>s</code><code>i</code><code>z</code><code>e</code><code>(</code><code>)</code> <em>i</em><em>s</em> <em>a</em><em>n</em> <em>e</em><em>v</em><em>e</em><em>n</em> <em>n</em><em>u</em><em>m</em><em>b</em><em>e</em><em>r</em> <em>a</em><em>n</em><em>d</em> 0 <em>o</em><em>t</em><em>h</em><em>e</em><em>r</em><em>w</em><em>i</em><em>s</em><em>e</em></span></p>
+<p>Let <span class="math inline"><em>n</em></span> denote the number of even-length strings in our source sequence. Then, the following predicate function delivers the exact split that we want: <span class="math inline"><em>p</em>(<em>m</em>) : <em>i</em><em>n</em><em>t</em> → <code>b</code><code>o</code><code>o</code><code>l</code> = <em>m</em> ≥ <em>n</em>/2</span>. Let <span class="math inline"><em>s</em></span> denote the sequence of strings (i.e., <code>[&quot;Let's&quot;, &quot;divide&quot;, &quot;this&quot;, &quot;string&quot;, &quot;into&quot;, &quot;two&quot;, &quot;pieces&quot;]</code> that we want to split. The following table shows the logical states of the split process.</p>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="10%" />
+<col width="12%" />
+<col width="10%" />
+<col width="12%" />
+<col width="10%" />
+<col width="9%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"><span class="math inline"><em>i</em></span></th>
+<th align="left">0</th>
+<th align="left">1</th>
+<th align="left">2</th>
+<th align="left">3</th>
+<th align="left">4</th>
+<th align="left">5</th>
+<th align="left">6</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><span class="math inline"><em>v</em><sub><em>i</em></sub></span></p></td>
+<td align="left"><p><code>Let's</code></p></td>
+<td align="left"><p><code>divide</code></p></td>
+<td align="left"><p><code>this</code></p></td>
+<td align="left"><p><code>string</code></p></td>
+<td align="left"><p><code>into</code></p></td>
+<td align="left"><p><code>two</code></p></td>
+<td align="left"><p><code>pieces</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><span class="math inline"><em>m</em>(<em>v</em><sub><em>i</em></sub>)</span></p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>1</p></td>
+<td align="left"><p>1</p></td>
+<td align="left"><p>1</p></td>
+<td align="left"><p>1</p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>1</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><span class="math inline"><em>M</em><sub>0, <em>i</em></sub>(<em>s</em>)</span></p></td>
+<td align="left"><p>0</p></td>
+<td align="left"><p>1</p></td>
+<td align="left"><p>2</p></td>
+<td align="left"><p>3</p></td>
+<td align="left"><p>4</p></td>
+<td align="left"><p>4</p></td>
+<td align="left"><p>5</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><span class="math inline"><em>p</em>(<em>M</em><sub>0, <em>i</em></sub>(<em>s</em>))</span></p></td>
+<td align="left"><p><code>false</code></p></td>
+<td align="left"><p><code>false</code></p></td>
+<td align="left"><p><code>false</code></p></td>
+<td align="left"><p><code>true</code></p></td>
+<td align="left"><p><code>true</code></p></td>
+<td align="left"><p><code>true</code></p></td>
+<td align="left"><p><code>true</code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Remark:</p>
+<blockquote>
+<p>Even though the search process might look like a linear search, the process in fact takes just logarithmic time in the number of items in the sequence. The logarithmic time bound is possible thanks to the fact that internal nodes of the chunkedseq tree (which is itself a tree whose height is logarithmic in the number of items) are annotated by partial sums of weights.</p>
+</blockquote>
+<h2 id="example-using-cached-measurement-to-implement-associative-maps"><span class="header-section-number">10.5</span> Example: using cached measurement to implement associative maps</h2>
+<p>Our final example combines all of the elements of cached measurement to yield an asymptotically efficient implementation of associative maps. The idea behind the implementation is to represent the map internally by a chunkedseq container of key-value pairs. The key to efficiency is that the items in the chunkedseq are stored in descending order. When key-value pairs are logically added to the map, the key-value pair is physically added to a position in the underlying sequence so that the descending order is maintained. The insertion and removal of key-value pairs is achieved by splitting by a certain predicate function which we will see later. At a high level, what is happening is a kind of binary search that navigates the underlying chunkedseq structure, guided by carefully chosen cached key values that annotate the interior nodes of the chunkedseq.</p>
+<p>Remark:</p>
+<blockquote>
+<p>We could have just as well maintain keys in ascending order.</p>
+</blockquote>
+<h3 id="optional-values"><span class="header-section-number">10.5.1</span> Optional values</h3>
+<p>Our implementation uses <em>optional values</em>, which are values that logically either contain a value of a given type or contain nothing at all. The concept is similar to that of the null pointer, except that the optional value applies to any given type, not just pointers.</p>
+<div class="sourceCode" include="../examples/map.example.option"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Item_swap&gt;
+<span class="kw">class</span> option {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> self_type = option&lt;Item, Item_swap&gt;;
+  
+  Item item;
+  <span class="dt">bool</span> no_item;
+  
+  option()
+  : item(), no_item(<span class="kw">true</span>) { }
+  
+  option(<span class="dt">const</span> Item&amp; item)
+  : item(item), no_item(<span class="kw">false</span>) { }
+  
+  option(<span class="dt">const</span> option&amp; other)
+  : item(other.item), no_item(other.no_item) { }
+  
+  <span class="dt">void</span> swap(option&amp; other) {
+    Item_swap::swap(item, other.item);
+    std::swap(no_item, other.no_item);
+  }
+  
+  <span class="dt">bool</span> <span class="kw">operator</span>&lt;(<span class="dt">const</span> self_type&amp; y) <span class="dt">const</span> {
+    <span class="kw">if</span> (no_item &amp;&amp; y.no_item)
+      <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">if</span> (no_item)
+      <span class="kw">return</span> <span class="kw">true</span>;
+    <span class="kw">if</span> (y.no_item)
+      <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">return</span> item &lt; y.item;
+  }
+    
+  <span class="dt">bool</span> <span class="kw">operator</span>&gt;=(<span class="dt">const</span> self_type&amp; y) <span class="dt">const</span> {
+    <span class="kw">return</span> ! (*<span class="kw">this</span> &lt; y);
+  }
+  
+};</code></pre></div>
+<p><a href="../examples/map.hpp">source</a></p>
+<p>Observe that our class implements the &quot;less-than&quot; operator: <code>&lt;</code>. Our implementation of this operator lifts any implementation of the same operator at the type <code>Item</code> to the space of our <code>option&lt;Item&gt;</code>: that is, our operator treats the empty (i.e., nullary) optional value as the smallest optional value. Otherwise, our the comparison used by our operator is the implementation already defined for the given type, <code>Item</code>, if such an implementation is available.</p>
+<h3 id="the-measure-descriptor-1"><span class="header-section-number">10.5.2</span> The measure descriptor</h3>
+<p>The type of value returned by the measure function (i.e., <code>measured_type</code>) is the optional key value, that is, a value of type <code>option&lt;key_type&gt;</code>. The measure function simply extracts the smallest key value from the key-value pairs that it has at hand and packages them as an optional key value.</p>
+<div class="sourceCode" include="../examples/map.example.get_key_of_last_item"><pre class="sourceCode cpp"><code class="sourceCode cpp">
+<span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Measured&gt;
+<span class="kw">class</span> get_key_of_last_item {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> key_type = <span class="kw">typename</span> value_type::first_type;
+  <span class="kw">using</span> measured_type = Measured;
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type&amp; v) <span class="dt">const</span> {
+    key_type key = v.first;
+    <span class="kw">return</span> measured_type(key);
+  }
+  
+  measured_type <span class="kw">operator</span>()(<span class="dt">const</span> value_type* lo, <span class="dt">const</span> value_type* hi) <span class="dt">const</span> {
+    <span class="kw">if</span> (hi - lo == <span class="dv">0</span>)
+      <span class="kw">return</span> measured_type();
+    <span class="dt">const</span> value_type* last = hi - <span class="dv">1</span>;
+    key_type key = last-&gt;first;
+    <span class="kw">return</span> measured_type(key);
+  }
+};</code></pre></div>
+<p><a href="../examples/map.hpp">source</a></p>
+<h3 id="the-monoid-descriptor"><span class="header-section-number">10.5.3</span> The monoid descriptor</h3>
+<p>The monoid uses for its identity element the nullary optional key. The combining operator takes two optional key values and of the two returns either the smallest one or the nullary optional key value.</p>
+<div class="sourceCode" include="../examples/map.example.take_right_if_nonempty"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Option&gt;
+<span class="kw">class</span> take_right_if_nonempty {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> value_type = Option;
+  
+  <span class="dt">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> has_inverse = <span class="kw">false</span>;
+  
+  <span class="dt">static</span> value_type identity() {
+    <span class="kw">return</span> value_type();
+  }
+
+  <span class="dt">static</span> value_type combine(value_type left, value_type right) {
+    <span class="kw">if</span> (right.no_item)
+      <span class="kw">return</span> left;
+    <span class="kw">return</span> right;
+  }
+  
+  <span class="dt">static</span> value_type inverse(value_type x) {
+    <span class="co">// cannot happen</span>
+    <span class="kw">return</span> identity();
+  }
+  
+};</code></pre></div>
+<p><a href="../examples/map.hpp">source</a></p>
+<h3 id="the-descriptor-of-the-cached-measurement-policy"><span class="header-section-number">10.5.4</span> The descriptor of the cached measurement policy</h3>
+<p>The cache measurement policy combines the measurement and monoid descriptors in a straightforward fashion.</p>
+<div class="sourceCode" include="../examples/map.example.map_cache"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item, <span class="kw">class</span> Size, <span class="kw">class</span> Key_swap&gt;
+<span class="kw">class</span> map_cache {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> size_type = Size;
+  <span class="kw">using</span> value_type = Item;
+  <span class="kw">using</span> key_type = <span class="kw">typename</span> value_type::first_type;
+  <span class="kw">using</span> option_type = option&lt;key_type, Key_swap&gt;;
+  <span class="kw">using</span> algebra_type = take_right_if_nonempty&lt;option_type&gt;;
+  <span class="kw">using</span> measured_type = <span class="kw">typename</span> algebra_type::value_type; <span class="co">// = option_type</span>
+  <span class="kw">using</span> measure_type = get_key_of_last_item&lt;value_type, measured_type&gt;;
+  
+  <span class="dt">static</span> <span class="dt">void</span> swap(measured_type&amp; x, measured_type&amp; y) {
+    x.swap(y);
+  }
+  
+};</code></pre></div>
+<p><a href="../examples/map.hpp">source</a></p>
+<h3 id="the-associative-map"><span class="header-section-number">10.5.5</span> The associative map</h3>
+<p>The associative map class maintains the underlying sorted sequence of key-value pairs in the field called <code>seq</code>. The method called <code>upper</code> is the method that is employed by the class to maintain the invariant on the descending order of the keys. This method returns either the position of the first key that is greater than the given key, or the position of one past the end of the sequence if the given key is the greatest key.</p>
+<p>As is typical of STL style, the indexing operator is used by the structure to handle both insertions and lookups. The operator works by first searching in its underlying sequence for the key referenced by its parameter; if found, the operator updates the value component of the corresponding key-value pair. Otherwise, the operator creates a new position in the sequence to put the given key by calling the <code>insert</code> method of <code>seq</code> at the appropriate position.</p>
+<div class="sourceCode" include="../examples/map.example.swap"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Item&gt;
+<span class="kw">class</span> std_swap {
+<span class="kw">public</span>:
+  
+  <span class="dt">static</span> <span class="dt">void</span> swap(Item&amp; x, Item&amp; y) {
+    std::swap(x, y);
+  }
+  
+};</code></pre></div>
+<p><a href="../examples/map.hpp">source</a></p>
+<div class="sourceCode" include="../examples/map.example.map"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">template</span> &lt;<span class="kw">class</span> Key,
+          <span class="kw">class</span> Item,
+          <span class="kw">class</span> Compare = std::less&lt;Key&gt;,
+          <span class="kw">class</span> Key_swap = std_swap&lt;Key&gt;,
+          <span class="kw">class</span> Alloc = std::allocator&lt;std::pair&lt;<span class="dt">const</span> Key, Item&gt; &gt;,
+          <span class="dt">int</span> chunk_capacity = <span class="dv">8</span>
+          &gt;
+<span class="kw">class</span> map {
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> key_type = Key;
+  <span class="kw">using</span> mapped_type = Item;
+  <span class="kw">using</span> value_type = std::pair&lt;key_type, mapped_type&gt;;
+  <span class="kw">using</span> key_compare = Compare;
+  <span class="kw">using</span> allocator_type = Alloc;
+  <span class="kw">using</span> reference = value_type&amp;;
+  <span class="kw">using</span> const_reference = <span class="dt">const</span> value_type&amp;;
+  <span class="kw">using</span> pointer = value_type*;
+  <span class="kw">using</span> const_pointer = <span class="dt">const</span> value_type*;
+  <span class="kw">using</span> difference_type = ptrdiff_t;
+  <span class="kw">using</span> size_type = size_t;
+  <span class="kw">using</span> key_swap_type = Key_swap;
+  
+<span class="kw">private</span>:
+  
+  <span class="kw">using</span> cache_type = map_cache&lt;value_type, size_type, key_swap_type&gt;;
+  <span class="kw">using</span> container_type = chunkedseq::bootstrapped::deque&lt;value_type, chunk_capacity, cache_type&gt;;
+  <span class="kw">using</span> option_type = <span class="kw">typename</span> cache_type::measured_type;
+  
+<span class="kw">public</span>:
+  
+  <span class="kw">using</span> iterator = <span class="kw">typename</span> container_type::iterator;
+  
+<span class="kw">private</span>:
+  
+  <span class="co">// invariant: items in seq are sorted in ascending order by their key values</span>
+  <span class="dt">mutable</span> container_type seq;
+  <span class="dt">mutable</span> iterator it;
+  
+  iterator upper(<span class="dt">const</span> key_type&amp; k) <span class="dt">const</span> {
+    option_type target(k);
+    it.search_by([target] (<span class="dt">const</span> option_type&amp; key) {
+      <span class="kw">return</span> target &gt;= key;
+    });
+    <span class="kw">return</span> it;
+  }
+  
+<span class="kw">public</span>:
+  
+  map() {
+    it = seq.begin();
+  }
+  
+  map(<span class="dt">const</span> map&amp; other)
+  : seq(other.seq) {
+    it = seq.begin();
+  }
+  
+  size_type size() <span class="dt">const</span> {
+    <span class="kw">return</span> seq.size();
+  }
+  
+  <span class="dt">bool</span> empty() <span class="dt">const</span> {
+    <span class="kw">return</span> size() == <span class="dv">0</span>;
+  }
+  
+  iterator find(<span class="dt">const</span> key_type&amp; k) <span class="dt">const</span> {
+    iterator it = upper(k);
+    <span class="kw">return</span> ((*it).first == k) ? it : seq.end();
+  }
+  
+  mapped_type&amp; <span class="kw">operator</span>[](<span class="dt">const</span> key_type&amp; k) <span class="dt">const</span> {
+    it = upper(k);
+    <span class="kw">if</span> (it == seq.end()) {
+      <span class="co">// key k is larger than any key current in seq</span>
+      value_type val;
+      val.first = k;
+      seq.push_back(val);
+      it = seq.end()<span class="dv">-1</span>;
+    } <span class="kw">else</span> <span class="kw">if</span> ((*it).first != k) {
+      <span class="co">// iterator it points to the first key that is less than k</span>
+      value_type val;
+      val.first = k;
+      it = seq.insert(it, val);
+    }
+    <span class="kw">return</span> (*it).second;
+  }
+  
+  <span class="dt">void</span> erase(iterator it) {
+    <span class="kw">if</span> (it == seq.end())
+      <span class="kw">return</span>;
+    <span class="kw">if</span> (it == seq.end()<span class="dv">-1</span>) {
+      seq.pop_front();
+      <span class="kw">return</span>;
+    }
+    seq.erase(it, it<span class="dv">+1</span>);
+  }
+  
+  size_type erase(<span class="dt">const</span> key_type&amp; k) {
+    size_type nb = seq.size();
+    erase(find(k));
+    <span class="kw">return</span> nb - seq.size();
+  }
+  
+  std::ostream&amp; stream(std::ostream&amp; out) <span class="dt">const</span> {
+    out &lt;&lt; <span class="st">&quot;[&quot;</span>;
+    size_type sz = size();
+    seq.for_each([&amp;] (value_type v) {
+      out &lt;&lt; <span class="st">&quot;(&quot;</span> &lt;&lt; v.first &lt;&lt; <span class="st">&quot;,&quot;</span> &lt;&lt; v.second &lt;&lt; <span class="st">&quot;)&quot;</span>;
+      <span class="kw">if</span> (sz-- != <span class="dv">1</span>)
+        out &lt;&lt; <span class="st">&quot;,&quot;</span>;
+    });
+    <span class="kw">return</span> out &lt;&lt; <span class="st">&quot;]&quot;</span>;
+  }
+  
+  iterator begin() <span class="dt">const</span> {
+    <span class="kw">return</span> seq.begin();
+  }
+  
+  iterator end() <span class="dt">const</span> {
+    <span class="kw">return</span> seq.end();
+  }
+  
+  <span class="dt">void</span> check() <span class="dt">const</span> {
+    seq.check();
+  }
+  
+};</code></pre></div>
+<p><a href="../examples/map.hpp">source</a></p>
+</body>
+</html>

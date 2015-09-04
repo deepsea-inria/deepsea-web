@@ -34,36 +34,14 @@ of experiments, extra experimental results, and proofs.
 - [Article](http://deepsea.inria.fr/chunkedseq/esa-2014-long.pdf) (long version)
 - [Slides from talk](http://www.chargueraud.org/talks/2014_09_08_talk_esa_chunked.pdf)
 
-Accessing and building the source code
-======================================
+Source code and documentation
+=============================
 
-Our C++ source code is supported by any platform on which the
-following packages can be installed.
+Our source code is hosted on a [Github
+repository](https://github.com/deepsea-inria/chunkedseq).
 
-Package dependencies
---------------------
-
---------------------------------------------------------------
-Package   Version      Details                                
--------   ----------   ---------------------------------------
-gcc        >= 4.9.0    The chunkedseq code makes use of recent
-                       features of C++1x, such as lambda
-                       expressions.
-                       [Source.](http://gcc.gnu.org/)
-
-php        >= 5.3.10   PHP is called by the makefiles to track 
-                       dependencies. This package is required 
-                       only to use provided Makefiles.
-                       [Source.](http://www.php.net/)
-
---------------------------------------------------------------
-
-Download
---------
-
-| Version       | Source package                                        | Documentation                                                    |
-|---------------|-------------------------------------------------------|------------------------------------------------------------------|
-| 1.0 (current) | [chunkedseq.tar.gz](packages/chunkedseq.tar.gz)       | [HTML](doc/html/index.html) [PDF](doc/latex/refman.pdf)          |
+Documentation is available in [HTML](doc/chunkedseq.html5) or
+[PDF](doc/chunkedseq.pdf) format.
 
 Running and extending our expriments
 ====================================
