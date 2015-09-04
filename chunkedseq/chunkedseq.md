@@ -40,7 +40,7 @@ Source code and documentation
 Our source code is hosted on a [Github
 repository](https://github.com/deepsea-inria/chunkedseq).
 
-Documentation is available in [HTML](doc/chunkedseq.html5) or
+Documentation is available in [HTML](doc/chunkedseq.html) or
 [PDF](doc/chunkedseq.pdf) format.
 
 Running and extending our expriments
