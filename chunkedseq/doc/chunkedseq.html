@@ -90,16 +90,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#iterators"><span class="toc-section-number">2.6</span> Iterators</a><ul>
 <li><a href="#deque-beg"><span class="toc-section-number">2.6.1</span> Iterator begin</a></li>
 <li><a href="#deque-end"><span class="toc-section-number">2.6.2</span> Iterator end</a></li>
-<li><a href="#deque-pushfrontback"><span class="toc-section-number">2.6.3</span> Push</a></li>
-<li><a href="#deque-popfrontback"><span class="toc-section-number">2.6.4</span> Pop</a></li>
-<li><a href="#deque-split"><span class="toc-section-number">2.6.5</span> Split</a></li>
-<li><a href="#deque-concat"><span class="toc-section-number">2.6.6</span> Concatenate</a></li>
-<li><a href="#deque-clear"><span class="toc-section-number">2.6.7</span> Clear</a></li>
-<li><a href="#deque-resize"><span class="toc-section-number">2.6.8</span> Resize</a></li>
-<li><a href="#deque-swap"><span class="toc-section-number">2.6.9</span> Exchange operation</a></li>
 </ul></li>
-<li><a href="#example-push-and-pop"><span class="toc-section-number">2.7</span> Example: push and pop</a></li>
-<li><a href="#example-split-and-concat"><span class="toc-section-number">2.8</span> Example: split and concat</a></li>
+<li><a href="#modifiers"><span class="toc-section-number">2.7</span> Modifiers</a><ul>
+<li><a href="#deque-pushfrontback"><span class="toc-section-number">2.7.1</span> Push</a></li>
+<li><a href="#deque-popfrontback"><span class="toc-section-number">2.7.2</span> Pop</a></li>
+<li><a href="#deque-split"><span class="toc-section-number">2.7.3</span> Split</a></li>
+<li><a href="#deque-concat"><span class="toc-section-number">2.7.4</span> Concatenate</a></li>
+<li><a href="#deque-clear"><span class="toc-section-number">2.7.5</span> Clear</a></li>
+<li><a href="#deque-resize"><span class="toc-section-number">2.7.6</span> Resize</a></li>
+<li><a href="#deque-swap"><span class="toc-section-number">2.7.7</span> Exchange contents</a></li>
+</ul></li>
+<li><a href="#example-push-and-pop"><span class="toc-section-number">2.8</span> Example: push and pop</a></li>
+<li><a href="#example-split-and-concat"><span class="toc-section-number">2.9</span> Example: split and concat</a></li>
 </ul></li>
 <li><a href="#stack"><span class="toc-section-number">3</span> Stack</a><ul>
 <li><a href="#template-interface"><span class="toc-section-number">3.1</span> Template interface</a></li>
@@ -549,14 +551,6 @@ const_reference <span class="kw">operator</span>[](size_type i) <span class="dt"
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><p><a href="#deque-frontback"><code>front</code></a> <a href="#deque-frontback"><code>back</code></a></p></td>
-<td align="left"><p>Access item on end.</p></td>
-</tr>
-<tr class="even">
-<td align="left"><p><a href="#deque-i-o"><code>operator[]</code></a></p></td>
-<td align="left"><p>Access member item</p></td>
-</tr>
-<tr class="odd">
 <td align="left"><p><a href="#deque-beg"><code>begin</code></a> <a href="#deque-beg"><code>cbegin</code></a></p></td>
 <td align="left"><p>Returns an iterator to the beginning</p></td>
 </tr>
@@ -578,6 +572,7 @@ const_iterator cend() <span class="dt">const</span>;</code></pre></div>
 <p>Returns an iterator to the element following the last item of the container.</p>
 <p>This element acts as a placeholder; attempting to access it results in undefined behavior.</p>
 <p><strong><em>Complexity.</em></strong> Constant time.</p>
+<h2 id="modifiers"><span class="header-section-number">2.7</span> Modifiers</h2>
 <table>
 <caption>Modifiers of the <code>deque</code> class.</caption>
 <colgroup>
@@ -621,20 +616,20 @@ const_iterator cend() <span class="dt">const</span>;</code></pre></div>
 </tr>
 </tbody>
 </table>
-<h3 id="deque-pushfrontback"><span class="header-section-number">2.6.3</span> Push</h3>
+<h3 id="deque-pushfrontback"><span class="header-section-number">2.7.1</span> Push</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> push_front(<span class="dt">const</span> value_type&amp; value);
 <span class="dt">void</span> push_back(<span class="dt">const</span> value_type&amp; value);</code></pre></div>
 <p>Prepends the given element <code>value</code> to the beginning of the container.</p>
 <p><strong><em>Iterator validity.</em></strong> All iterators, including the past-the-end iterator, are invalidated. No references are invalidated.</p>
 <p><strong><em>Complexity.</em></strong> Constant time.</p>
-<h3 id="deque-popfrontback"><span class="header-section-number">2.6.4</span> Pop</h3>
+<h3 id="deque-popfrontback"><span class="header-section-number">2.7.2</span> Pop</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp">value_type pop_back();
 value_type pop_front();</code></pre></div>
 <p>Removes the last element of the container and returns the element.</p>
 <p>Calling <code>pop_back</code> or <code>pop_front</code> on an empty container is undefined.</p>
 <p>Returns the removed element.</p>
 <p><strong><em>Complexity.</em></strong> Constant time.</p>
-<h3 id="deque-split"><span class="header-section-number">2.6.5</span> Split</h3>
+<h3 id="deque-split"><span class="header-section-number">2.7.3</span> Split</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> split(iterator position, self_type&amp; other);    <span class="co">// (1)</span>
 <span class="dt">void</span> split(size_type position, self_type&amp; other);   <span class="co">// (2)</span>
 <span class="kw">template</span> &lt;<span class="kw">class</span> Predicate&gt;
@@ -653,18 +648,18 @@ value_type pop_front();</code></pre></div>
 <p><strong><em>Precondition.</em></strong> The <code>other</code> container is empty.</p>
 <p><strong><em>Complexity.</em></strong> Time is logarithmic in the size of the container.</p>
 <p><strong><em>Iterator validity.</em></strong> Invalidates all iterators.</p>
-<h3 id="deque-concat"><span class="header-section-number">2.6.6</span> Concatenate</h3>
+<h3 id="deque-concat"><span class="header-section-number">2.7.4</span> Concatenate</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> concat(self_type other);</code></pre></div>
 <p>Removes all items from <code>other</code>, effectively reducing its size to zero.</p>
 <p>Adds items removed from <code>other</code> to the back of this container, after its current last item.</p>
 <p><strong><em>Complexity.</em></strong> Time is logarithmic in the size of the container.</p>
 <p><strong><em>Iterator validity.</em></strong> Invalidates all iterators.</p>
-<h3 id="deque-clear"><span class="header-section-number">2.6.7</span> Clear</h3>
+<h3 id="deque-clear"><span class="header-section-number">2.7.5</span> Clear</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> clear();</code></pre></div>
 <p>Erases the contents of the container, which becomes an empty container.</p>
 <p><strong><em>Complexity.</em></strong> Time is linear in the size of the container.</p>
 <p><strong><em>Iterator validity.</em></strong> Invalidates all iterators, if the size before the operation differs from the size after.</p>
-<h3 id="deque-resize"><span class="header-section-number">2.6.8</span> Resize</h3>
+<h3 id="deque-resize"><span class="header-section-number">2.7.6</span> Resize</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> resize(size_type n, <span class="dt">const</span> value_type&amp; val); <span class="co">// (1)</span>
 <span class="dt">void</span> resize(size_type n) {                       <span class="co">// (2)</span>
   value_type val;
@@ -679,11 +674,11 @@ value_type pop_front();</code></pre></div>
 </ol>
 <p><strong><em>Complexity.</em></strong> Let <span class="math inline"><em>m</em></span> be the size of the container just before and <span class="math inline"><em>n</em></span> just after the resize operation. Then, the time is linear in <span class="math inline">max(<em>m</em>, <em>n</em>)</span>.</p>
 <p><strong><em>Iterator validity.</em></strong> Invalidates all iterators, if the size before the operation differs from the size after.</p>
-<h3 id="deque-swap"><span class="header-section-number">2.6.9</span> Exchange operation</h3>
+<h3 id="deque-swap"><span class="header-section-number">2.7.7</span> Exchange contents</h3>
 <div class="sourceCode"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> swap(deque&amp; other);</code></pre></div>
 <p>Exchanges the contents of the container with those of <code>other</code>. Does not invoke any move, copy, or swap operations on individual items.</p>
 <p><strong><em>Complexity.</em></strong> Constant time.</p>
-<h2 id="example-push-and-pop"><span class="header-section-number">2.7</span> Example: push and pop</h2>
+<h2 id="example-push-and-pop"><span class="header-section-number">2.8</span> Example: push and pop</h2>
 <div class="sourceCode" include="../examples/chunkedseq_2.example.deque_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
 <span class="ot">#include &lt;string&gt;</span>
 <span class="ot">#include &lt;assert.h&gt;</span>
@@ -720,7 +715,7 @@ value_type pop_front();</code></pre></div>
 <p><a href="../examples/chunkedseq_2.cpp">source</a></p>
 <p><strong><em>Output</em></strong></p>
 <pre><code>mydeque contains: 4 9 3 8 2 7 1 6 0 5</code></pre>
-<h2 id="example-split-and-concat"><span class="header-section-number">2.8</span> Example: split and concat</h2>
+<h2 id="example-split-and-concat"><span class="header-section-number">2.9</span> Example: split and concat</h2>
 <div class="sourceCode" include="../examples/chunkedseq_5.example.split_example"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="ot">#include &lt;iostream&gt;</span>
 <span class="ot">#include &lt;string&gt;</span>
 <span class="ot">#include &lt;assert.h&gt;</span>
@@ -1598,19 +1593,19 @@ measured_pair&lt;Measured1,Measured2&gt; make_measured_pair(Measured1 m1, Measur
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">const bool has_inverse</td>
+<td align="left"><code>const bool has_inverse</code></td>
 <td align="left"><code>true</code>, iff the algebra is a group</td>
 </tr>
 <tr class="even">
-<td align="left">value_type identity()</td>
+<td align="left"><code>value_type identity()</code></td>
 <td align="left">returns <span class="math inline"><strong>I</strong></span></td>
 </tr>
 <tr class="odd">
-<td align="left">value_type combine(value_type x, value_type y)</td>
+<td align="left"><code>value_type combine(value_type x, value_type y)</code></td>
 <td align="left">returns <code>x</code> <span class="math inline"> ⊕ </span> <code>y</code></td>
 </tr>
 <tr class="even">
-<td align="left">value_type inverse(value_type x)</td>
+<td align="left"><code>value_type inverse(value_type x)</code></td>
 <td align="left">returns <span class="math inline"> ⊖ </span> <code>x</code></td>
 </tr>
 </tbody>

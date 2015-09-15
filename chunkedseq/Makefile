@@ -32,7 +32,7 @@ PROJECT_SSH_TARGET=yquem.inria.fr:/net/yquem/infosystems/www/gallium/deepsea
 REMOTE_DEST=$(PROJECT_SSH_TARGET)/$(PROJECT_NAME)/
 GENERATED_FILES=$(PROJECT_NAME).html $(PROJECT_NAME).pdf
 PROJECT_FILES=$(PROJECT_NAME).bib esa-2014-long.pdf 
-PROJECT_BIBS=--biblio $(PROJECT_NAME).bib
+PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 
 %.pdf : %.md
 	pandoc $< -s -S $(PROJECT_BIBS) -o $@

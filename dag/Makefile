@@ -11,7 +11,7 @@ PNG_FILES=
 TALK_FILES=
 PAPER_FILES=
 PROJECT_FILES=$(PROJECT_NAME).bib $(PNG_FILES) $(PAPER_FILES)
-PROJECT_BIBS=--biblio $(PROJECT_NAME).bib
+PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 
 %.pdf : %.md
 	pandoc $< -s -S $(PROJECT_BIBS) -o $@

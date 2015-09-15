@@ -13,8 +13,8 @@ PNG_FILES=evaluation.png lemma.png \
 TALK_FILES=2011_10_26_talk_oopsla_oracle.pdf 2012_01_28_talk_damp_par.pdf \
            2014_09_08_talk_esa_chunked.pdf ppopp2013-slides.pdf
 PAPER_FILES=damp2012_primitives.pdf oracle_scheduling.pdf ppopp13.pdf chunkedseq.pdf
-PROJECT_FILES=$(PROJECT_NAME).bib $(PNG_FILES)
-PROJECT_BIBS=--biblio $(PROJECT_NAME).bib
+PROJECT_FILES=$(PROJECT_NAME).bib $(PNG_FILES) $(PAPER_FILES) $(TALK_FILES)
+PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 
 %.pdf : %.md
 	pandoc $< -s -S $(PROJECT_BIBS) -o $@

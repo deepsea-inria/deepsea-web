@@ -20,7 +20,7 @@
 <blockquote>
 <p><em>Can we design asymptotically and practically efficient data structures for sequences that can support a broad range of operations, including push/pop operations on both ends, concatenation, and split at a specified position?</em></p>
 </blockquote>
-<p>In our ESA’14 paper <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, we present two new algorithms for which we use adaptations of the classic chunking technique for accelerating tree-based representations of sequences by representing sequences as trees of small, fixed-capacity arrays (i.e., chunks). We prove that our algorithms deliver tight amortized, worst-case bounds with small constant factors. We present two C++ implementations of our two algorithms and a number of experiments comparing our implementations to highly tuned and specialized sequence data structures, such as STL deque and STL rope. This work presents the first data structures for shared memory that simultaneously match the semantic and asymptotic profile of the Finger Tree of Hinze and Patterson <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>, deliver strong guarantees with respect to constant-factor performance (as well as asymptotic performance), and compete well with highly tuned but more specialized data structures.</p>
+<p>In our ESA’14 paper,<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> we present two new algorithms for which we use adaptations of the classic chunking technique for accelerating tree-based representations of sequences by representing sequences as trees of small, fixed-capacity arrays (i.e., chunks). We prove that our algorithms deliver tight amortized, worst-case bounds with small constant factors. We present two C++ implementations of our two algorithms and a number of experiments comparing our implementations to highly tuned and specialized sequence data structures, such as STL deque and STL rope. This work presents the first data structures for shared memory that simultaneously match the semantic and asymptotic profile of the Finger Tree of Hinze and Patterson,<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> deliver strong guarantees with respect to constant-factor performance (as well as asymptotic performance), and compete well with highly tuned but more specialized data structures.</p>
 <p>We have made available a long version of our ESA’14 article which includes appendices. In the appendix, there is additional discussion of experiments, extra experimental results, and proofs.</p>
 <ul>
 <li><a href="http://deepsea.inria.fr/chunkedseq/esa-2014-long.pdf">Article</a> (long version)</li>
@@ -174,11 +174,19 @@ $ make chunkedseq.byte</code></pre>
 </ul>
 <h1 id="references">References</h1>
 <p>Get the <a href="chunkedseq.bib">bibtex file</a> used to generate these references.</p>
+<div class="references">
+<div id="ref-chunkedseq14-esa">
+<p>Acar, Umut A., Arthur Charguéraud, and Mike Rainey. 2014. “Theory and Practice of Chunked Sequences.” In <em>ESA 2014</em>, 8737:25–36. LNCS. Springer Berlin Heidelberg. <a href="http://doi.org/10.1007/978-3-662-44777-2_3">doi:10.1007/978-3-662-44777-2_3</a>.</p>
+</div>
+<div id="ref-finger-trees">
+<p>Hinze, Ralf, and Ross Paterson. 2006. “Finger Trees: A Simple General-Purpose Data Structure.” <em>Journal of Functional Programming</em> 16 (2). New York, NY, USA: Cambridge University Press: 197–217. <a href="http://doi.org/10.1017/S0956796805005769">doi:10.1017/S0956796805005769</a>.</p>
+</div>
+</div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><span class="citation">[@chunkedseq14-esa]</span><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><span class="citation">[@finger-trees]</span><a href="#fnref2">↩</a></p></li>
+<li id="fn1"><p><span class="citation">(Acar, Charguéraud, and Rainey 2014)</span><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><span class="citation">(Hinze and Paterson 2006)</span><a href="#fnref2">↩</a></p></li>
 </ol>
 </div>
 </body>
