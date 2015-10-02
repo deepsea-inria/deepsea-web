@@ -67,14 +67,27 @@ Conducting a speedup experiment
 
 To get started, let us consider an experiment that is typical for
 parallel programming: one where the objective is to generate a speedup
-plot. Our experiment is going to study a program which computes the
-forty-seventh Fibonacci number, using a naive exponential
+plot. For purposes of our demo, the speedup of a parallel program that
+is run on $P$ processors in time $T_p$ is defined by the ratio $T_S /
+T_p$, where $T_S$ denotes the running time of a corresponding
+sequential program. Our experiment is going to study a program which
+computes the forty-seventh Fibonacci number, using a naive exponential
 algorithm. This Fibonacci algorithm is the "hello world" algorithm of
 parallel programming.
 
+In this experiment, for simplicity, we are going to use the same
+Fibonacci algorithm as both the sequential baseline and the parallel
+program. In general, however, the pbench speedup plot allows the
+sequential baseline program to be different from the parallel
+program. Now, suppose, for example that running time of the sequential
+baseline, which in our case is going to be the running time of the
+Fibonacci algorithm on a single processor, is $T_S = 2s$. Further,
+suppose that the running time of the parallel program on 2 processors
+is $T_2 = 1s$. Then, the speedup is $T_S / T_2 = 2x$.
+
 In this experiment, we have a binary, named `fib`, that takes as
 argument a number, `-n 47`, and a number of processors, `-proc p`,
-where `p` varies. To run our experiment using ten processors, for
+where we vary `p`. To run our experiment using ten processors, for
 example, we woud issue the following command and get something like
 the corresponding output.
 
