@@ -44,6 +44,7 @@ People
 ======
 
 - [Umut Acar](http://www.umut-acar.org/site/umutacar/)
+- Vitaly Aksenov
 - [Arthur Charguéraud](http://www.chargueraud.org/)
 - [Mike Rainey](http://gallium.inria.fr/~rainey/)
 - [Filip Sieczkowski](http://cs.au.dk/~filips/)
@@ -52,6 +53,7 @@ Collaborators
 =============
 
 - [Pramod Bhatotia](http://www.mpi-sws.org/~bhatotia/)
+- Anna Malova
 - [Stefan Muller](http://www.cs.cmu.edu/~smuller/)
 - [Ram Raghunathan](http://www.cs.cmu.edu/~rraghuna/)
 - [Rodrigo Rodrigues](http://asc.di.fct.unl.pt/~rodrigo/)

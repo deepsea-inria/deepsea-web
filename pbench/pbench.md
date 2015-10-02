@@ -17,12 +17,14 @@ scripts and for the errors to go undetected and lead to confusion or
 false conclusions. While this problem is inherent to any significant
 experimental study involving complex scripts, we believe that much can
 be done to reduce this problem in the particular case of studies which
-concern parallel codes on shared-memory machines. In 2013, we began to
-develop a set of scripts, named pbench and written in the
-[Caml](https://ocaml.org/) programming language, that we could use to
-benchmark our parallel programs. Since then, we have generalized our
-scripts and have studied in detail a number of techniques to automate
-and ease the execution of experimental studies on parallel codes.
+concern parallel codes on shared-memory machines.
+
+In 2013, we began to develop a set of scripts, named pbench and
+written in the [Caml](https://ocaml.org/) programming language, that
+we could use to benchmark our parallel programs. Since then, we have
+generalized our scripts and have studied in detail a number of
+techniques to automate and ease the execution of experimental studies
+on parallel codes.
 
 We have a few reasons to believe that others may find pbench
 useful. First, the scripts enjoy the correctness guarantees, such as
@@ -60,30 +62,32 @@ We are going to present three small case studies and end with a link
 to a substantial case where we used pbench for the empirical
 evaluation in one of our research publications.
 
-Conducting a "speedup experiment"
----------------------------------
+Conducting a speedup experiment
+-------------------------------
 
 To get started, let us consider an experiment that is typical for
-parallel programming: one where we generate a speedup plot. We are
-going to generate a speedup for a program which computes the
+parallel programming: one where the objective is to generate a speedup
+plot. Our experiment is going to study a program which computes the
 forty-seventh Fibonacci number, using a naive exponential
 algorithm. This Fibonacci algorithm is the "hello world" algorithm of
 parallel programming.
 
-In our experiment, we have a binary, named `fib`, that takes as
+In this experiment, we have a binary, named `fib`, that takes as
 argument a number, `-n 47`, and a number of processors, `-proc p`,
 where `p` varies. To run our experiment using ten processors, for
 example, we woud issue the following command and get something like
-the corresponding output. The output is printed by our Fibonacci
-program and, in this case, the output represents the running time in
-seconds that was taken to compute the forty-seventh Fibonacci number.
-In other words, this measurement was both taken internally and printed
-to `stdout` by our Fibonacci program.
+the corresponding output.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ fib -n 47 -proc 10
 exectime 2.696
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The output is printed by our Fibonacci program and, in this case, the
+output represents the running time in seconds that was taken to
+compute the forty-seventh Fibonacci number.  In other words, this
+measurement was both taken internally and printed to `stdout` by our
+Fibonacci program.
 
 Setting up the experiment with `prun` is not much more work. The
 following command collects data from one baseline run, using a single
