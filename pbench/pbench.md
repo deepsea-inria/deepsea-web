@@ -55,6 +55,16 @@ by given parallel codes [@work-inflation]. Although this study is
 still being prepared for publication, we post the draft here so that
 others may learn about our technique and provide us with feedback.
 
+Source code and documentation
+=============================
+
+Our source code is hosted on a [Github
+repository](https://github.com/deepsea-inria/pbench).
+
+The manual page for the `prun` tool is available in
+[PDF](prun.pdf) and [HTML](prun.html), for the `pplot` tool
+also in [PDF](pplot.pdf) and [HTML](pplot.html).
+
 Demos
 =====
 
