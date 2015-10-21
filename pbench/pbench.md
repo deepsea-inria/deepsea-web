@@ -112,20 +112,35 @@ compute the forty-seventh Fibonacci number.  In other words, this
 measurement was both taken internally and printed to `stdout` by our
 Fibonacci program.
 
-Setting up the experiment with `prun` is not much more work. The
-following command collects data from one baseline run, using a single
-processor, and four parallel runs, using ten, twenty, thirty, and
-forty processors.
+Setting up the experiment with `prun` is not much more work. Our next
+step is to and collect data from one run of the baseline and four
+parallel runs, using ten, twenty, thirty, and forty processors. In
+order to get the corresponding command command lines from `prun`, we
+need the following formatting.
  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ prun speedup -baseline "fib -proc 1" -parallel "fib -proc 10,20,30,
 40" -n 47
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All we had to do is format our command, and the `prun` tool performs
-the runs. The command lines that are issued and the running times that
-are collected by `prun` are echoed to `stdout`. The data that is
-collected by `prun` is written by `prun` to the file `results.txt`.
+The `prun speedup` part of the above command tells `prun` to perform a
+speedup experiment. Each speedup experiment requires three additional
+parts: the baseline-specific command, the parallel-specific command
+and the shared commands. In this case, our baseline command is `fib
+-proc 1`. This command is issued to `prun` by putting the command into
+the quotes after the argument `-baseline`. The parallel-specific
+command is specified in a similar fashion. All commands that are
+shared between the baseline and parallel runs must be specified once,
+after the `-baseline` and `-parallel` commands. In our example, the
+only shared command is the input size, which is specified by `-n 47`.
+
+Note that `fib`, `-proc 1`, `-proc 10,20,30,400`, and `-n 47` are
+specific to our `fib` program, whereas `-baseline` and `-parallel` are
+builtin keywords of the `prun` tool.
+
+The command lines that are issued and the running times that are
+collected by `prun` are echoed to `stdout`. The data that is collected
+by `prun` is written by `prun` to the file `results.txt`.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [1/5]
@@ -266,16 +281,6 @@ Related research articles
 [@work-inflation]
 
 [paper](work-inflation.pdf)
-
-Software
-========
-
-The pbench sources and documentation can be found on the [github
-repository](https://github.com/deepsea-inria/pbench). For
-documentation, look at the markdown text files (ones with the
-extension `.md`). For best rendering results, compile the markdown
-files first using `pandoc` (e.g., to compile `mydoc.md` to a nicely
-formatted pdf file: `pandoc mydoc.md -o mydoc.pdf`).
 
 Team
 ====

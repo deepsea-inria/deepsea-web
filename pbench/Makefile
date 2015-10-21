@@ -17,7 +17,7 @@ PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 %.pdf : %.md
 	pandoc $< -s -S $(PROJECT_BIBS) -o $@
 %.html : %.md
-	pandoc $< -s -S $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET_OPT) -o $@
+	pandoc $< -s -S $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET_OPT) --mathjax -o $@
 
 clean: 
 	rm -f $(GENERATED_FILES)
@@ -31,7 +31,7 @@ doc2: git pplot.pdf pplot.html prun.html
 
 ### push to server (important: must first run `make clean`)
 
-publish: doc2 $(PROJECT_FILES)
+publish: pbench.html doc2 $(PROJECT_FILES)
 	scp $(PROJECT_STYLE_SHEET) $(REMOTE_DEST)
 	scp $(PROJECT_FILES) $(REMOTE_DEST)
 	scp $(PROJECT_NAME).html $(REMOTE_DEST)/index.html
