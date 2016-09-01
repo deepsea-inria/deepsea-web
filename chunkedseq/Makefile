@@ -31,7 +31,7 @@ PROJECT_STYLE_SHEET_OPT=-c $(PROJECT_STYLE_SHEET)
 PROJECT_SSH_TARGET=yquem.inria.fr:/net/yquem/infosystems/www/gallium/deepsea
 REMOTE_DEST=$(PROJECT_SSH_TARGET)/$(PROJECT_NAME)/
 GENERATED_FILES=$(PROJECT_NAME).html $(PROJECT_NAME).pdf
-PROJECT_FILES=$(PROJECT_NAME).bib esa-2014-long.pdf 
+PROJECT_FILES=$(PROJECT_NAME).bib chunked_seq.pdf 
 PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 
 %.pdf : %.md
