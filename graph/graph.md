@@ -110,8 +110,8 @@ Package                                            Version        Details
 
 Table: Software dependencies for our PASL benchmarks.
 
-IPFS
-----
+2. IPFS
+-------
 
 IPFS is a tool that is useful for transfering large amounts of data
 over the internet. We need this tool because our experiments use large
@@ -132,7 +132,7 @@ $ ipfs daemon &
 
 TODO: write instructions so that i can renew the quickcheck/graph files in ipfs
 
-2. Getting the sources
+3. Getting the sources
 ----------------------
 
 Now, create a new directory in which to store all of our the code and
@@ -152,13 +152,13 @@ $ chmod u+x get.sh
 $ ./get.sh
 ~~~~
 
-3. Building the binaries
+4. Building the binaries
 ------------------------
 
-4. Running the experiment
+5. Running the experiment
 -------------------------
 
-5. Analyzing the results
+6. Analyzing the results
 ------------------------
 
 Team
