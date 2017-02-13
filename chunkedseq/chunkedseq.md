@@ -60,9 +60,9 @@ describing the issue to [Mike Rainey](mailto:mike.rainey@inria.fr).
 To have enough room to run the experiments, your filesystem should
 have about 80GB of free space and your machine at least 8GB or
 RAM. These space requirements are so large because, for our
-graph-search benchmarks, we use a few very large graphs. In addition
-to those listed above, the following packages should be installed on
-your test machine.
+graph-search benchmarks, we use a few very large graphs.
+
+The following packages should be installed on your test machine.
 
 ---------------------------------------------------------------------
 Package   Version      Details                                
