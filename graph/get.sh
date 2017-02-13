@@ -12,4 +12,3 @@ git clone https://github.com/deepsea-inria/ligra.git
 git clone https://github.com/deepsea-inria/ls-pbfs.git
 # PDFS15 sources
 git clone https://github.com/deepsea-inria/pasl.git -b new-sc15-graph sc15-graph
-
