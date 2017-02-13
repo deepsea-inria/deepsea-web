@@ -16,26 +16,26 @@ machines (aka multicore). In this project, we address the question:
 > utilized is close to the hard limit imposed by the input graph and
 > the machine?*
 
-Such algorithms are important because, for best performance, multicore
-hardware demands computations that make the most economical use of
-their time, in particular with respect to load balancing. Economical
-algorithms spend few cycles on load balancing. There are two competing
-forces that make this problem challenging. First, the space of
-possible input graphs is huge, and the graphs vary substantially in
+Such algorithms are desireable because multicore hardware demands
+computations that make the most economical use of their time. In
+contrast, algorithms that spend many cycles performing load-balancing
+work are often slower and may consume excess power. There are two
+competing forces that make this problem challenging. First, the space
+of possible input graphs is huge, and the graphs vary substantially in
 their structure. Particularly challenging inputs include long chains
-and, more generally, high diameter graphs.
+and, more generally, high diameter graphs. To add to the challenge,
+graph traversal algorithms typically discover new regions of graph on
+the fly. So, the second competing force is the fact that new
+parallelism is discovered online, thus challenging the load-balancing
+algorithm to adapt quickly.
 
-To add to the challenge, by definition, a graph traversal algoritm
-discovers new regions of graph on the fly. So, the second competing
-force is the fact that new parallelism is discovered online, thus
-challenging the load-balancing algorithm to adapt quickly. The
-algorithm must cope with the large input space, rapid-fire
-parallelism, yet keep load-balancing overheads to a minimum. There are
-several algorithms proposed for this task, all of which use heuristics
-of various kinds and all are covered in detail in our paper. However,
-we found that, altough the previous state of the art performs well for
-certain classes of graphs, none meet the main challenge *for all
-graphs*.
+To summarize, a good graph-traversal algorithm must cope with the
+large input space, rapid-fire parallelism, yet keep load-balancing
+overheads low. There are several algorithms proposed to this end. All
+of these algorithms and related issues are covered in detail in our
+paper. Overall, we found that, although the previous state of the art
+performs well for certain classes of graphs, none meet the main
+challenge *for all graphs*.
 
 In our Supercomputing'15 paper[^1], we answer the main question from
 above in the affirmative: we present a new algorithm that performs a
@@ -129,6 +129,8 @@ machine.
 ~~~~
 $ ipfs daemon &
 ~~~~
+
+TODO: write instructions so that i can renew the quickcheck/graph files in ipfs
 
 2. Getting the sources
 ----------------------
