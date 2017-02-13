@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # quickcheck
-ipfs daemon & # need to start the ipfs daemon
-ipfs_pid=$!
 ipfs get QmUvGoyv8hBprTqjFnhD5m4HGkcxqS4FoNteKEbYmyLj9n -o=quickcheck
-kill $ipfs_daemon
 # chunkedseq
 git clone https://github.com/deepsea-inria/chunkedseq.git
 # pbench
