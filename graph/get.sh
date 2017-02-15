@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# quickcheck
-ipfs get QmUvGoyv8hBprTqjFnhD5m4HGkcxqS4FoNteKEbYmyLj9n -o=quickcheck
 # chunkedseq
 git clone https://github.com/deepsea-inria/chunkedseq.git
 # pbench

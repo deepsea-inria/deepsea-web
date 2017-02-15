@@ -5,9 +5,10 @@
 Overview
 ========
 
-This project concerns parallel graph traversal (or, graph search) over
-directed, in-memory graphs using shared-memory, multiprocessor
-machines (aka multicore). In this project, we address the question:
+This project concerns high-performance parallel graph traversal (or,
+graph search) over directed, in-memory graphs using shared-memory,
+multiprocessor machines (aka multicore). The main research question
+addressed by this project is the following:
 
 > *Can we design asymptotically and practically algorithms for the
 > efficient traversal of in-memory directed graphs? Furthermore, can
@@ -16,7 +17,7 @@ machines (aka multicore). In this project, we address the question:
 > utilized is close to the hard limit imposed by the input graph and
 > the machine?*
 
-Such algorithms are desireable because multicore hardware demands
+Such algorithms are crucial because multicore hardware demands
 computations that make the most economical use of their time. In
 contrast, algorithms that spend many cycles performing load-balancing
 work are often slower and may consume excess power. There are two
@@ -81,13 +82,13 @@ The following packages should be installed on your test machine.
 ----------------------------------------------------------------------------------------------------------
 Package                                            Version        Details
 ------------------------------------------------   ----------     ----------------------------------------
-[gcc](https://gcc.gnu.org/)                         >= 4.9.0      Recent gcc is required because PASL 
+[gcc](https://gcc.gnu.org/)                         >= 4.9.0      Recent gcc is required because pdfs 
                                                                   makes heavy use of features of C++1x,
                                                                   such as lambda expressions and
                                                                   higher-order templates.
 
 [php](http://www.php.net/)                          >= 5.3.10     PHP is currently used by the build system 
-                                                                  of PASL. 
+                                                                  of pdfs. 
 
 [ocaml](http://www.ocaml.org/)                      >= 4.00       Ocaml is required to build the
                                                                   benchmarking script.
@@ -99,7 +100,7 @@ Package                                            Version        Details
                                                                   allocation that is crucial for all of 
                                                                   the graph-search algorithms.
 
-[hwloc](http://www.open-mpi.org/projects/hwloc/)    recent        PASL uses this package to force
+[hwloc](http://www.open-mpi.org/projects/hwloc/)    recent        pdfs uses this package to force
                                                                   interleaved NUMA allocation; as
                                                                   such this package is optional and only
                                                                   really relevant for NUMA machines.
@@ -108,7 +109,7 @@ Package                                            Version        Details
                                                                   download data sets for our experiments.
 ----------------------------------------------------------------------------------------------------------
 
-Table: Software dependencies for our PASL benchmarks.
+Table: Software dependencies for our pdfs benchmarks.
 
 2. IPFS
 -------
@@ -130,10 +131,8 @@ machine.
 $ ipfs daemon &
 ~~~~
 
-TODO: write instructions so that i can renew the quickcheck/graph files in ipfs
-
-3. Getting the sources
-----------------------
+3. Getting source code and experimental graphs
+----------------------------------------------
 
 Now, create a new directory in which to store all of our the code and
 data.
@@ -143,8 +142,22 @@ $ mkdir sc15
 $ cd sc15
 ~~~~
 
-To start downloading, first get the [downloader
-script](get.sh).
+Now, to obtain the quickcheck code, run the following. The transfer
+might take a long time to complete.
+
+~~~~
+$ ipfs get QmUvGoyv8hBprTqjFnhD5m4HGkcxqS4FoNteKEbYmyLj9n -o=quickcheck
+~~~~
+
+The next command downloads the graph data. This command is going to
+take a very long time because there is at least 30GB of graph data.
+
+~~~~
+$ ipfs get ...
+~~~~
+
+To obtain the source code, first get the [downloader script](get.sh),
+then perform the following steps.
 
 ~~~~
 $ wget http://deepsea.inria.fr/graph/get.sh
