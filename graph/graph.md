@@ -153,8 +153,10 @@ The next command downloads the graph data. This command is going to
 take a very long time because there is at least 30GB of graph data.
 
 ~~~~
-$ ipfs get ...
+$ ipfs get QmdB74WHotovGbzsCYN72irU2j9LnaqFUZ6UR54nnPzMka -o=sc15-graphs
 ~~~~
+
+QmSo1PdRffxbZFGyz89ZkegZM99UTREPbtEJhjhzu9bjPF
 
 To obtain the source code, first get the [downloader script](get.sh),
 then perform the following steps.
