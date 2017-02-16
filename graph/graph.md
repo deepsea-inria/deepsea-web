@@ -79,40 +79,47 @@ the input graphs we use are huge.
 
 The following packages should be installed on your test machine.
 
-----------------------------------------------------------------------------------------------------------
-Package                                            Version        Details
-------------------------------------------------   ----------     ----------------------------------------
-[gcc](https://gcc.gnu.org/)                         >= 4.9.0      Recent gcc is required because pdfs 
-                                                                  makes heavy use of features of C++1x,
-                                                                  such as lambda expressions and
-                                                                  higher-order templates.
+-----------------------------------------------------------------------------------
+Package    Version        Details
+--------   ----------     ---------------------------------------------------------
+gcc         >= 4.9.0      Recent gcc is required because pdfs 
+                          makes heavy use of features of C++1x,
+                          such as lambda expressions and
+                          higher-order templates.
+                          ([Home page](https://gcc.gnu.org/))
 
-[php](http://www.php.net/)                          >= 5.3.10     PHP is currently used by the build system 
-                                                                  of pdfs. 
+php         >= 5.3.10     PHP is currently used by the build system 
+                          of pdfs.
+                          ([Home page](http://www.php.net/))
 
-[ocaml](http://www.ocaml.org/)                      >= 4.00       Ocaml is required to build the
-                                                                  benchmarking script.
+ocaml        >= 4.00       Ocaml is required to build the
+                           benchmarking script.
+                           ([Home page](http://www.ocaml.org/))
 
-[R](http://www.r-project.org/)                      >= 2.4.1      The R tools is used by our scripts to
-                                                                  generate plots.
+R            >= 2.4.1      The R tools is used by our scripts to
+                           generate plots.
+                           ([Home page](http://www.r-project.org/))
                                                
-[tcmalloc](http://goog-perftools.sourceforge.net)   2.2.1         This package provides scalable heap
-                                                                  allocation that is crucial for all of 
-                                                                  the graph-search algorithms.
+tcmalloc     2.2.1         This package provides scalable heap
+                           allocation that is crucial for all of 
+                           the graph-search algorithms.
+                           ([Home page](http://goog-perftools.sourceforge.net))
 
-[hwloc](http://www.open-mpi.org/projects/hwloc/)    recent        pdfs uses this package to force
-                                                                  interleaved NUMA allocation; as
-                                                                  such this package is optional and only
-                                                                  really relevant for NUMA machines.
+hwloc        recent        This package is used by pdfs to force
+                           interleaved NUMA allocation; as
+                           such this package is optional and only
+                           really relevant for NUMA machines.
+                           ([Home page](http://www.open-mpi.org/projects/hwloc/))
 
-[ipfs](https://ipfs.io/)                            recent        We are going to use this software to
-                                                                  download data sets for our experiments.
-----------------------------------------------------------------------------------------------------------
+ipfs         recent        We are going to use this software to
+                           download data sets for our experiments.
+                           ([Home page](https://ipfs.io/))
+-----------------------------------------------------------------------------------
 
 Table: Software dependencies for our pdfs benchmarks.
 
-2. IPFS
--------
+2. Getting experimental data
+----------------------------
 
 IPFS is a tool that is useful for transfering large amounts of data
 over the internet. We need this tool because our experiments use large
@@ -149,14 +156,13 @@ might take a long time to complete.
 $ ipfs get QmUvGoyv8hBprTqjFnhD5m4HGkcxqS4FoNteKEbYmyLj9n -o=quickcheck
 ~~~~
 
-The next command downloads the graph data. This command is going to
-take a very long time because there is at least 30GB of graph data.
+The next command downloads the folder storing the graph data. Because
+the size of the folder is about 90GB, the download may take a long
+time.
 
 ~~~~
 $ ipfs get QmdB74WHotovGbzsCYN72irU2j9LnaqFUZ6UR54nnPzMka -o=sc15-graphs
 ~~~~
-
-QmSo1PdRffxbZFGyz89ZkegZM99UTREPbtEJhjhzu9bjPF
 
 To obtain the source code, first get the [downloader script](get.sh),
 then perform the following steps.

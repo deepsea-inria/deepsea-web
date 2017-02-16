@@ -4,10 +4,24 @@ module Chunk =
 
     let k = 32
 
-    type 'a t = int list
+    (* weight, chunk contents *)
+    type 'a t = int * int list
 
-    let tabulate = List.tabulate
+    let tabulate ((w, n), f) =
+      let rec tab i =
+        if i < 0 then
+          []
+        else
+          f i :: tab (i - 1)
+      in
+      tab (n - 1)
 
+    let sub (c, i) = List.nth c i
+
+    let size = List.length
+
+                 
+      
 end
 
 
