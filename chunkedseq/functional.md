@@ -201,12 +201,12 @@ push_front' wf (Shallow c) x =
     push_front' wf (mk_deep wf {fₒ=ec wf, fᵢ=ec wf, m=m, bᵢ=ec wf, bₒ=c}, x)
   else
     Shallow (Chunk.push_front wf (c, x))
-push_front wf (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ})) =
+push_front' wf (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ})) =
   if Chunk.full fₒ then
     if Chunk.empty fᵢ then
       push_front' wf (mk_deep wf {fₒ=fᵢ, fᵢ=fₒ, m=m, bᵢ=bᵢ, bₒ=bₒ}, x)
     else
-      let m' = push_front (Σ weight) (m, fᵢ) in
+      let m' = push_front' (Σ weight) (m, fᵢ) in
       push_front' wf (mk_deep wf {fₒ=ec wf, fᵢ=fₒ, m=m', bᵢ=bᵢ, bₒ=bₒ}, x)
   else
     let fₒ' = Chunk.push_front wf (fₒ, x) in
@@ -226,7 +226,7 @@ pop_front' wf (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ})) =
     if ¬ (Chunk.empty fᵢ) then
       pop_front' wf (mk_deep' wf {fₒ=fᵢ, fᵢ=fₒ, m=m, bᵢ=bᵢ, bₒ=bₒ})
     else if ¬ (empty m) then 
-      let (m', c) = pop_front (Σ weight) m in
+      let (m', c) = pop_front' (Σ weight) m in
       pop_front' wf (mk_deep' wf {fₒ=c, fᵢ=fᵢ, m=m', bᵢ=bᵢ, bₒ=bₒ})
     else if ¬ (Chunk.empty bᵢ) then
       pop_front' wf (mk_deep' wf {fₒ=bₒ, fᵢ=fᵢ, m=m, bᵢ=bᵢ, bₒ=fₒ})
