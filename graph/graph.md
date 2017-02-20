@@ -202,10 +202,10 @@ $ make graph.pbench
 Generation of the synthetic graphs may take a long time. To start
 running our graph generator, specify the number of processors to be
 used by the experiment by passing the argument `-proc p` for a
-positive number `p`. For instance, our system has `p := 72` cores.
+positive number `p`. For instance, our system has `p := 40` cores.
 
 ~~~~
-$ export P=72
+$ export P=40
 $ graph.pbench generate -proc $P -size large
 ~~~~
 
