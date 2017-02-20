@@ -138,8 +138,8 @@ machine.
 $ ipfs daemon &
 ~~~~
 
-3. Getting source code and experimental graphs
-----------------------------------------------
+3. Getting source code and non-synthetic graphs
+-----------------------------------------------
 
 Now, create a new directory in which to store all of our the code and
 data.
@@ -170,14 +170,69 @@ then perform the following steps.
 ~~~~
 $ wget http://deepsea.inria.fr/graph/get.sh
 $ chmod u+x get.sh
-$ ./get.sh
+$ get.sh
 ~~~~
 
-4. Building the binaries
-------------------------
+***Linking with hwloc.*** If your system has a non-uniform memory
+model (aka NUMA), then using hwloc may prove crucial to obtain clean
+experimental results. To link correctly with hwloc, all you need to do
+is pass to the script `get.sh` the path to the hwloc installation
+folder. On my system, this folder is located at
+`/usr/lib64/pkgconfig/`. You need to ensure that whatever path you
+substitute for this one on your machine contains the `hwloc.pc`.
+
+4. Generating synthetic graphs
+------------------------------
+
+Before building any packages, we need configure some paths. Let us
+change to the directory where the configuration file is going to be
+stored.
+
+~~~~
+$ cd sc15-graph/graph/bench/
+~~~~
+
+The next step is to generate the graph data via our benchmarking
+script. 
+
+~~~~
+$ make graph.pbench
+~~~~
+
+Generation of the synthetic graphs may take a long time. To start
+running our graph generator, specify the number of processors to be
+used by the experiment by passing the argument `-proc p` for a
+positive number `p`. For instance, our system has `p := 72` cores.
+
+~~~~
+$ export P=72
+$ graph.pbench generate -proc $P -size large
+~~~~
 
 5. Running the experiment
 -------------------------
+
+The first series of benchmark runs gather data to serve as baseline
+measurements. The baseline in this case is a fast sequential
+graph-traversal algorithm, hence the argument `-proc 1`.
+
+~~~~
+$ graph.pbench baselines -proc 1 -size large
+~~~~
+
+After the command completes, the results of the experiment are going
+to be stored in the `_results` folder. But, we still need to run the
+main body of experiments. The following command starts the experiments
+running.
+
+~~~~
+$ graph.pbench overview -proc $P -size large -runs 30
+~~~~
+
+To achieve clean results, we recommend performing thirty
+runs. However, it may be faster to perform just a few at first, and
+then collect more data later, next time passing to `graph.pbench` the
+flag `-mode append`.
 
 6. Analyzing the results
 ------------------------
