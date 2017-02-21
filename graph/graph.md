@@ -1,6 +1,10 @@
 % pdfs
-% Fast Parallel Graph-Search with Splittable and Catenable Frontiers
+% A work-efficient algorithm for parallel unordered depth-first search
 % [Deepsea project](http://deepsea.inria.fr/)
+
+The purpose of this web page is to provide links to the project
+publications and software and to provide a guide for experimenters to
+repeat our experimental evaluation.
 
 Overview
 ========
@@ -58,6 +62,7 @@ We made available a long version of our Supercomputing'15 article
 which includes appendices. In the appendix, there is a longer version
 of one of the proofs
 
+- [Page on ACM Digital Library](http://dl.acm.org/citation.cfm?id=2807651)
 - [Article](http://chargueraud.org/research/2015/pdfs/pdfs_sc15.pdf)
 - [Slides from talk](http://gallium.inria.fr/~rainey/slides/sc15-pdfs-talk.pdf)
 - [Video copy of talk](https://www.youtube.com/watch?v=kOausvmMtmM)
@@ -67,7 +72,10 @@ Run our experimental evaluation
 
 The source code we used for our experimental evaluation is hosted by a
 [Github
-repository](https://github.com/deepsea-inria/pasl/tree/new-sc15-graph/).
+repository](https://github.com/deepsea-inria/pasl/tree/new-sc15-graph/). The
+source code for our PDFS and our implementation of the DFS of Cong et
+al is stored in the file named
+[dfs.hpp](https://github.com/deepsea-inria/pasl/blob/new-sc15-graph/graph/include/dfs.hpp).
 
 1. Prerequisites
 ----------------
@@ -125,7 +133,14 @@ local IPFS configuration.
 $ ipfs init
 ~~~~
 
-Then, we need to run the IPFS daemon. This process needs to be running
+***Warning: disk space.*** The default behavior of IPFS is to keep a
+cache of all downloaded files in the folder `~/.ipfs/`. Because the
+graph data is several gigabytes, the cache folder should have at least
+twice this much free space. To select a different cache folder for
+IPFS, before issuing the command `ipfs init`, set the environment
+variable `$IPFS_PATH` to point to the desired path.
+
+Next, we need to run the IPFS daemon. This process needs to be running
 until after all input graphs have been successfully downloaded to your
 machine.
 

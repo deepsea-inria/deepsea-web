@@ -12,6 +12,10 @@ problems on large data sets.
 Project pages
 =============
 
+## [pdfs](http://deepsea.inria.fr/graph/)
+
+A work-efficient algorithm for parallel unordered depth-first search
+
 ## [pasl](http://deepsea.inria.fr/pasl/)
 
 Parallel-algorithm scheduling library
