@@ -6,9 +6,8 @@ TARGET=$1
 
     cd $TARGET
 
-    git clone https://github.com/deepsea-inria/pctl.git
+    git clone https://github.com/deepsea-inria/pbbs-pctl.git
 
-    ./pctl/script/get-dependencies.sh $TARGET
+    pbbs-pctl/script/get-dependencies.sh $TARGET
     
 )
-
