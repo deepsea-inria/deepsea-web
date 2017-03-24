@@ -60,6 +60,10 @@ ipfs         recent        We are going to use this software to
 
 openssl      recent        This library is required by the hash
                            benchmark.
+
+pkgconfig    recent        This package is used by the makefile
+                           to locate paths to packages, such
+			   as hwloc
 -----------------------------------------------------------------------------------
 
 Table: Software dependencies for our pdfs benchmarks.
