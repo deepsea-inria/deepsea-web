@@ -343,6 +343,11 @@ module Chunkedseq =
               let cs1 = mk_deep {fo=fo1; fi=ec; mid=Shallow ec; bi=ec; bo=ec} in
               let cs2 = mk_deep {fo=fo2; fi=ec; mid=mid; bi=bi; bo=bo} in
               (cs1, x, cs2)
+	    else if i < wfo + wfi then
+	      let (fi1, x, fi2) = Chunk.split wf (fi, i - wfo) in
+	      let cs1 = mk_deep {fo=fo; fi=ec; mid=create; bi=ec; bo=fi1} in
+	      let cs2 = mk_deep {fo=fi2; fi=ec; mid=mid; bo=bo; bi=bi} in
+	      (cs1, x, cs2)
             else if i <= wfo + wfi + wm then
               let j = i - wfo - wfi in
               let (mid1, c, mid2) = split' (sigma wf) (mid, j) in
@@ -351,9 +356,17 @@ module Chunkedseq =
               let cs2 = mk_deep {fo=c2; fi=ec; mid=mid2; bi=bi; bo=bo} in
               (cs1, x, cs2)
             else if i <= wfo + wfi + wm + wbi then
-              failwith ""
-            else
-              failwith ""
+	      let (bi1, x, bi2) = Chunk.split wf (bi, i - wfo - wfi - wm) in
+	      let cs1 = mk_deep {fo=fo; fi=fi; mid=mid; bi=ec; bo=bi1} in
+	      let cs2 = mk_deep {fo=bi2; fi=ec; mid=create; bi=ec; bo=bo} in
+	      (cs1, x, cs2)
+            else if i <= wfo + wfi + wm + wbi + wbo then
+	      let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo + wfi + wm + wbi + wbo) in
+	      let cs1 = mk_deep {fo=fo; fi=fi; mid=mid; bi=bi; bo=bo1} in
+	      let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
+	      (cs1, x, cs2)
+	    else
+              failwith "out of bounds"
           in
           (check wf cs1, x, check wf cs2)
             
