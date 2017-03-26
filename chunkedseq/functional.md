@@ -238,35 +238,43 @@ Concatenation
 -------------
 
 ~~~~~ {.ocaml}
-push_buffer_back : α wf → α chunkedseq ✕ α chunk → α chunkedseq
+push_buffer_back :
+  α chunk wf → α chunk chunkedseq ✕ α chunk → α chunk chunkedseq
 push_buffer_back γ (s, c)  =
-  if Chunk.empty c then s
-  else push_buffer_back' γ (s, c)
-
-push_buffer_back' γ (Shallow c', c)  =
-  mk_deep' γ {fₒ=c', fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮], bₒ=c}
-push_buffer_back' γ (s as Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ}), c)  =
-  let (m', b) = pop_back (Σ γ) m in
-  if Chunk.weight_of c + Chunk.weight_of b ≤ K then
-    let m'' = push_back' γ (m', Chunk.concat γ (b, c)) in
-    mk_deep {fₒ=fₒ, fᵢ=fᵢ, m=m'', bᵢ=bᵢ, bₒ=bₒ}
+  if Chunk.empty c then
+    s
+  else if empty s then
+    Shallow (Chunk.push_back γ ([⋮⋮], c))
   else
-    let m' = push_back' γ (m, c) in
-    mk_deep {fₒ=fₒ, fᵢ=fᵢ, m=m', bᵢ=bᵢ, bₒ=bₒ}
+    let (cs', c') = pop_back' γ cs in
+    if Chunk.size c + Chunk.size c' <= Chunk.k then
+      push_back' γ (cs', Chunk.concat γ (c', c))
+    else
+      push_back' γ (cs, c)
+~~~~~
+
+~~~~~ {.ocaml}
+transfer_contents_back :
+  α wf → α chunkedseq ✕ α chunk → α chunkedseq
+  if Chunk.empty c then
+    cs
+  else
+    let (c', x) = Chunk.pop_front γ c in
+    transfer_contents_back γ (push_back' γ (cs, x), c')
 ~~~~~
 
 ~~~~~ {.ocaml}
 concat' : α wf → α chunkedseq ✕ α chunkedseq → α chunkedseq
 concat' γ (Shallow c₁, s₂) =
-  push_buffer_front γ (s₂, c₁)
+  transfer_contents_front γ (s₂, c₁)
 concat' γ (s₁, Shallow c₂) =
-  push_buffer_back γ (s₁, c₂)
+  transfer_contents_back γ (s₁, c₂)
 concat' γ (s₁ as Deep (_, {fₒ=fₒ₁, fᵢ=fᵢ₁, m=m₁, bᵢ=bᵢ₁, bₒ=bₒ₁}),
            s₂ as Deep (_, {fₒ=fₒ₂, fᵢ=fᵢ₂, m=m₂, bᵢ=bᵢ₂, bₒ=bₒ₂})) =
-  let m₁' = push_buffer_back γ (m₁, bᵢ₁) in
-  let m₁'' = push_buffer_back γ (m₁', bₒ₁) in
-  let m₂' = push_buffer_front γ (m₂, fᵢ₂) in
-  let m₂'' = push_buffer_front γ (m₂', fₒ₂) in
+  let m₁' = push_buffer_back (Σ γ) (m₁, bᵢ₁) in
+  let m₁'' = push_buffer_back (Σ γ) (m₁', bₒ₁) in
+  let m₂' = push_buffer_front (Σ γ) (m₂, fᵢ₂) in
+  let m₂'' = push_buffer_front (Σ γ) (m₂', fₒ₂) in
   if empty s₁ then
     s₂
   else if empty s₂ then
@@ -275,10 +283,10 @@ concat' γ (s₁ as Deep (_, {fₒ=fₒ₁, fᵢ=fᵢ₁, m=m₁, bᵢ=bᵢ₁, 
     let (c₁, c₂) = (back m₁'', front m₂'') in
     let (m₁''', m₂''') = 
       if Chunk.weight_of c₁ + Chunk.weight_of c₂ ≤ K then
-        let (m₁'', _) = pop_back' γ m₁'' in
-        let (m₂'', _) = pop_front' γ m₂'' in
+        let (m₁'', _) = pop_back' (Σ γ) m₁'' in
+        let (m₂'', _) = pop_front' (Σ γ) m₂'' in
         let c' = Chunk.concat γ (c₁, c₂) in
-        (push_back' γ (m₁'', c'), m₂'')
+        (push_back' (Σ γ) (m₁'', c'), m₂'')
       else
         (m₁'', m₂'')
     let m₁₂ = concat' (Σ γ) (m₁''', m₂''') in
