@@ -61,9 +61,12 @@ module Chunk =
 
     let full c = (size c = k)
 
+    let fold_right : 'a 'b . ('a -> 'b -> 'b) -> 'a chunk -> 'b -> 'b = fun f (_, xs)  x ->
+      List.fold_right f xs x
+                                                 
   end
 
-module ChunkedseqSpecification =
+module ChunkedseqSpec =
   struct
 
     let create = []
@@ -102,21 +105,27 @@ module Chunkedseq =
   struct
 
     type 'a chunk = 'a Chunk.chunk
+
+    type weight = Chunk.weight
 	  
     type 'a chunkedseq
       = Shallow of 'a chunk
-      | Deep of int * 'a deep
+      | Deep of weight * 'a deep
                          
      and 'a deep = {
-       fo : 'a chunk; fi : 'a chunk;
+       fo : 'a chunk;
+       fi : 'a chunk;
        mid : ('a chunk) chunkedseq;
-       bi : 'a chunk; bo : 'a chunk;
+       bi : 'a chunk;
+       bo : 'a chunk;
      }
-
+                                
     let weight_of cs =
       match cs with
-      | Shallow c -> Chunk.weight_of c
-      | Deep (w, _) -> w
+      | Shallow c ->
+         Chunk.weight_of c
+      | Deep (w, _) ->
+         w
 
     let mk_deep d =
       let {fo; fi; mid; bi; bo} = d in
@@ -144,8 +153,6 @@ module Chunkedseq =
 
     type 'a weight_fn = 'a Chunk.weight_fn
                            
-    let sigma = Chunk.sigma
-                  
     let ec = Chunk.create
 
     let create = Shallow ec
@@ -154,6 +161,8 @@ module Chunkedseq =
       match cs with
       | Shallow c -> Chunk.empty c
       | _ -> false
+
+    let unit_weight_fn : 'a weight_fn = fun _ -> 1
 
     let rec push_front' : 'a. wf:('a weight_fn) -> ('a chunkedseq * 'a) -> 'a chunkedseq = fun ~wf (cs, x) ->
       match cs with
@@ -167,11 +176,14 @@ module Chunkedseq =
             if Chunk.empty fi then
               push_front' wf (mk_deep {fo=ec; fi=fo; mid=mid; bi=bi; bo=bo}, x)
             else
-              let mid' = push_front' ~wf:(sigma wf) (mid, fi) in
+              let mid' = push_front' ~wf:(Chunk.weight_of) (mid, fi) in
               push_front' wf (mk_deep {fo=ec; fi=fo; mid=mid'; bi=bi; bo=bo}, x)
           else
             let fo' = Chunk.push_front wf (fo, x) in
             mk_deep {fo=fo'; fi=fi; mid=mid; bi=bi; bo=bo}
+
+    and push_front  : 'a. ('a chunkedseq * 'a) -> 'a chunkedseq = fun (cs, x) ->
+      push_front' unit_weight_fn (cs, x)
 	      
     let rec push_back' : 'a. wf:('a weight_fn) -> ('a chunkedseq * 'a) -> 'a chunkedseq = fun ~wf (cs, x) ->
       match cs with
@@ -185,11 +197,14 @@ module Chunkedseq =
             if Chunk.empty bi then
               push_back' wf (mk_deep {fo=fo; fi=fi; mid=mid; bi=bo; bo=ec}, x)
             else
-              let mid' = push_back' ~wf:(sigma wf) (mid, bi) in
+              let mid' = push_back' ~wf:(Chunk.weight_of) (mid, bi) in
               push_back' wf (mk_deep {fo=fo; fi=fi; mid=mid'; bi=bo; bo=ec}, x)
           else
             let bo' = Chunk.push_back wf (bo, x) in
             mk_deep {fo=fo; fi=fi; mid=mid; bi=bi; bo=bo'}
+
+    and push_back  : 'a. ('a chunkedseq * 'a) -> 'a chunkedseq = fun (cs, x) ->
+      push_back' unit_weight_fn (cs, x)
               
     let rec check : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq = fun ~wf cs ->
       match cs with
@@ -202,7 +217,7 @@ module Chunkedseq =
               Chunk.weight_of bo + Chunk.weight_of bi
           in
           if w = 0 && not (empty mid) then
-            let (mid', fo') = pop_front' ~wf:(sigma wf) mid in
+            let (mid', fo') = pop_front' ~wf:(Chunk.weight_of) mid in
             mk_deep {fo=fo'; fi=fi; mid=mid'; bi=bi; bo=bo}
           else if w <= 1 && empty mid then
             mk_shallow (fo, fi, bi, bo)
@@ -223,12 +238,13 @@ module Chunkedseq =
       | Shallow c ->
          let (c', x) = Chunk.pop_front wf c in
          (Shallow c', x)
-      | Deep (_, {fo; fi; mid; bi; bo}) ->
+      | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
          if Chunk.empty fo then
            if not (Chunk.empty fi) then
-             pop_front' wf (mk_deep' wf {fo=fi; fi=ec; mid=mid; bi=bi; bo=bo;})
+             pop_front' wf (mk_deep' wf {d with fo=fi; fi=ec;})
            else if not (empty mid) then
-             let (mid', c) = pop_front' ~wf:(sigma wf) mid in
+             let (mid', c) = pop_front' ~wf:(Chunk.weight_of) mid in
+             (* free fo *)
              pop_front' wf (mk_deep' wf {fo=c; fi=fi; mid=mid'; bi=bi; bo=bo})
            else if not (Chunk.empty bi) then
              pop_front' wf (mk_deep' wf {fo=bo; fi=fi; mid=mid; bi=bi; bo=ec})
@@ -238,6 +254,9 @@ module Chunkedseq =
          else
            let (fo', x) = Chunk.pop_front wf fo in
            (mk_deep' wf {fo=fo'; fi=fi; mid=mid; bi=bi; bo=bo}, x)
+
+    and pop_front : 'a. 'a chunkedseq -> 'a chunkedseq * 'a = fun cs ->
+      pop_front' unit_weight_fn cs
 
     and pop_back' : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq * 'a = fun ~wf cs ->
       match cs with
@@ -249,7 +268,8 @@ module Chunkedseq =
            if not (Chunk.empty bi) then
              pop_back' wf (mk_deep' wf {fo=fo; fi=fi; mid=mid; bi=ec; bo=bi})
            else if not (empty mid) then
-             let (mid', c) = pop_back' ~wf:(sigma wf) mid in
+             let (mid', c) = pop_back' ~wf:(Chunk.weight_of) mid in
+             (* free bo *)
              pop_back' wf (mk_deep' wf {fo=fo; fi=fi; mid=mid'; bi=bi; bo=c})
            else if not (Chunk.empty bi) then
              pop_back' wf (mk_deep' wf {fo=ec; fi=fi; mid=mid; bi=bi; bo=fo})
@@ -259,6 +279,9 @@ module Chunkedseq =
          else
            let (bo', x) = Chunk.pop_back wf bo in
            (mk_deep' wf {fo=fo; fi=fi; mid=mid; bi=bi; bo=bo'}, x)
+
+    and pop_back : 'a. 'a chunkedseq -> 'a chunkedseq * 'a = fun cs ->
+      pop_back' unit_weight_fn cs
 
     and push_buffer_back : 'a. ('a chunk weight_fn) -> ('a chunk chunkedseq * 'a chunk) -> 'a chunk chunkedseq = fun wf (cs, c) ->
       if Chunk.empty c then
@@ -306,28 +329,31 @@ module Chunkedseq =
          transfer_contents_back wf (cs1, c2)
       | (Deep (_, {fo=fo1; fi=fi1; mid=mid1; bi=bi1; bo=bo1}),
          Deep (_, {fo=fo2; fi=fi2; mid=mid2; bi=bi2; bo=bo2})) ->
-           let mid1' = push_buffer_back (sigma wf) (mid1, bi1) in
-           let mid1'' = push_buffer_back (sigma wf) (mid1', bo1) in
-           let mid2' = push_buffer_front (sigma wf) (mid2, fi2) in
-           let mid2'' = push_buffer_front (sigma wf) (mid2', fo2) in
+           let mid1' = push_buffer_back Chunk.weight_of (mid1, bi1) in
+           let mid1'' = push_buffer_back Chunk.weight_of (mid1', bo1) in
+           let mid2' = push_buffer_front Chunk.weight_of (mid2, fi2) in
+           let mid2'' = push_buffer_front Chunk.weight_of (mid2', fo2) in
            if empty cs1 then
              cs2
            else if empty cs2 then
              cs1
            else
-             let ((_, c1), (_, c2)) = (pop_back' (sigma wf) mid1', pop_front' (sigma wf) mid2'') in
+             let ((_, c1), (_, c2)) = (pop_back' Chunk.weight_of mid1', pop_front' Chunk.weight_of mid2'') in
              let (mid1''', mid2''') =
                if Chunk.weight_of c1 + Chunk.weight_of c2 <= Chunk.k then
-		 let (mid1'', _) = pop_back' (sigma wf) mid1'' in
-		 let (mid2'', _) = pop_front' (sigma wf) mid2'' in
+		 let (mid1'', _) = pop_back' Chunk.weight_of mid1'' in
+		 let (mid2'', _) = pop_front' Chunk.weight_of mid2'' in
 		 let c' = Chunk.concat wf (c1, c2) in
-		 (push_back' (sigma wf) (mid1'', c'), mid2'')
+		 (push_back' Chunk.weight_of (mid1'', c'), mid2'')
                else
 		 (mid1'', mid2'')
              in
-             let mid12 = concat' (sigma wf) (mid1''', mid2''') in
+             let mid12 = concat' Chunk.weight_of (mid1''', mid2''') in
              mk_deep' wf {fo=fo1; fi=fi1; mid=mid12; bi=bi2; bo=bo2}
-
+                      
+    and concat : 'a chunkedseq * 'a chunkedseq -> 'a chunkedseq = fun (cs1, cs2) ->
+      concat' unit_weight_fn (cs1, cs2)
+      
     and split' : 'a. wf:('a weight_fn) -> ('a chunkedseq * int) -> ('a chunkedseq * 'a * 'a chunkedseq) = fun ~wf (cs, i) ->
       match cs with
       | Shallow c ->
@@ -350,7 +376,7 @@ module Chunkedseq =
 	      (cs1, x, cs2)
             else if i <= wfo + wfi + wm then
               let j = i - wfo - wfi in
-              let (mid1, c, mid2) = split' (sigma wf) (mid, j) in
+              let (mid1, c, mid2) = split' Chunk.weight_of (mid, j) in
               let (c1, x, c2) = Chunk.split wf (c, j - weight_of mid1) in
               let cs1 = mk_deep {fo=fo; fi=fi; mid=mid1; bi=ec; bo=c1} in
               let cs2 = mk_deep {fo=c2; fi=ec; mid=mid2; bi=bi; bo=bo} in
@@ -369,7 +395,25 @@ module Chunkedseq =
               failwith "out of bounds"
           in
           (check wf cs1, x, check wf cs2)
-            
+
+    and split : 'a. ('a chunkedseq * int) -> ('a chunkedseq * 'a * 'a chunkedseq) = fun (cs, i) ->
+      split' unit_weight_fn (cs, i)
+
+    let rec fold_right : 'a 'b . ('a -> 'b -> 'b) -> 'a chunkedseq -> 'b -> 'b = fun f cs i ->
+      match cs with
+      | Shallow c ->
+         Chunk.fold_right f c i
+      | Deep (_, {fo; fi; mid; bi; bo}) ->
+          Chunk.fold_right f fo (
+            Chunk.fold_right f fi (
+              fold_right (fun c i' -> 
+                Chunk.fold_right f c i') mid (
+                 Chunk.fold_right f bi (
+                   Chunk.fold_right f bo i))))
+
+    let list_of cs =
+      List.rev (fold_right (fun x y -> x :: y) cs [])
+      
   end
 
 module ChunkedseqTest =
@@ -413,26 +457,129 @@ module ChunkedseqTest =
       | End_front -> "F"
       | End_back -> "B"
 
-    let rec print_trace : trace -> string -> bool -> unit = fun t p s -> (
-      if not (t = Trace_nil) then Printf.printf "%s%s" p (if s then "└── " else "├── ") else ();
-      match t with 
-      | Trace_nil ->
-	  ()
-      | Trace_push (e, x, t) ->
-	  (Printf.printf "+%s[%d]\n" (string_of_orientation e) x;
-	   print_trace t (p ^ (if s then "    " else "│   ")) true)
-      | Trace_pop (e, t) ->
-	  (Printf.printf "-%s[]\n" (string_of_orientation e);
-	   print_trace t (p ^ (if s then "    " else "│   ")) true)
-      | Trace_split_concat (i, t1, t2) ->
-	  (Printf.printf "*%d\n" i;
-	   print_trace t1 (p ^ (if s then "    " else "│   ")) false;
-	   print_trace t2 (p ^ (if s then "    " else "│   ")) true))
+    let print_trace t =
+      let rec pt : trace -> string -> bool -> unit = fun t p s -> (
+          if not (t = Trace_nil) then Printf.printf "%s%s" p (if s then "└── " else "├── ") else ();
+          match t with 
+          | Trace_nil ->
+	     ()
+          | Trace_push (e, x, t) ->
+	     (Printf.printf "+%s[%d]\n" (string_of_orientation e) x;
+	      pt t (p ^ (if s then "    " else "│   ")) true)
+          | Trace_pop (e, t) ->
+	     (Printf.printf "-%s[]\n" (string_of_orientation e);
+	      pt t (p ^ (if s then "    " else "│   ")) true)
+          | Trace_split_concat (i, t1, t2) ->
+	     (Printf.printf "*%d\n" i;
+	      pt t1 (p ^ (if s then "    " else "│   ")) false;
+	      pt t2 (p ^ (if s then "    " else "│   ")) true))
+      in
+      pt t "" true
+
+    let xs = Chunkedseq.list_of (
+        Chunkedseq.push_front  (
+          Chunkedseq.push_back (Chunkedseq.create, 123), 321))
+
+    let print_list sep print_item xs =
+      let rec pl sep print_item xs =
+        match xs with
+        | [] ->
+           ()
+        | [x] ->
+           print_item x
+        | x :: xs -> (
+          print_item x;
+          Printf.printf "%s" sep;
+          pl sep print_item xs)
+      in
+      (Printf.printf "["; pl sep print_item xs; Printf.printf "]")
+                     
+    let _ =
+      (print_list "," (Printf.printf "%d") xs; Printf.printf "\n")
+                 
+    type 'a list_compare_res =
+      | Lists_equal
+      | Lists_item_mismatch of int * 'a * 'a (* position of mismatch, 
+                                              * and positions in first and second lists, 
+                                              * respectively *)
+      | Lists_unequal_lengths of int * int   (* length of first list, length of second *)
+
+
+    let compare_lists (xs, ys) =
+      let (n1, n2) = (List.length xs, List.length ys) in
+      if n1 <> n2 then
+        Lists_unequal_lengths (n1, n2)
+      else
+        let rec f (i, xs, ys) =
+          match (xs, ys) with
+          | ([], []) ->
+             Lists_equal
+          | (x :: xs, y :: ys) ->
+             if x <> y then
+               Lists_item_mismatch (i, x, y)
+             else
+               f (i + 1, xs, ys)
+          | _ ->
+             failwith "impossible"
+        in
+        f (0, xs, ys)
 
     let _ = Random.init (truncate (Unix.time ()))
-	
+
+    let check t0 =
+      let ok r s =
+        (match compare_lists (r, s) with
+         | Lists_equal ->
+            ()
+         | Lists_item_mismatch (i, x, y) -> (
+           print_trace t0;
+           let s = Printf.sprintf "item mismatch at %d with x=%d and y=%d\n" i x y in
+           failwith s)
+         | Lists_unequal_lengths (nr, ns) -> (
+           print_trace t0;
+           let s = Printf.sprintf "unequal lengths |r|=%d and |s|=%d\n" nr ns in
+           failwith s))
+      in
+      let rec chk t r s = (
+        ok r (Chunkedseq.list_of s);
+        (match t with
+         | Trace_nil ->
+            (r, s)
+         | Trace_push (End_front, x, t') ->
+            let r' = ChunkedseqSpec.push_front (r, x) in
+            let s' = Chunkedseq.push_front (s, x) in
+            chk t r' s'
+         | Trace_push (End_back, x, t') ->
+            let r' = ChunkedseqSpec.push_back (r, x) in
+            let s' = Chunkedseq.push_back (s, x) in
+            chk t' r' s'
+         | Trace_pop (End_front, t') ->
+            let (r', _) = ChunkedseqSpec.pop_front r in
+            let (s', _) = Chunkedseq.pop_front s in
+            chk t' r' s'
+         | Trace_pop (End_back, t') ->
+            let (r', _) = ChunkedseqSpec.pop_back r in
+            let (s', _) = Chunkedseq.pop_back s in
+            chk t' r' s'
+         | Trace_split_concat (i, t1, t2) ->
+            let (r1, x, r2) = ChunkedseqSpec.split (r, i) in
+            let (s1, y, s2) = Chunkedseq.split (s, i) in
+            let _ = ok r1 (Chunkedseq.list_of s1) in
+            let _ = ok r2 (Chunkedseq.list_of s2) in
+            let _ = ok [x] [y] in
+            let (r1', s1') = chk t1 s1 r1 in
+            let (r2', s2') = chk t2 s2 r2 in
+            let _ = ok r1' (Chunkedseq.list_of s1') in
+            let _ = ok r2' (Chunkedseq.list_of s2') in
+            let r' = ChunkedseqSpec.concat r1' r2' in
+            let s' = Chunkedseq.concat s1 s2 in
+            let _ = ok r' (Chunkedseq.list_of s') in
+            (r', s')))
+      in
+      chk t0 ChunkedseqSpec.create Chunkedseq.create
+
     let _ =
-      let t = Trace_push (random_orientation (), random_item (), gen_trace 1 2) in
-      print_trace t "" true
+      let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 2) in
+      check t0    
 
   end
