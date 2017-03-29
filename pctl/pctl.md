@@ -54,6 +54,10 @@ hwloc        recent        This package is used by pdfs to force
                            really relevant for NUMA machines.
                            ([Home page](http://www.open-mpi.org/projects/hwloc/))
 
+tcmalloc     recent        This package provides a drop-in
+                           replacement for system malloc.
+                           ([Home page](http://goog-perftools.sourceforge.net/))
+
 ipfs         recent        We are going to use this software to
                            download data sets for our experiments.
                            ([Home page](https://ipfs.io/))
