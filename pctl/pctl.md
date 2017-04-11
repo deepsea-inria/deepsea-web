@@ -99,7 +99,22 @@ machine.
 $ ipfs daemon &
 ~~~~
 
+~~~~
+ipfs get QmauU3YTG7D7Kq729pVRX4noVwmaDwDzVnJcd5VYvUCk31 -o _data
+~~~~
+
 3. Setting paths
+
+`pbbs-pctl/bench/settings.sh`
+
+~~~~
+LIB_OPENSSL_PATH=/usr/lib/x86_64-linux-gnu/
+~~~~
+
+~~~~
+USE_ALLOCATOR=tcmalloc
+TCMALLOC_PATH=/home/mrainey/Installs/gperftools/lib/
+~~~~
 
 Team
 ====
