@@ -1,6 +1,10 @@
 (* 
 To compile:
-ocamlc unix.cma chunkedseq.ml
+$ ocamlc -rectypes unix.cma chunkedseq.ml
+
+To debug:
+$ ocamlc -rectypes unix.cma -g chunkedseq.ml
+$ ocamldebug a.out
  *)
 
 module Chunk =
