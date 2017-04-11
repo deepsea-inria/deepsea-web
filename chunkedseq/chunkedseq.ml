@@ -83,21 +83,35 @@ module ChunkedseqSpec =
 
     let push_front (xs, x) = List.append xs [x]
 
-    let pop_back = List.tl
+    let pop_back xs =
+      match xs with
+      | x :: xs ->
+         (xs, x)
+      | [] ->
+         failwith "bogus"
 
-    let pop_front xs = List.rev (pop_back (List.rev xs))
+    let pop_front xs =
+      match List.rev xs with
+      | x :: sx ->
+         (List.rev sx, x)
+      | [] ->
+         failwith "bogus"
 
     let concat (xs1, xs2) = List.append xs1 xs2
 
     let split (xs, i) =
-      let rec take_drop (n, l) =
-        if n = 0 then ([], l) else
-          match l with
-          | [] -> failwith "bogus"
-          | x::l' -> let (h,t) = take_drop (n-1, l') in
-                     (x::h, t)
+      let rec f (xs1, xs2, i) =
+        match xs2 with
+        | x :: xs2 ->
+           let i' = 1 + i in
+           if i' >= i then
+             (List.rev xs1, x, xs2)
+           else
+             f (x :: xs1, xs2, i')
+        | [] ->
+           failwith ""
       in
-      take_drop (i, xs)
+      f ([], xs, 0)
         
   end
 
@@ -567,12 +581,12 @@ module ChunkedseqTest =
             let _ = ok r1 (Chunkedseq.list_of s1) in
             let _ = ok r2 (Chunkedseq.list_of s2) in
             let _ = ok [x] [y] in
-            let (r1', s1') = chk t1 s1 r1 in
-            let (r2', s2') = chk t2 s2 r2 in
+            let (r1', s1') = chk t1 r1 s1 in
+            let (r2', s2') = chk t2 r2 s2 in
             let _ = ok r1' (Chunkedseq.list_of s1') in
             let _ = ok r2' (Chunkedseq.list_of s2') in
-            let r' = ChunkedseqSpec.concat r1' r2' in
-            let s' = Chunkedseq.concat s1 s2 in
+            let r' = ChunkedseqSpec.concat (r1', r2') in
+            let s' = Chunkedseq.concat (s1, s2) in
             let _ = ok r' (Chunkedseq.list_of s') in
             (r', s')))
       in
