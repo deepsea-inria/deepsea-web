@@ -1,3 +1,7 @@
+(* 
+To compile:
+ocamlc unix.cma chunkedseq.ml
+ *)
 
 module Chunk =
   struct
