@@ -8,7 +8,7 @@ $ ocamldebug a.out
 
 *)
 
-let _ = Random.init 78
+let _ = Random.init 82
 (*let _ = Random.init (truncate (Unix.time ()))*)
     
 module Chunk =
