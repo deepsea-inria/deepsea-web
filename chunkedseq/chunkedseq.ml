@@ -4,13 +4,24 @@ $ ocamlc -rectypes unix.cma chunkedseq.ml
 
 To debug:
 $ ocamlc -rectypes unix.cma -g chunkedseq.ml
-  $ ocamldebug a.out
- *)
+$ ocamldebug a.out
+
+
+    let xs = Chunkedseq.list_of (
+        Chunkedseq.push_front  (
+          Chunkedseq.push_back (Chunkedseq.create, 123), 321))
+
+    let _ =
+      (print_list "," (Printf.printf "%d") xs; Printf.printf "\n")
+
+*)
+
+let _ = Random.init 39
 
 module Chunk =
   struct
 
-    let k = 32
+    let k = 2
 
     type weight = int
 
@@ -498,9 +509,6 @@ module ChunkedseqTest =
       in
       pt t "" true
         
-    let xs = Chunkedseq.list_of (
-        Chunkedseq.push_front  (
-          Chunkedseq.push_back (Chunkedseq.create, 123), 321))
 
     let print_list sep print_item xs =
       let rec pl sep print_item xs =
@@ -515,9 +523,6 @@ module ChunkedseqTest =
           pl sep print_item xs)
       in
       (Printf.printf "["; pl sep print_item xs; Printf.printf "]")
-                     
-    let _ =
-      (print_list "," (Printf.printf "%d") xs; Printf.printf "\n")
                  
     type 'a list_compare_res =
       | Lists_equal
@@ -545,6 +550,7 @@ module ChunkedseqTest =
              failwith "impossible"
         in
         f (0, xs, ys)
+
 
 (*    let _ = Random.init (truncate (Unix.time ()))*)
 
