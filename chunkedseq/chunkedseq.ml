@@ -14,10 +14,11 @@ $ ocamldebug a.out
     let _ =
       (print_list "," (Printf.printf "%d") xs; Printf.printf "\n")
 
-*)
+        *)
 
-let _ = Random.init 39
-
+(*let _ = Random.init 59*)
+let _ = Random.init (truncate (Unix.time ()))
+    
 module Chunk =
   struct
 
@@ -80,7 +81,7 @@ module Chunk =
 
     let full c = (size c = k)
 
-    let fold_right : 'a 'b . ('a -> 'b -> 'b) -> 'a chunk -> 'b -> 'b = fun f (_, xs)  x ->
+    let fold_right : 'a 'b . ('a -> 'b -> 'b) -> 'a chunk -> 'b -> 'b = fun f (_, xs) x ->
       List.fold_right f xs x
                                                  
   end
@@ -222,7 +223,7 @@ module Chunkedseq =
       match cs with
       | Shallow c ->
           if Chunk.full c then
-            push_back' wf (mk_deep {fo=ec; fi=ec; mid=Shallow ec; bi=ec; bo=c}, x)
+            push_back' wf (mk_deep {fo=c; fi=ec; mid=Shallow ec; bi=ec; bo=ec}, x)
           else
             Shallow (Chunk.push_back wf (c, x))
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
@@ -437,15 +438,15 @@ module Chunkedseq =
       | Shallow c ->
          Chunk.fold_right f c i
       | Deep (_, {fo; fi; mid; bi; bo}) ->
-          Chunk.fold_right f fo (
-            Chunk.fold_right f fi (
+          Chunk.fold_right f bo (
+            Chunk.fold_right f bi (
               fold_right (fun c i' -> 
                 Chunk.fold_right f c i') mid (
-                 Chunk.fold_right f bi (
-                   Chunk.fold_right f bo i))))
+                 Chunk.fold_right f fi (
+                   Chunk.fold_right f fo i))))
 
     let list_of cs =
-      List.rev (fold_right (fun x y -> x :: y) cs [])
+      fold_right (fun x y -> x :: y) cs []
       
   end
 
@@ -508,7 +509,6 @@ module ChunkedseqTest =
 	           pt t2 (p ^ (if s then "    " else "│   ")) true))
       in
       pt t "" true
-        
 
     let print_list sep print_item xs =
       let rec pl sep print_item xs =
@@ -531,7 +531,6 @@ module ChunkedseqTest =
                                               * respectively *)
       | Lists_unequal_lengths of int * int   (* length of first list, length of second *)
 
-
     let compare_lists (xs, ys) =
       let (n1, n2) = (List.length xs, List.length ys) in
       if n1 <> n2 then
@@ -551,8 +550,7 @@ module ChunkedseqTest =
         in
         f (0, xs, ys)
 
-
-(*    let _ = Random.init (truncate (Unix.time ()))*)
+    let print_chunkedseq cs = print_list "," (Printf.printf "%d") (Chunkedseq.list_of cs)
 
     let check t0 =
       let ok r s =
@@ -569,7 +567,6 @@ module ChunkedseqTest =
            failwith s))
       in
       let rec chk t r s = (
-(*        print_trace t;*)
         ok r (Chunkedseq.list_of s);
         (match t with
          | Trace_nil ->
@@ -577,7 +574,7 @@ module ChunkedseqTest =
          | Trace_push (End_front, x, t') ->
             let r' = ChunkedseqSpec.push_front (r, x) in
             let s' = Chunkedseq.push_front (s, x) in
-            chk t r' s'
+            chk t' r' s'
          | Trace_push (End_back, x, t') ->
             let r' = ChunkedseqSpec.push_back (r, x) in
             let s' = Chunkedseq.push_back (s, x) in
@@ -606,9 +603,33 @@ module ChunkedseqTest =
             (r', s')))
       in
       chk t0 ChunkedseqSpec.create Chunkedseq.create
-
+        
     let _ =
       let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 2) in
-      check t0    
-
+        let _ = check t0   in (*
+      let c0 = Chunkedseq.create in
+      let c1 = Chunkedseq.push_back (c0, 469) in
+      let c2 = Chunkedseq.push_back (c1, 570) in
+      let c3 = Chunkedseq.push_front (c2, 278) in
+      let (c4, x1) = Chunkedseq.pop_back c3 in
+      let (c5, x2) = Chunkedseq.pop_front c4 in
+      let (c6, x3) = Chunkedseq.pop_back c5 in
+      let _ = print_chunkedseq c0 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c1 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c2 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c3 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c4 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c5 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c6 in
+      let _ = Printf.printf "\n" in
+      let _ = Printf.printf "res:\t" in
+      let _ = print_list "," (Printf.printf "%d") [x1;x2;x3] in *)
+    () 
+    
   end
