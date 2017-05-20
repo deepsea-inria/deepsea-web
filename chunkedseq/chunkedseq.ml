@@ -6,15 +6,7 @@ To debug:
 $ ocamlc -rectypes unix.cma -g chunkedseq.ml
 $ ocamldebug a.out
 
-
-    let xs = Chunkedseq.list_of (
-        Chunkedseq.push_front  (
-          Chunkedseq.push_back (Chunkedseq.create, 123), 321))
-
-    let _ =
-      (print_list "," (Printf.printf "%d") xs; Printf.printf "\n")
-
-        *)
+*)
 
 (*let _ = Random.init 59*)
 let _ = Random.init (truncate (Unix.time ()))
@@ -307,7 +299,7 @@ module Chunkedseq =
       else
 	      let (cs', c') = pop_back' wf cs in
 	      if Chunk.size c + Chunk.size c' <= Chunk.k then
-	        push_back' wf (cs', Chunk.concat wf (c', c))
+	        push_back' wf (cs', Chunk.concat wf (c, c'))
 	      else
 	        push_back' wf (cs, c)
             
@@ -319,7 +311,7 @@ module Chunkedseq =
       else
 	      let (cs', c') = pop_front' wf cs in
 	      if Chunk.size c + Chunk.size c' <= Chunk.k then
-	        push_front' wf (cs', Chunk.concat wf (c, c'))
+	        push_front' wf (cs', Chunk.concat wf (c', c))
 	      else
 	        push_front' wf (cs, c)
             
@@ -377,13 +369,12 @@ module Chunkedseq =
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
           let w = 
             Chunk.weight_of fo + Chunk.weight_of fi +
-              weight_of mid +
               Chunk.weight_of bo + Chunk.weight_of bi
           in
           if w = 0 && not (empty mid) then
             let (mid', fo') = pop_front' ~wf:(Chunk.weight_of) mid in
             mk_deep {d with fo=fo'; mid=mid'}
-          else if w <= 1 && empty mid then
+          else if (w == 0 || w == 1) && empty mid then
             mk_shallow (fo, fi, bi, bo)
           else
             cs
