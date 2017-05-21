@@ -8,11 +8,11 @@ $ ocamldebug a.out
 
 *)
 
-let _ = Random.init 1495378010
+let _ = Random.init 1495380101
 (*let _ =
   let v = truncate (Unix.time ()) in
   Printf.printf "seed = %d\n" v;
-  Random.init v *)
+  Random.init v  *)
     
 module Chunk =
   struct
@@ -472,12 +472,13 @@ module ChunkedseqTest =
     let rec gen_trace n d =
       if n = 0 then
 	      Trace_nil
-      else if n >= 1 && Random.int d = 0 then
+      else if n >= 1 && Random.int (d + 1) = 0 then
 	      let i = Random.int n in
 	      let t1 = gen_trace i (d + 1) in
 	      let t2 = gen_trace (n - i - 1) (d + 1) in
+let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
 	      Trace_split_concat (i, t1, t2)
-      else if (Random.int (2 + (1 lsl n))) < 3 then
+      else if (Random.int (2 + (n * n))) < 3 then
 	      let e = random_orientation () in
 	      let x = random_item () in
 	      let t = gen_trace (n + 1) d in
@@ -571,7 +572,7 @@ module ChunkedseqTest =
       in
       let ok r s = ok' r (Chunkedseq.list_of s) in
       let rec chk t r s = (
-        (*
+
         Printf.printf "--------------------------\n";
         print_trace t;
         Printf.printf "\n";
@@ -579,7 +580,7 @@ module ChunkedseqTest =
         Printf.printf "\n";
         print_chunkedseq s;
         Printf.printf "\n";
-        Printf.printf "--------------------------\n\n"; *)
+        Printf.printf "--------------------------\n\n"; 
         ok r s;
         (match t with
          | Trace_nil ->
@@ -618,7 +619,7 @@ module ChunkedseqTest =
       chk t0 ChunkedseqSpec.create Chunkedseq.create
         
     let _ =
-      let t0 = Trace_push (random_orientation (), random_item (), gen_trace 3 2) in
+      let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 1) in
         let _ = check t0   in   (*
       let c0 = Chunkedseq.create in
       let c1 = Chunkedseq.push_back (c0, 995) in
