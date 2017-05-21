@@ -8,7 +8,7 @@ $ ocamldebug a.out
 
 *)
 
-let _ = Random.init 83
+let _ = Random.init 32
 (*let _ = Random.init (truncate (Unix.time ()))*)
     
 module Chunk =
@@ -32,7 +32,7 @@ module Chunk =
 
     let front (_, xs) = List.hd xs
 
-    let push_back wf ((w, xs), x) = (w + (wf x), List.append xs [x])
+    let push_back wf ((w, xs), x) = (w + wf x, List.append xs [x])
                                       
     let push_front wf ((w, xs), x) = (w + wf x, x :: xs)
 
@@ -379,8 +379,10 @@ module Chunkedseq =
           if w = 0 && not (empty mid) then
             let (mid', fo') = pop_front' ~wf:(Chunk.weight_of) mid in
             mk_deep {d with fo=fo'; mid=mid'}
-          else if (w == 0 || w == 1) && empty mid then
+          else if w == 1 && empty mid then
             mk_shallow (fo, fi, bi, bo)
+          else if w == 0 && empty mid then
+            create
           else
             cs
       
@@ -394,29 +396,29 @@ module Chunkedseq =
           let wm = weight_of mid in
           let (wbi, wbo) = (Chunk.weight_of bi, Chunk.weight_of bo) in
           let (cs1, x, cs2) =
-            if i <= wfo then
+            if not (Chunk.empty fo) && i <= wfo then
               let (fo1, x, fo2) = Chunk.split wf (fo, i) in
               let cs1 = mk_deep {fo=fo1; fi=ec; mid=Shallow ec; bi=ec; bo=ec} in
               let cs2 = mk_deep {d with fo=fo2} in
               (cs1, x, cs2)
-	          else if i < wfo + wfi then
+	          else if not (Chunk.empty fi) && i < wfo + wfi then
 	            let (fi1, x, fi2) = Chunk.split wf (fi, i - wfo) in
 	            let cs1 = mk_deep {fo=fo; fi=ec; mid=create; bi=ec; bo=fi1} in
 	            let cs2 = mk_deep {d with fo=fi2; fi=ec} in
 	            (cs1, x, cs2)
-            else if i <= wfo + wfi + wm then
+            else if not (empty mid) && i <= wfo + wfi + wm then
               let j = i - wfo - wfi in
               let (mid1, c, mid2) = split' Chunk.weight_of (mid, j) in
               let (c1, x, c2) = Chunk.split wf (c, j - weight_of mid1) in
               let cs1 = mk_deep {d with mid=mid1; bi=ec; bo=c1} in
               let cs2 = mk_deep {d with fo=c2; fi=ec; mid=mid2} in
               (cs1, x, cs2)
-            else if i <= wfo + wfi + wm + wbi then
+            else if not (Chunk.empty bi) && i <= wfo + wfi + wm + wbi then
 	            let (bi1, x, bi2) = Chunk.split wf (bi, i - wfo - wfi - wm) in
 	            let cs1 = mk_deep {d with bi=ec; bo=bi1} in
 	            let cs2 = mk_deep {d with fo=bi2; fi=ec; mid=create; bi=ec} in
 	            (cs1, x, cs2)
-            else if i <= wfo + wfi + wm + wbi + wbo then
+            else if not (Chunk.empty bo) && i <= wfo + wfi + wm + wbi + wbo then
 	            let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo + wfi + wm + wbi) in
 	            let cs1 = mk_deep {d with bo=bo1} in
 	            let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
@@ -612,11 +614,14 @@ module ChunkedseqTest =
         
     let _ =
       let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 2) in
-        let _ = check t0   in 
+        let _ = check t0   in  
 (*      let c0 = Chunkedseq.create in
-      let c1 = Chunkedseq.push_back (c0, 469) in
-      let c2 = Chunkedseq.push_back (c1, 570) in
-      let (sc1, sx, sc2) = Chunkedseq.split (c2, 1) in
+      let c1 = Chunkedseq.push_back (c0, 161) in
+      let c2 = Chunkedseq.push_front (c1, 673) in
+      let c3 = Chunkedseq.push_front (c2, 12) in
+      let (c4, _) = Chunkedseq.pop_front c3 in
+      let (sc1, sx, sc2) = Chunkedseq.split (c4, 0) in
+
       
       let _ = print_chunkedseq c0 in
       let _ = Printf.printf "\n" in
@@ -624,10 +629,20 @@ module ChunkedseqTest =
       let _ = Printf.printf "\n" in
       let _ = print_chunkedseq c2 in
       let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c3 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c4 in
+      let _ = Printf.printf "\n" in
+
       let _ = print_chunkedseq sc1 in
       let _ = Printf.printf "\n" in
       let _ = print_chunkedseq sc2 in
-      let _ = Printf.printf "\nsx = %d\n" sx in *)
+      let _ = Printf.printf "\nsx = %d\n" sx in 
+
+      let _ = print_chunkedseq sc1' in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq sc2' in
+      let _ = Printf.printf "\nsx = %d\n" sx' in  *) 
       () 
     
   end
