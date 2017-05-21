@@ -8,7 +8,7 @@ $ ocamldebug a.out
 
 *)
 
-let _ = Random.init 82
+let _ = Random.init 83
 (*let _ = Random.init (truncate (Unix.time ()))*)
     
 module Chunk =
@@ -39,12 +39,12 @@ module Chunk =
     let pop_back wf (w, xs) =
       match List.rev xs with
       | x :: sx' -> ((w - wf x, List.rev sx'), x)
-      | _ -> failwith "pop_back: bogus"
+      | _ -> failwith "Chunk.pop_back: bogus input"
 
     let pop_front wf (w, xs) =
       match xs with
       | x :: xs' -> ((w - wf x, xs'), x)
-      | _ -> failwith "pop_front: bogus"
+      | _ -> failwith "Chunk.pop_front: bogus input"
 
     let concat _ ((w1, xs1), (w2, xs2)) = (w1 + w2, List.append xs1 xs2)
 
@@ -53,19 +53,21 @@ module Chunk =
       sum (List.map wf xs)
         
     let split : 'a. ('a weight_fn) -> ('a chunk * weight) -> ('a chunk * 'a * 'a chunk) = fun wf ((_, xs), i) ->
-      let rec f (xs1, xs2, wxs1) =
-        match xs2 with
-        | x :: xs2 ->
-           let wxs1' = (wf x) + wxs1 in
-           let wxs2 = sigma wf (0, xs2) in
-           if wxs1' >= i then
-             ((wxs1', List.rev xs1), x, (wxs2, xs2))
-           else
-             f (x :: xs1, xs2, wxs1')
+      let rec f (sx, xs, w) =
+        match xs with
+        | x :: xs' ->
+            let w' = w + (wf x) in
+            if w' > i then
+              (List.rev sx, x, xs')
+            else
+              f (x :: sx, xs', w')
         | [] ->
-           failwith ""
+            failwith "Chunk.split: bogus input"
       in
-      f ([], xs, 0)
+      let (xs1, x, xs2) = f([], xs, 0) in
+      let c1 = (sigma wf (0, xs1), xs1) in
+      let c2 = (sigma wf (0, xs2), xs2) in
+      (c1, x, c2)
 
     let weight_of (w, _) = w
 
@@ -100,30 +102,29 @@ module ChunkedseqSpec =
       | x :: sx ->
          (List.rev sx, x)
       | [] ->
-         failwith "pop_back: bogus"
+         failwith "ChunkedseqSpec.pop_back: bogus input"
 
     let pop_front xs =
       match xs with
       | x :: xs ->
          (xs, x)
       | [] ->
-         failwith "pop_front: bogus"
+         failwith "ChunkedseqSpec.pop_front: bogus input"
 
     let concat (xs1, xs2) = List.append xs1 xs2
 
     let split (xs, i) =
-      let rec f (xs1, xs2, i) =
-        match xs2 with
-        | x :: xs2 ->
-           let i' = 1 + i in
-           if i' >= i then
-             (List.rev xs1, x, xs2)
-           else
-             f (x :: xs1, xs2, i')
+      let rec f (sx, xs, i) =
+        match xs with
+        | x :: xs' ->
+            if i = 0 then
+              (List.rev sx, x, xs')
+            else
+              f (x :: sx, xs', i - 1)
         | [] ->
-           failwith ""
+           failwith "ChunkedseqSpec.split: bogus input"
       in
-      f ([], xs, 0)
+      f ([], xs, i)
         
   end
 
@@ -173,7 +174,7 @@ module Chunkedseq =
         else if Chunk.weight_of c4 > 0 then
           c4
         else
-          failwith "bogus"
+          failwith "Chunkedseq.mk_shallow: bogus input"
       in
       Shallow c
 
@@ -421,7 +422,7 @@ module Chunkedseq =
 	            let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
 	            (cs1, x, cs2)
 	          else
-              failwith "out of bounds"
+              failwith "Chunkedseq.split: out of bounds"
           in
           (check wf cs1, x, check wf cs2)
 
@@ -549,27 +550,30 @@ module ChunkedseqTest =
 
     let check t0 =
       Printf.printf "\n";
-      let ok r s =
+      let ok' r s =
         (match compare_lists (r, s) with
          | Lists_equal ->
             ()
          | Lists_item_mismatch (i, x, y) -> (
-           print_trace t0;
+           (*print_trace t0;*)
            let s = Printf.sprintf "item mismatch at %d with x=%d and y=%d\n" i x y in
            failwith s)
          | Lists_unequal_lengths (nr, ns) -> (
-           print_trace t0;
+           (*print_trace t0;*)
            let s = Printf.sprintf "unequal lengths |r|=%d and |s|=%d\n" nr ns in
            failwith s))
       in
+      let ok r s = ok' r (Chunkedseq.list_of s) in
       let rec chk t r s = (
+        Printf.printf "--------------------------\n";
         print_trace t;
         Printf.printf "\n";
         print_list "," (Printf.printf "%d") r;
         Printf.printf "\n";
         print_chunkedseq s;
         Printf.printf "\n";
-        ok r (Chunkedseq.list_of s);
+        Printf.printf "--------------------------\n\n";
+        ok r s;
         (match t with
          | Trace_nil ->
             (r, s)
@@ -592,46 +596,38 @@ module ChunkedseqTest =
          | Trace_split_concat (i, t1, t2) ->
             let (r1, x, r2) = ChunkedseqSpec.split (r, i) in
             let (s1, y, s2) = Chunkedseq.split (s, i) in
-            let _ = ok r1 (Chunkedseq.list_of s1) in
-            let _ = ok r2 (Chunkedseq.list_of s2) in
-            let _ = ok [x] [y] in
+            let _ = ok r1 s1 in
+            let _ = ok r2 s2 in
+            let _ = ok' [x] [y] in
             let (r1', s1') = chk t1 r1 s1 in
             let (r2', s2') = chk t2 r2 s2 in
-            let _ = ok r1' (Chunkedseq.list_of s1') in
-            let _ = ok r2' (Chunkedseq.list_of s2') in
+            let _ = ok r1' s1' in
+            let _ = ok r2' s2' in
             let r' = ChunkedseqSpec.concat (r1', r2') in
-            let s' = Chunkedseq.concat (s1, s2) in
-            let _ = ok r' (Chunkedseq.list_of s') in
+            let s' = Chunkedseq.concat (s1', s2') in
+            let _ = ok r' s' in
             (r', s')))
       in
       chk t0 ChunkedseqSpec.create Chunkedseq.create
         
     let _ =
       let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 2) in
-        let _ = check t0   in (*
-      let c0 = Chunkedseq.create in
+        let _ = check t0   in 
+(*      let c0 = Chunkedseq.create in
       let c1 = Chunkedseq.push_back (c0, 469) in
       let c2 = Chunkedseq.push_back (c1, 570) in
-      let c3 = Chunkedseq.push_front (c2, 278) in
-      let (c4, x1) = Chunkedseq.pop_back c3 in
-      let (c5, x2) = Chunkedseq.pop_front c4 in
-      let (c6, x3) = Chunkedseq.pop_back c5 in
+      let (sc1, sx, sc2) = Chunkedseq.split (c2, 1) in
+      
       let _ = print_chunkedseq c0 in
       let _ = Printf.printf "\n" in
       let _ = print_chunkedseq c1 in
       let _ = Printf.printf "\n" in
       let _ = print_chunkedseq c2 in
       let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c3 in
+      let _ = print_chunkedseq sc1 in
       let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c4 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c5 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c6 in
-      let _ = Printf.printf "\n" in
-      let _ = Printf.printf "res:\t" in
-      let _ = print_list "," (Printf.printf "%d") [x1;x2;x3] in *)
-    () 
+      let _ = print_chunkedseq sc2 in
+      let _ = Printf.printf "\nsx = %d\n" sx in *)
+      () 
     
   end
