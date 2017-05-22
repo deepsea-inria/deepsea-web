@@ -382,9 +382,9 @@ module Chunkedseq =
           if w = 0 && not (empty mid) then
             let (mid', fo') = pop_front' ~wf:(Chunk.weight_of) mid in
             mk_deep {d with fo=fo'; mid=mid'}
-          else if w == 1 && empty mid then
+          else if w = 1 && empty mid then
             mk_shallow (fo, fi, bi, bo)
-          else if w == 0 && empty mid then
+          else if w = 0 && empty mid then
             create
           else
             cs
