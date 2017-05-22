@@ -219,7 +219,7 @@ module Chunkedseq =
       match cs with
       | Shallow c ->
           if Chunk.full c then
-            push_back' wf (mk_deep {fo=c; fi=ec; mid=Shallow ec; bi=ec; bo=ec}, x)
+            push_back' wf (mk_deep {fo=c; fi=ec; mid=create; bi=ec; bo=ec}, x)
           else
             Shallow (Chunk.push_back wf (c, x))
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
@@ -401,7 +401,7 @@ module Chunkedseq =
           let (cs1, x, cs2) =
             if not (Chunk.empty fo) && i < wfo then
               let (fo1, x, fo2) = Chunk.split wf (fo, i) in
-              let cs1 = mk_deep {fo=fo1; fi=ec; mid=Shallow ec; bi=ec; bo=ec} in
+              let cs1 = mk_deep {fo=fo1; fi=ec; mid=create; bi=ec; bo=ec} in
               let cs2 = mk_deep {d with fo=fo2} in
               (cs1, x, cs2)
 	          else if not (Chunk.empty fi) && i < wfo + wfi then
