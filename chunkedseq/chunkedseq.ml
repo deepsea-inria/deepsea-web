@@ -229,15 +229,28 @@ module Chunkedseq =
 
     and push_back  : 'a. ('a chunkedseq * 'a) -> 'a chunkedseq = fun (cs, x) ->
       push_back' unit_weight_fn (cs, x)
-              
-    and mk_deep' : 'a. wf:('a weight_fn) -> 'a deep -> 'a chunkedseq = fun ~wf d ->
-      match d with
-      | {fo; fi; mid; bi; bo} ->
-      let w = Chunk.weight fo + Chunk.weight fi +
-                weight mid +
-                Chunk.weight bi + Chunk.weight bo
-      in
-      Deep (w, d)
+
+    and check : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq = fun ~wf cs ->
+      match cs with
+      | Shallow c ->
+	        cs
+      | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
+          let w = 
+            Chunk.weight fo + Chunk.weight fi +
+              Chunk.weight bo + Chunk.weight bi
+          in
+          if w = 0 && not (empty mid) then
+            let (mid', fo') = pop_front' ~wf:(Chunk.weight) mid in
+            mk_deep {d with fo=fo'; mid=mid'}
+          else if w = 1 && empty mid then
+            mk_shallow (fo, fi, bi, bo)
+          else if w = 0 && empty mid then
+            create
+          else
+            cs
+
+   and mk_deep' : 'a. wf:('a weight_fn) -> 'a deep -> 'a chunkedseq = fun ~wf d ->
+      check wf (mk_deep d)
 
     and pop_front' : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq * 'a = fun ~wf cs ->
       match cs with
@@ -361,25 +374,6 @@ module Chunkedseq =
                       
     and concat : 'a chunkedseq * 'a chunkedseq -> 'a chunkedseq = fun (cs1, cs2) ->
       concat' unit_weight_fn (cs1, cs2)
-
-    let rec check : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq = fun ~wf cs ->
-      match cs with
-      | Shallow c ->
-	        cs
-      | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
-          let w = 
-            Chunk.weight fo + Chunk.weight fi +
-              Chunk.weight bo + Chunk.weight bi
-          in
-          if w = 0 && not (empty mid) then
-            let (mid', fo') = pop_front' ~wf:(Chunk.weight) mid in
-            mk_deep {d with fo=fo'; mid=mid'}
-          else if w = 1 && empty mid then
-            mk_shallow (fo, fi, bi, bo)
-          else if w = 0 && empty mid then
-            create
-          else
-            cs
       
     and split' : 'a. wf:('a weight_fn) -> ('a chunkedseq * int) -> ('a chunkedseq * 'a * 'a chunkedseq) = fun ~wf (cs, i) ->
       match cs with
@@ -449,7 +443,7 @@ module ChunkedseqTest =
    let _ = Random.init 1495380101
    let _ =
      let v = truncate (Unix.time ()) in
-     Printf.printf "seed = %d\n" v;
+     (*Printf.printf "seed = %d\n" v;*)
      Random.init v  
    
     type item = int
@@ -614,38 +608,6 @@ module ChunkedseqTest =
        let _ = check t0 in
        check_loop (n - 1)
    
-
    let _ = check_loop 50000
-
-  
-            (*
-      let c0 = Chunkedseq.create in
-      let c1 = Chunkedseq.push_back (c0, 295) in
-      let c2 = Chunkedseq.push_back (c1, 592) in
-      let c3 = Chunkedseq.push_front (c2, 614) in
-      let (_, sx, c4) = Chunkedseq.split (c3, 0) in
-      let c5 = Chunkedseq.push_back (c4, 7) in
-      let c6 = Chunkedseq.push_front (c5, 724) in
-      let (c7, _) = Chunkedseq.pop_front c6 in
-      
-      let _ = print_chunkedseq c0 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c1 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c2 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c3 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c4 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c5 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c6 in
-      let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq c7 in
-      let _ = Printf.printf "\n" in
-
-      let _ = Chunkedseq.split (c7, 2) in
-*)
     
   end
