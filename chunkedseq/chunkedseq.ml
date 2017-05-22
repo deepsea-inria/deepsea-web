@@ -9,10 +9,10 @@ $ ocamldebug a.out
 *)
 
 let _ = Random.init 1495380101
-(*let _ =
+let _ =
   let v = truncate (Unix.time ()) in
   Printf.printf "seed = %d\n" v;
-  Random.init v  *)
+  Random.init v  
     
 module Chunk =
   struct
@@ -422,7 +422,7 @@ module Chunkedseq =
 	            let cs2 = mk_deep {d with fo=bi2; fi=ec; mid=create; bi=ec} in
 	            (cs1, x, cs2)
             else if not (Chunk.empty bo) && i < wfo + wfi + wm + wbi + wbo then
-	            let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo + wfi + wm + wbi) in
+	            let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo - wfi - wm - wbi) in
 	            let cs1 = mk_deep {d with bo=bo1} in
 	            let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
 	            (cs1, x, cs2)
@@ -472,13 +472,12 @@ module ChunkedseqTest =
     let rec gen_trace n d =
       if n = 0 then
 	      Trace_nil
-      else if n >= 1 && Random.int (d + 1) = 0 then
+      else if n >= 1 && Random.int (d + 3) = 0 then
 	      let i = Random.int n in
 	      let t1 = gen_trace i (d + 1) in
 	      let t2 = gen_trace (n - i - 1) (d + 1) in
-let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
 	      Trace_split_concat (i, t1, t2)
-      else if (Random.int (2 + (n * n))) < 3 then
+      else if (Random.int (2 + (1 lsl n))) < 3 then
 	      let e = random_orientation () in
 	      let x = random_item () in
 	      let t = gen_trace (n + 1) d in
@@ -553,10 +552,10 @@ let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
         f (0, xs, ys)
 
     let print_chunkedseq cs = print_list "," (Printf.printf "%d") (Chunkedseq.list_of cs)
-
-    let check t0 =
-      print_trace t0;
-      Printf.printf "\n";
+    
+    let check t0 = 
+(*      print_trace t0;
+      Printf.printf "\n"; *)
       let ok' r s =
         (match compare_lists (r, s) with
          | Lists_equal ->
@@ -572,15 +571,6 @@ let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
       in
       let ok r s = ok' r (Chunkedseq.list_of s) in
       let rec chk t r s = (
-
-        Printf.printf "--------------------------\n";
-        print_trace t;
-        Printf.printf "\n";
-        print_list "," (Printf.printf "%d") r;
-        Printf.printf "\n";
-        print_chunkedseq s;
-        Printf.printf "\n";
-        Printf.printf "--------------------------\n\n"; 
         ok r s;
         (match t with
          | Trace_nil ->
@@ -617,17 +607,28 @@ let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
             (r', s')))
       in
       chk t0 ChunkedseqSpec.create Chunkedseq.create
-        
-    let _ =
-(*      let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 1) in
-        let _ = check t0   in   *)
+
+   let rec check_loop n =
+     if n <= 0 then
+       ()
+     else
+       let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 1) in
+       let _ = check t0 in
+       check_loop (n - 1)
+   
+
+   let _ = check_loop 50000
+
+  
+            (*
       let c0 = Chunkedseq.create in
       let c1 = Chunkedseq.push_back (c0, 295) in
       let c2 = Chunkedseq.push_back (c1, 592) in
-      let (_, sx, c31) = Chunkedseq.split (c2, 0) in
-      let c4 = Chunkedseq.push_back (c31, 7) in
-      let c5 = Chunkedseq.push_back (c4, 724) in
-      let (c6, _) = Chunkedseq.pop_front c5 in
+      let c3 = Chunkedseq.push_front (c2, 614) in
+      let (_, sx, c4) = Chunkedseq.split (c3, 0) in
+      let c5 = Chunkedseq.push_back (c4, 7) in
+      let c6 = Chunkedseq.push_front (c5, 724) in
+      let (c7, _) = Chunkedseq.pop_front c6 in
       
       let _ = print_chunkedseq c0 in
       let _ = Printf.printf "\n" in
@@ -643,9 +644,10 @@ let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
       let _ = Printf.printf "\n" in
       let _ = print_chunkedseq c6 in
       let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c7 in
+      let _ = Printf.printf "\n" in
 
-      let (c71, x7, c72) = Chunkedseq.split (c6, 2) in
-
-      () 
+      let _ = Chunkedseq.split (c7, 2) in
+*)
     
   end
