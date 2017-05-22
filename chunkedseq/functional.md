@@ -33,7 +33,7 @@ concat (xs₁, xs₂)    : α chunkedseq ✕ α chunkedseq → α chunkedseq = x
 split (xs₁ ⊕ [xᵢ] ⊕ xs₂, i)
                      : α chunkedseq ✕ int → (α chunkedseq ✕ α ✕ α chunkedseq)
                      = (xs₁, xᵢ, xs₂)
-  such that size xs₁ == i
+  such that size xs₁ = i
 ~~~~~
 
 ***Complexity.***
@@ -63,13 +63,13 @@ The simplest weight function assigns to each item the same weight:
 one.
 
 ~~~~~ {.ocaml}
-(λ x . 1) : α wf
+let γ₀ : α wf = (λ x . 1)
 ~~~~~
 
 It is often useful to take the sum of the weights of a given
 buffer. For this purpose, we define the function `Σ`. The function
-itself takes as argument a weight function `wf` and yields the
-combined weights of the items in the given buffer.
+itself takes as argument a weight function and yields the combined
+weights of the items in the given buffer.
 
 ~~~~~ {.ocaml}
 Σ f [x₀, ..., xₙ] : α wf → (α, K) fixed_capacity_buffer → int
@@ -79,28 +79,28 @@ combined weights of the items in the given buffer.
 ***Abstract data type.***
 
 ~~~~~ {.ocaml}
-let K = 32
+let K (* be an integer > 1; typically, 32 *)
 type α chunk = weight ✕ (α, K) fixed_capacity_buffer
 
 [⋮⋮]                        : α chunk = []
 size (_, [x₀, ..., xₙ])    : α chunk → int = n + 1
 sub ((_, xs₁ ⊕ [xᵢ] ⊕ xs₂) , i)
                            : α chunk ✕ int → α = xᵢ
-  such that |xs₁| == i
+  such that |xs₁| = i
 back (_, xs ⊕ [x])         : α chunk → α = x
 front (_, [x] ⊕ xs)        : α chunk → α = x
 push_front γ ((w, xs), x)  : α wf → α chunk ✕ α → α chunk = (w', [x] ⊕ xs)
-  where w' == γ x + Σ γ xs == γ x + w
+  where w' = γ x + Σ γ xs = γ x + w
 push_back γ ((w, xs), x)   : α wf → α chunk ✕ α → α chunk = (w', xs ⊕ [x])
-  where w' == γ x + Σ γ xs == γ x + w
+  where w' = γ x + Σ γ xs = γ x + w
 pop_front γ (w, [x] ⊕ xs)  : α wf → α chunk → (α chunk ✕ α) = ((w', xs), x)
-  where w' + γ x == Σ γ xs + γ x == w
+  where w' + γ x = Σ γ xs + γ x = w
 pop_back γ (w, xs ⊕ [x])   : α wf → α chunk → (α chunk ✕ α) = ((w', xs), x)
-  where w' + γ x == Σ γ xs + γ x == w
+  where w' + γ x = Σ γ xs + γ x = w
 concat γ ((w₁, xs₁), (w₂, xs₂))
                            : α wf → α chunk ✕ α chunk → α chunk
                            = (w₁ + w₂, xs₁ ⊕ xs₂)
-  such that w₁ + w₂ == Σ γ xs₁ + Σ γ xs₂
+  such that w₁ + w₂ = Σ γ xs₁ + Σ γ xs₂
 split γ ((w, xs₁ ⊕ [x] ⊕ xs₂), i)
                             : α chunk ✕ int → (α chunk ✕ α ✕ α chunk)
                             = ((w₁, xs₁), x, (w₂, xs₂))
@@ -110,15 +110,15 @@ split γ ((w, xs₁ ⊕ [x] ⊕ xs₂), i)
 ~~~~~
 
 ~~~~~ {.ocaml}
-weight_of (w, _)    : α chunk → int = w
+weight (w, _)    : α chunk → int = w
 ~~~~~
 
 ~~~~~ {.ocaml}
 empty : α chunk → bool
-empty c = (size c == 0)
+empty c = (size c = 0)
 
 full : α chunk → bool
-full c = (size c == K)
+full c = (size c = K)
 ~~~~~
 
 Chunked sequence
@@ -145,9 +145,9 @@ Smart constructors
 ~~~~~ {.ocaml}
 mk_deep : α deep → α chunkedseq
 mk_deep (d as {fₒ, fᵢ, m, bᵢ, bₒ}) =
-  let w = Chunk.weight_of fₒ + Chunk.weight_of fᵢ
-        + weight_of m
-        + Chunk.weight_of bᵢ + Chunk.weight_of bₒ
+  let w = Chunk.weight fₒ + Chunk.weight fᵢ
+        + weight m
+        + Chunk.weight bᵢ + Chunk.weight bₒ
   in
   Deep (w, d)
 ~~~~~    
@@ -173,16 +173,16 @@ push_front' γ (Shallow c, x) =
     push_front' γ (mk_deep {fₒ=[⋮⋮], fᵢ=[⋮⋮], m=m, bᵢ=[⋮⋮], bₒ=c}, x)
   else
     Shallow (Chunk.push_front γ (c, x))
-push_front' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ}), x) =
+push_front' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ} as d), x) =
   if Chunk.full fₒ then
     if Chunk.empty fᵢ then
-      push_front' γ (mk_deep {fₒ=[⋮⋮], fᵢ=fₒ, m=m, bᵢ=bᵢ, bₒ=bₒ}, x)
+      push_front' γ (mk_deep {d with fₒ=[⋮⋮], fᵢ=fₒ}, x)
     else
-      let m' = push_front' (Σ γ) (m, fᵢ) in
-      push_front' γ (mk_deep {fₒ=[⋮⋮], fᵢ=fₒ, m=m', bᵢ=bᵢ, bₒ=bₒ}, x)
+      let m' = push_front' Chunk.weight (m, fᵢ) in
+      push_front' γ (mk_deep {d with fₒ=[⋮⋮], fᵢ=fₒ, m=m'}, x)
   else
     let fₒ' = Chunk.push_front γ (fₒ, x) in
-    mk_deep {fₒ=fₒ', fᵢ=fᵢ, m=m, bᵢ=bᵢ, bₒ=bₒ}
+    mk_deep {d with fₒ=fₒ'}
 ~~~~~
 
 Check
@@ -191,17 +191,19 @@ Check
 ~~~~~ {.ocaml}
 check : α wf → α chunkedseq → α chunkedseq
 check γ (Shallow c) = Shallow c
-check γ (d as Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ})) =
-  let w = Chunk.size fₒ + Chunk.size fᵢ
-         + Chunk.size bᵢ + Chunk.size bₒ
+check γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ}) as s) =
+  let w = Chunk.weight fₒ + Chunk.weight fᵢ
+        + Chunk.weight bᵢ + Chunk.weight bₒ
   in
-  if w == 0 && ¬ (empty m) then
-    let (m', fₒ') = pop_front γ m in
+  if w = 0 ∧ ¬ (empty m) then
+    let (m', fₒ') = pop_front' Chunk.weight m in
     mk_deep {fₒ=fₒ', fᵢ=[⋮⋮], m=m', bᵢ=[⋮⋮], bₒ=[⋮⋮]}
-  else if w ≤ 1 && empty m then
+  else if w = 1 ∧ empty m then
     mk_shallow (fₒ, fᵢ, bᵢ, bₒ)
+  else if w = 0 ∧ empty m then
+    Shallow [⋮⋮]
   else
-    d
+    s
 ~~~~~
 
 ~~~~~ {.ocaml}
@@ -217,21 +219,21 @@ pop_front' : α wf → α chunkedseq → (α chunkedseq ✕ α)
 pop_front' γ (Shallow c) =
   let (c', x) = Chunk.pop_front γ c in
   (Shallow c', x)
-pop_front' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ})) =
+pop_front' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ} as d)) =
   if Chunk.empty fₒ then
     if ¬ (Chunk.empty fᵢ) then
-      pop_front' γ (mk_deep' γ {fₒ=fᵢ, fᵢ=[⋮⋮], m=m, bᵢ=bᵢ, bₒ=bₒ})
+      pop_front' γ (mk_deep' γ {d with fₒ=fᵢ, fᵢ=[⋮⋮]})
     else if ¬ (empty m) then 
-      let (m', c) = pop_front' (Σ γ) m in
-      pop_front' γ (mk_deep' γ {fₒ=c, fᵢ=fᵢ, m=m', bᵢ=bᵢ, bₒ=bₒ})
+      let (m', c) = pop_front' Chunk.weight m in
+      pop_front' γ (mk_deep' γ {d with fₒ=c, m=m'})
     else if ¬ (Chunk.empty bᵢ) then
-      pop_front' γ (mk_deep' γ {fₒ=bₒ, fᵢ=fᵢ, m=m, bᵢ=bᵢ, bₒ=[⋮⋮]})
+      pop_front' γ (mk_deep' γ {d with fₒ=bᵢ, bᵢ=[⋮⋮]})
     else
       let (bₒ', x) = Chunk.pop_front γ bₒ in
-      (mk_deep' γ {fₒ=fₒ, fᵢ=fᵢ, m=m, bᵢ=bᵢ, bₒ=bₒ'}, x)
+      (mk_deep' γ {d with bₒ=bₒ'}, x)
   else
     let (fₒ', x) = Chunk.pop_front γ fₒ in
-    (mk_deep' γ {fₒ=fₒ', fᵢ=fᵢ, m=m, bᵢ=bᵢ, bₒ=bₒ}, x)
+    (mk_deep' γ {d with fₒ=fₒ'}, x)
 ~~~~~
 
 Concatenation
@@ -247,7 +249,7 @@ push_buffer_back γ (s, c)  =
     Shallow (Chunk.push_back γ ([⋮⋮], c))
   else
     let (cs', c') = pop_back' γ cs in
-    if Chunk.size c + Chunk.size c' <= Chunk.k then
+    if Chunk.size c + Chunk.size c' ≤ Chunk.k then
       push_back' γ (cs', Chunk.concat γ (c', c))
     else
       push_back' γ (cs, c)
@@ -271,26 +273,23 @@ concat' γ (s₁, Shallow c₂) =
   transfer_contents_back γ (s₁, c₂)
 concat' γ (s₁ as Deep (_, {fₒ=fₒ₁, fᵢ=fᵢ₁, m=m₁, bᵢ=bᵢ₁, bₒ=bₒ₁}),
            s₂ as Deep (_, {fₒ=fₒ₂, fᵢ=fᵢ₂, m=m₂, bᵢ=bᵢ₂, bₒ=bₒ₂})) =
-  let m₁' = push_buffer_back (Σ γ) (m₁, bᵢ₁) in
-  let m₁'' = push_buffer_back (Σ γ) (m₁', bₒ₁) in
-  let m₂' = push_buffer_front (Σ γ) (m₂, fᵢ₂) in
-  let m₂'' = push_buffer_front (Σ γ) (m₂', fₒ₂) in
-  if empty s₁ then
-    s₂
-  else if empty s₂ then
-    s₁
-  else
-    let (c₁, c₂) = (back m₁'', front m₂'') in
-    let (m₁''', m₂''') = 
-      if Chunk.weight_of c₁ + Chunk.weight_of c₂ ≤ K then
-        let (m₁'', _) = pop_back' (Σ γ) m₁'' in
-        let (m₂'', _) = pop_front' (Σ γ) m₂'' in
+  let m₁' = push_buffer_back Chunk.weight (m₁, bᵢ₁) in
+  let m₁'' = push_buffer_back Chunk.weight (m₁', bₒ₁) in
+  let m₂' = push_buffer_front Chunk.weight (m₂, fᵢ₂) in
+  let m₂'' = push_buffer_front Chunk.weight (m₂', fₒ₂) in
+  let (m₁''', m₂''') =
+    if empty m₁'' ∨ empty m₂'' then
+      (m₁'', m₂'')
+    else
+      let (m₁'', c₁) = pop_back' Chunk.weight m₁'' in
+      let (m₂'', c₂) = pop_front' Chunk.weight m₂'' in
+      if Chunk.weight c₁ + Chunk.weight c₂ ≤ K then
         let c' = Chunk.concat γ (c₁, c₂) in
-        (push_back' (Σ γ) (m₁'', c'), m₂'')
+        (push_back' Chunk.weight (m₁'', c'), m₂'')
       else
         (m₁'', m₂'')
-    let m₁₂ = concat' (Σ γ) (m₁''', m₂''') in
-    mk_deep' γ {fₒ=fₒ₁, fᵢ=fᵢ₁, m=m₁₂, bᵢ=bᵢ₂, bₒ=bₒ₂}
+  let m₁₂ = concat' Chunk.weight (m₁''', m₂''') in
+  mk_deep' γ {fₒ=fₒ₁, fᵢ=fᵢ₁, m=m₁₂, bᵢ=bᵢ₂, bₒ=bₒ₂}
 ~~~~~
 
 Weighted split
@@ -301,35 +300,40 @@ split' : α wf → α chunkedseq ✕ int → (α chunkedseq ✕ α ✕ α chunke
 split' γ (Shallow c, i) =
   let (c₁, x, c₂) = Chunk.split γ (c, i) in
   (Shallow c₁, x, Shallow c₂)
-split' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ})) =
-  let (wfₒ, wfᵢ) = (Chunk.weight_of fₒ, Chunk.weight_of fᵢ) in
-  let wₘ = weight_of m in
-  let (wbᵢ, wbₒ) = (Chunk.weight_of bᵢ, Chunk.weight_of bₒ) in
+split' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ} as d)) =
+  let (wfₒ, wfᵢ) = (Chunk.weight fₒ, Chunk.weight fᵢ) in
+  let wₘ = weight m in
+  let (wbᵢ, wbₒ) = (Chunk.weight bᵢ, Chunk.weight bₒ) in
   let (s₁, x, s₂) = 
-    if i ≤ wfₒ then
+    if ¬ (Chunk.empty fₒ) ∧ i < wfₒ then
       let (fₒ₁, x, fₒ₂) = Chunk.split γ (fₒ, i) in
-      let s₁ = mk_deep {fₒ=fₒ₁, fᵢ=[⋮⋮], m=Shallow [⋮⋮],
-                          bᵢ=[⋮⋮], bₒ=[⋮⋮]}
-      in
-      let s₂ = mk_deep {fₒ=fₒ₂, fᵢ=fᵢ, m=m, bᵢ=bᵢ, bₒ=bₒ} in
+      let s₁ = mk_deep {fₒ=fₒ₁, fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮], bₒ=[⋮⋮]} in
+      let s₂ = mk_deep {d with fₒ=fₒ₂} in
       (s₁, x, s₂)
-    else if i ≤ wfₒ + wfᵢ then
+    else if ¬ (Chunk.empty fᵢ) ∧ i < wfₒ + wfᵢ then
       let (fᵢ₁, x, fᵢ₂) = Chunk.split γ (fᵢ, i) in
-      let s₁ = mk_deep {fₒ=fₒ, fᵢ=[⋮⋮], m=Shallow [⋮⋮],
-                          bᵢ=[⋮⋮], bₒ=fᵢ₁} in
-      let s₂ = mk_deep {fₒ=fᵢ₂, fᵢ=[⋮⋮], m=m, bᵢ=bᵢ, bₒ=bₒ} in
+      let s₁ = mk_deep {d with fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮], bₒ=fᵢ₁} in
+      let s₂ = mk_deep {d with fₒ=fᵢ₂, fᵢ=[⋮⋮]} in
       (s₁, x, s₂)
-    else if i ≤ wfₒ + wfᵢ + wₘ then
+    else if ¬ (empty m) ∧ i < wfₒ + wfᵢ + wₘ then
       let j = i - wfₒ - wfᵢ in
-      let (m₁, c, m₂) = split' (Σ γ) (m, j) in
-      let (c₁, x, c₂) = Chunk.split γ (c, j - weight_of m₁) in
-      let s₁ = mk_deep {fₒ=fₒ, fᵢ=fᵢ, m=m₁, bᵢ=[⋮⋮], bₒ=c₁} in
-      let s₂ = mk_deep {fₒ=c₂, fᵢ=[⋮⋮], m=m₂, bᵢ=bᵢ, bₒ=bₒ} in
+      let (m₁, c, m₂) = split' Chunk.weight (m, j) in
+      let (c₁, x, c₂) = Chunk.split γ (c, j - weight m₁) in
+      let s₁ = mk_deep {d with m=m₁, bᵢ=[⋮⋮], bₒ=c₁} in
+      let s₂ = mk_deep {d with fₒ=c₂, fᵢ=[⋮⋮], m=m₂} in
       (s₁, x, s₂)
-    else if i ≤ wfₒ + wfᵢ + wₘ + wbᵢ then
-      ...
+    else if ¬ (Chunk.empty bᵢ) ∧ i < wfₒ + wfᵢ + wₘ + wbᵢ then
+      let j = i - wfₒ - wfᵢ - wₘ in
+      let (bᵢ₁, x, bᵢ₂) = Chunk.split γ (bᵢ, j) in
+      let s₁ = mk_deep {d with bᵢ=[⋮⋮], bₒ=bᵢ₁} in
+      let s₂ = mk_deep {d with fₒ=bᵢ₂, fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮]} in
+      (s₁, x, s₂)
     else
-      ...
+      let j = i - wfₒ - wfᵢ - wₘ - wbᵢ in
+      let (bₒ₁, x, bₒ₂) = Chunk.split γ (bₒ, j) in
+      let s₁ = mk_deep {d with bₒ=bₒ₁} in
+      let s₂ = mk_deep {fₒ=bₒ₂, fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮], bₒ=[⋮⋮]} in
+      (s₁, x, s₂)
   in
   (check γ s₁, x, check γ s₂)
 ~~~~~
@@ -340,13 +344,11 @@ Summary
 ~~~~~ {.ocaml}
 sub xs = ...
 
-size xs = weight_of xs
+size xs = weight xs
 
 back xs = ...
 
 front xs = ...
-
-let γ₀ : α wf = (λ x . 1)
 
 push_front = push_front' γ₀
 push_back = push_back' γ₀
