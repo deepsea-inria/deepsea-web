@@ -8,12 +8,54 @@ $ ocamldebug a.out
 
 *)
 
-let _ = Random.init 1495380101
-let _ =
-  let v = truncate (Unix.time ()) in
-  Printf.printf "seed = %d\n" v;
-  Random.init v  
+module ChunkedseqSpec =
+  struct
+
+    let create = []
     
+    let size = List.length
+
+    let sub (xs, i) = List.nth xs i
+
+    let back xs = sub (xs, size xs - 1)
+
+    let front = List.hd
+
+    let push_back (xs, x) = List.append xs [x]
+
+    let push_front (xs, x) = x :: xs
+
+    let pop_back xs =
+      match List.rev xs with
+      | x :: sx ->
+         (List.rev sx, x)
+      | [] ->
+         failwith "ChunkedseqSpec.pop_back: bogus input"
+
+    let pop_front xs =
+      match xs with
+      | x :: xs ->
+         (xs, x)
+      | [] ->
+         failwith "ChunkedseqSpec.pop_front: bogus input"
+
+    let concat (xs1, xs2) = List.append xs1 xs2
+
+    let split (xs, i) =
+      let rec f (sx, xs, i) =
+        match xs with
+        | x :: xs' ->
+            if i = 0 then
+              (List.rev sx, x, xs')
+            else
+              f (x :: sx, xs', i - 1)
+        | [] ->
+           failwith "ChunkedseqSpec.split: bogus input"
+      in
+      f ([], xs, i)
+        
+  end
+
 module Chunk =
   struct
 
@@ -81,54 +123,6 @@ module Chunk =
     let fold_right : 'a 'b . ('a -> 'b -> 'b) -> 'a chunk -> 'b -> 'b = fun f (_, xs) x ->
       List.fold_right f xs x
                                                  
-  end
-
-module ChunkedseqSpec =
-  struct
-
-    let create = []
-    
-    let size = List.length
-
-    let sub (xs, i) = List.nth xs i
-
-    let back xs = sub (xs, size xs - 1)
-
-    let front = List.hd
-
-    let push_back (xs, x) = List.append xs [x]
-
-    let push_front (xs, x) = x :: xs
-
-    let pop_back xs =
-      match List.rev xs with
-      | x :: sx ->
-         (List.rev sx, x)
-      | [] ->
-         failwith "ChunkedseqSpec.pop_back: bogus input"
-
-    let pop_front xs =
-      match xs with
-      | x :: xs ->
-         (xs, x)
-      | [] ->
-         failwith "ChunkedseqSpec.pop_front: bogus input"
-
-    let concat (xs1, xs2) = List.append xs1 xs2
-
-    let split (xs, i) =
-      let rec f (sx, xs, i) =
-        match xs with
-        | x :: xs' ->
-            if i = 0 then
-              (List.rev sx, x, xs')
-            else
-              f (x :: sx, xs', i - 1)
-        | [] ->
-           failwith "ChunkedseqSpec.split: bogus input"
-      in
-      f ([], xs, i)
-        
   end
 
 module Chunkedseq =
@@ -256,7 +250,6 @@ module Chunkedseq =
              pop_front' wf (mk_deep' wf {d with fo=fi; fi=ec;})
            else if not (empty mid) then
              let (mid', c) = pop_front' ~wf:(Chunk.weight) mid in
-             (* free fo *)
              pop_front' wf (mk_deep' wf {d with fo=c; mid=mid'})
            else if not (Chunk.empty bi) then
              pop_front' wf (mk_deep' wf {d with fo=bi; bi=ec})
@@ -281,7 +274,6 @@ module Chunkedseq =
              pop_back' wf (mk_deep' wf {d with bi=ec; bo=bi})
            else if not (empty mid) then
              let (mid', c) = pop_back' ~wf:(Chunk.weight) mid in
-             (* free bo *)
              pop_back' wf (mk_deep' wf {d with mid=mid'; bo=c})
            else if not (Chunk.empty fi) then
              pop_back' wf (mk_deep' wf {d with fi=ec; bo=fi})
@@ -450,10 +442,16 @@ module Chunkedseq =
       fold_right (fun x y -> x :: y) cs []
       
   end
-
+   
 module ChunkedseqTest =
   struct
 
+   let _ = Random.init 1495380101
+   let _ =
+     let v = truncate (Unix.time ()) in
+     Printf.printf "seed = %d\n" v;
+     Random.init v  
+   
     type item = int
 
     type orientation = End_front | End_back
