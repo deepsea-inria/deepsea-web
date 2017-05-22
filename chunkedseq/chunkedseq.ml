@@ -198,7 +198,7 @@ module Chunkedseq =
       match cs with
       | Shallow c ->
           if Chunk.full c then
-            push_front' wf (mk_deep {fo=ec; fi=ec; mid=Shallow ec; bi=ec; bo=c}, x)
+            push_front' wf (mk_deep {fo=ec; fi=ec; mid=create; bi=ec; bo=c}, x)
           else
             Shallow (Chunk.push_front wf (c, x))
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
@@ -373,7 +373,7 @@ module Chunkedseq =
     let rec check : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq = fun ~wf cs ->
       match cs with
       | Shallow c ->
-	        Shallow c
+	        cs
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
           let w = 
             Chunk.weight_of fo + Chunk.weight_of fi +
