@@ -619,13 +619,15 @@ let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
       chk t0 ChunkedseqSpec.create Chunkedseq.create
         
     let _ =
-      let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 1) in
-        let _ = check t0   in   (*
+(*      let t0 = Trace_push (random_orientation (), random_item (), gen_trace 1 1) in
+        let _ = check t0   in   *)
       let c0 = Chunkedseq.create in
-      let c1 = Chunkedseq.push_back (c0, 995) in
-      let c2 = Chunkedseq.push_front (c1, 845) in
-      let c3 = Chunkedseq.push_front (c2, 671) in
-      let (sc1, sx, sc2) = Chunkedseq.split (c3, 2) in
+      let c1 = Chunkedseq.push_back (c0, 295) in
+      let c2 = Chunkedseq.push_back (c1, 592) in
+      let (_, sx, c31) = Chunkedseq.split (c2, 0) in
+      let c4 = Chunkedseq.push_back (c31, 7) in
+      let c5 = Chunkedseq.push_back (c4, 724) in
+      let (c6, _) = Chunkedseq.pop_front c5 in
       
       let _ = print_chunkedseq c0 in
       let _ = Printf.printf "\n" in
@@ -635,14 +637,15 @@ let _ = Printf.printf "i1 = %d i2 = %d\n" i (n - i - 1) in
       let _ = Printf.printf "\n" in
       let _ = print_chunkedseq c3 in
       let _ = Printf.printf "\n" in
-
-      let _ = print_chunkedseq sc1 in
+      let _ = print_chunkedseq c4 in
       let _ = Printf.printf "\n" in
-      let _ = print_chunkedseq sc2 in
-      let _ = Printf.printf "\nsx = %d\n" sx in 
+      let _ = print_chunkedseq c5 in
+      let _ = Printf.printf "\n" in
+      let _ = print_chunkedseq c6 in
+      let _ = Printf.printf "\n" in
 
-      let (sc1', sx', sc2') = Chunkedseq.split (sc1, 1) in
-*)      
+      let (c71, x7, c72) = Chunkedseq.split (c6, 2) in
+
       () 
     
   end
