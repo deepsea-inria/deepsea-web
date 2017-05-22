@@ -240,8 +240,7 @@ Concatenation
 -------------
 
 ~~~~~ {.ocaml}
-push_buffer_back :
-  α chunk wf → α chunk chunkedseq ✕ α chunk → α chunk chunkedseq
+push_buffer_back : α chunk wf → α chunk chunkedseq ✕ α chunk → α chunk chunkedseq
 push_buffer_back γ (s, c)  =
   if Chunk.empty c then
     s
@@ -256,8 +255,7 @@ push_buffer_back γ (s, c)  =
 ~~~~~
 
 ~~~~~ {.ocaml}
-transfer_contents_back :
-  α wf → α chunkedseq ✕ α chunk → α chunkedseq
+transfer_contents_back : α wf → α chunkedseq ✕ α chunk → α chunkedseq
   if Chunk.empty c then
     cs
   else
