@@ -50,12 +50,12 @@ module Chunk =
       | _ -> failwith "Chunk.pop_front: bogus input"
 
     let concat _ ((w1, xs1), (w2, xs2)) = (w1 + w2, List.append xs1 xs2)
-
-    let sigma wf (_, xs) =
-      let sum = List.fold_left (fun x y -> x + y) 0 in
-      sum (List.map wf xs)
         
     let split : 'a. ('a weight_fn) -> ('a chunk * weight) -> ('a chunk * 'a * 'a chunk) = fun wf ((_, xs), i) ->
+      let sigma wf (_, xs) =
+        let sum = List.fold_left (fun x y -> x + y) 0 in
+        sum (List.map wf xs)
+      in
       let rec f (sx, xs, w) =
         match xs with
         | x :: xs' ->
