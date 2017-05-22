@@ -72,7 +72,7 @@ module Chunk =
       let c2 = (sigma wf (0, xs2), xs2) in
       (c1, x, c2)
 
-    let weight_of (w, _) = w
+    let weight (w, _) = w
 
     let empty c = (size c = 0)
 
@@ -150,31 +150,31 @@ module Chunkedseq =
        bo : 'a chunk;
      }
                                 
-    let weight_of cs =
+    let weight cs =
       match cs with
       | Shallow c ->
-         Chunk.weight_of c
+         Chunk.weight c
       | Deep (w, _) ->
          w
 
     let mk_deep d =
       let {fo; fi; mid; bi; bo} = d in
       let w =
-        Chunk.weight_of fo + Chunk.weight_of fi +
-          weight_of mid +
-          Chunk.weight_of bo + Chunk.weight_of bi
+        Chunk.weight fo + Chunk.weight fi +
+          weight mid +
+          Chunk.weight bo + Chunk.weight bi
       in
       Deep (w, d)
 
     let mk_shallow (c1, c2, c3, c4) =
       let c =
-        if Chunk.weight_of c1 > 0 then
+        if Chunk.weight c1 > 0 then
           c1
-        else if Chunk.weight_of c2 > 0 then
+        else if Chunk.weight c2 > 0 then
           c2
-        else if Chunk.weight_of c3 > 0 then
+        else if Chunk.weight c3 > 0 then
           c3
-        else if Chunk.weight_of c4 > 0 then
+        else if Chunk.weight c4 > 0 then
           c4
         else
           failwith "Chunkedseq.mk_shallow: bogus input"
@@ -206,7 +206,7 @@ module Chunkedseq =
             if Chunk.empty fi then
               push_front' wf (mk_deep {d with fo=ec; fi=fo}, x)
             else
-              let mid' = push_front' ~wf:(Chunk.weight_of) (mid, fi) in
+              let mid' = push_front' ~wf:(Chunk.weight) (mid, fi) in
               push_front' wf (mk_deep {d with fo=ec; fi=fo; mid=mid'}, x)
           else
             let fo' = Chunk.push_front wf (fo, x) in
@@ -227,7 +227,7 @@ module Chunkedseq =
             if Chunk.empty bi then
               push_back' wf (mk_deep {d with bi=bo; bo=ec}, x)
             else
-              let mid' = push_back' ~wf:(Chunk.weight_of) (mid, bi) in
+              let mid' = push_back' ~wf:(Chunk.weight) (mid, bi) in
               push_back' wf (mk_deep {d with mid=mid'; bi=bo; bo=ec}, x)
           else
             let bo' = Chunk.push_back wf (bo, x) in
@@ -239,9 +239,9 @@ module Chunkedseq =
     and mk_deep' : 'a. wf:('a weight_fn) -> 'a deep -> 'a chunkedseq = fun ~wf d ->
       match d with
       | {fo; fi; mid; bi; bo} ->
-      let w = Chunk.weight_of fo + Chunk.weight_of fi +
-                weight_of mid +
-                Chunk.weight_of bi + Chunk.weight_of bo
+      let w = Chunk.weight fo + Chunk.weight fi +
+                weight mid +
+                Chunk.weight bi + Chunk.weight bo
       in
       Deep (w, d)
 
@@ -255,7 +255,7 @@ module Chunkedseq =
            if not (Chunk.empty fi) then
              pop_front' wf (mk_deep' wf {d with fo=fi; fi=ec;})
            else if not (empty mid) then
-             let (mid', c) = pop_front' ~wf:(Chunk.weight_of) mid in
+             let (mid', c) = pop_front' ~wf:(Chunk.weight) mid in
              (* free fo *)
              pop_front' wf (mk_deep' wf {d with fo=c; mid=mid'})
            else if not (Chunk.empty bi) then
@@ -280,7 +280,7 @@ module Chunkedseq =
            if not (Chunk.empty bi) then
              pop_back' wf (mk_deep' wf {d with bi=ec; bo=bi})
            else if not (empty mid) then
-             let (mid', c) = pop_back' ~wf:(Chunk.weight_of) mid in
+             let (mid', c) = pop_back' ~wf:(Chunk.weight) mid in
              (* free bo *)
              pop_back' wf (mk_deep' wf {d with mid=mid'; bo=c})
            else if not (Chunk.empty fi) then
@@ -346,25 +346,25 @@ module Chunkedseq =
            transfer_contents_back wf (cs1, c2)
         | (Deep (_, {fo=fo1; fi=fi1; mid=mid1; bi=bi1; bo=bo1}),
            Deep (_, {fo=fo2; fi=fi2; mid=mid2; bi=bi2; bo=bo2})) ->
-             let mid1' = push_buffer_back Chunk.weight_of (mid1, bi1) in
-             let mid1'' = push_buffer_back Chunk.weight_of (mid1', bo1) in
-             let mid2' = push_buffer_front Chunk.weight_of (mid2, fi2) in
-             let mid2'' = push_buffer_front Chunk.weight_of (mid2', fo2) in
+             let mid1' = push_buffer_back Chunk.weight (mid1, bi1) in
+             let mid1'' = push_buffer_back Chunk.weight (mid1', bo1) in
+             let mid2' = push_buffer_front Chunk.weight (mid2, fi2) in
+             let mid2'' = push_buffer_front Chunk.weight (mid2', fo2) in
              let (mid1''', mid2''') =
                if empty mid1'' || empty mid2'' then
                  (mid1'', mid2'')
                else
-                 let ((_, c1), (_, c2)) = (pop_back' Chunk.weight_of mid1'',
-                                           pop_front' Chunk.weight_of mid2'') in
-                 if Chunk.weight_of c1 + Chunk.weight_of c2 <= Chunk.k then
-                   let (mid1'', _) = pop_back' Chunk.weight_of mid1'' in
-                   let (mid2'', _) = pop_front' Chunk.weight_of mid2'' in
+                 let ((_, c1), (_, c2)) = (pop_back' Chunk.weight mid1'',
+                                           pop_front' Chunk.weight mid2'') in
+                 if Chunk.weight c1 + Chunk.weight c2 <= Chunk.k then
+                   let (mid1'', _) = pop_back' Chunk.weight mid1'' in
+                   let (mid2'', _) = pop_front' Chunk.weight mid2'' in
                    let c' = Chunk.concat wf (c1, c2) in
-                   (push_back' Chunk.weight_of (mid1'', c'), mid2'')
+                   (push_back' Chunk.weight (mid1'', c'), mid2'')
                  else
                    (mid1'', mid2'')
              in
-             let mid12 = concat' Chunk.weight_of (mid1''', mid2''') in
+             let mid12 = concat' Chunk.weight (mid1''', mid2''') in
              mk_deep' wf {fo=fo1; fi=fi1; mid=mid12; bi=bi2; bo=bo2}
                       
     and concat : 'a chunkedseq * 'a chunkedseq -> 'a chunkedseq = fun (cs1, cs2) ->
@@ -376,11 +376,11 @@ module Chunkedseq =
 	        cs
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
           let w = 
-            Chunk.weight_of fo + Chunk.weight_of fi +
-              Chunk.weight_of bo + Chunk.weight_of bi
+            Chunk.weight fo + Chunk.weight fi +
+              Chunk.weight bo + Chunk.weight bi
           in
           if w = 0 && not (empty mid) then
-            let (mid', fo') = pop_front' ~wf:(Chunk.weight_of) mid in
+            let (mid', fo') = pop_front' ~wf:(Chunk.weight) mid in
             mk_deep {d with fo=fo'; mid=mid'}
           else if w = 1 && empty mid then
             mk_shallow (fo, fi, bi, bo)
@@ -395,9 +395,9 @@ module Chunkedseq =
           let (c1, x, c2) = Chunk.split wf (c, i) in
           (Shallow c1, x, Shallow c2)
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
-          let (wfo, wfi) = (Chunk.weight_of fo, Chunk.weight_of fi) in
-          let wm = weight_of mid in
-          let (wbi, wbo) = (Chunk.weight_of bi, Chunk.weight_of bo) in
+          let (wfo, wfi) = (Chunk.weight fo, Chunk.weight fi) in
+          let wm = weight mid in
+          let (wbi, wbo) = (Chunk.weight bi, Chunk.weight bo) in
           let (cs1, x, cs2) =
             if not (Chunk.empty fo) && i < wfo then
               let (fo1, x, fo2) = Chunk.split wf (fo, i) in
@@ -411,8 +411,8 @@ module Chunkedseq =
 	            (cs1, x, cs2)
             else if not (empty mid) && i < wfo + wfi + wm then
               let j = i - wfo - wfi in
-              let (mid1, c, mid2) = split' Chunk.weight_of (mid, j) in
-              let (c1, x, c2) = Chunk.split wf (c, j - weight_of mid1) in
+              let (mid1, c, mid2) = split' Chunk.weight (mid, j) in
+              let (c1, x, c2) = Chunk.split wf (c, j - weight mid1) in
               let cs1 = mk_deep {d with mid=mid1; bi=ec; bo=c1} in
               let cs2 = mk_deep {d with fo=c2; fi=ec; mid=mid2} in
               (cs1, x, cs2)
