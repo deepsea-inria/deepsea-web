@@ -110,7 +110,7 @@ split γ ((w, xs₁ ⊕ [x] ⊕ xs₂), i)
 ~~~~~
 
 ~~~~~ {.ocaml}
-weight (w, _)    : α chunk → int = w
+weight (w, _) : α chunk → int = w
 ~~~~~
 
 ~~~~~ {.ocaml}
@@ -298,29 +298,29 @@ split' : α wf → α chunkedseq ✕ int → (α chunkedseq ✕ α ✕ α chunke
 split' γ (Shallow c, i) =
   let (c₁, x, c₂) = Chunk.split γ (c, i) in
   (Shallow c₁, x, Shallow c₂)
-split' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ} as d)) =
+split' γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ} as d), i) =
   let (wfₒ, wfᵢ) = (Chunk.weight fₒ, Chunk.weight fᵢ) in
   let wₘ = weight m in
   let (wbᵢ, wbₒ) = (Chunk.weight bᵢ, Chunk.weight bₒ) in
   let (s₁, x, s₂) = 
-    if ¬ (Chunk.empty fₒ) ∧ i < wfₒ then
+    if i < wfₒ then
       let (fₒ₁, x, fₒ₂) = Chunk.split γ (fₒ, i) in
       let s₁ = mk_deep {fₒ=fₒ₁, fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮], bₒ=[⋮⋮]} in
       let s₂ = mk_deep {d with fₒ=fₒ₂} in
       (s₁, x, s₂)
-    else if ¬ (Chunk.empty fᵢ) ∧ i < wfₒ + wfᵢ then
+    else if i < wfₒ + wfᵢ then
       let (fᵢ₁, x, fᵢ₂) = Chunk.split γ (fᵢ, i) in
       let s₁ = mk_deep {d with fᵢ=[⋮⋮], m=Shallow [⋮⋮], bᵢ=[⋮⋮], bₒ=fᵢ₁} in
       let s₂ = mk_deep {d with fₒ=fᵢ₂, fᵢ=[⋮⋮]} in
       (s₁, x, s₂)
-    else if ¬ (empty m) ∧ i < wfₒ + wfᵢ + wₘ then
+    else if i < wfₒ + wfᵢ + wₘ then
       let j = i - wfₒ - wfᵢ in
       let (m₁, c, m₂) = split' Chunk.weight (m, j) in
       let (c₁, x, c₂) = Chunk.split γ (c, j - weight m₁) in
       let s₁ = mk_deep {d with m=m₁, bᵢ=[⋮⋮], bₒ=c₁} in
       let s₂ = mk_deep {d with fₒ=c₂, fᵢ=[⋮⋮], m=m₂} in
       (s₁, x, s₂)
-    else if ¬ (Chunk.empty bᵢ) ∧ i < wfₒ + wfᵢ + wₘ + wbᵢ then
+    else if i < wfₒ + wfᵢ + wₘ + wbᵢ then
       let j = i - wfₒ - wfᵢ - wₘ in
       let (bᵢ₁, x, bᵢ₂) = Chunk.split γ (bᵢ, j) in
       let s₁ = mk_deep {d with bᵢ=[⋮⋮], bₒ=bᵢ₁} in

@@ -383,29 +383,29 @@ module Chunkedseq =
           let wm = weight mid in
           let (wbi, wbo) = (Chunk.weight bi, Chunk.weight bo) in
           let (cs1, x, cs2) =
-            if not (Chunk.empty fo) && i < wfo then
+            if i < wfo then
               let (fo1, x, fo2) = Chunk.split wf (fo, i) in
               let cs1 = mk_deep {fo=fo1; fi=ec; mid=create; bi=ec; bo=ec} in
               let cs2 = mk_deep {d with fo=fo2} in
               (cs1, x, cs2)
-	    else if not (Chunk.empty fi) && i < wfo + wfi then
+	    else if i < wfo + wfi then
 	      let (fi1, x, fi2) = Chunk.split wf (fi, i - wfo) in
 	      let cs1 = mk_deep {d with fi=ec; mid=create; bi=ec; bo=fi1} in
 	      let cs2 = mk_deep {d with fo=fi2; fi=ec} in
 	      (cs1, x, cs2)
-            else if not (empty mid) && i < wfo + wfi + wm then
+            else if i < wfo + wfi + wm then
               let j = i - wfo - wfi in
               let (mid1, c, mid2) = split' Chunk.weight (mid, j) in
               let (c1, x, c2) = Chunk.split wf (c, j - weight mid1) in
               let cs1 = mk_deep {d with mid=mid1; bi=ec; bo=c1} in
               let cs2 = mk_deep {d with fo=c2; fi=ec; mid=mid2} in
               (cs1, x, cs2)
-            else if not (Chunk.empty bi) && i < wfo + wfi + wm + wbi then
+            else if i < wfo + wfi + wm + wbi then
 	      let (bi1, x, bi2) = Chunk.split wf (bi, i - wfo - wfi - wm) in
 	      let cs1 = mk_deep {d with bi=ec; bo=bi1} in
 	      let cs2 = mk_deep {d with fo=bi2; fi=ec; mid=create; bi=ec} in
 	      (cs1, x, cs2)
-            else if not (Chunk.empty bo) && i < wfo + wfi + wm + wbi + wbo then
+            else if i < wfo + wfi + wm + wbi + wbo then
 	      let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo - wfi - wm - wbi) in
 	      let cs1 = mk_deep {d with bo=bo1} in
 	      let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
