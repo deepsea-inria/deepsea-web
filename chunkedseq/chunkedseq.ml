@@ -233,7 +233,7 @@ module Chunkedseq =
     and check : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq = fun ~wf cs ->
       match cs with
       | Shallow c ->
-	        cs
+	 assert false
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
           let w = 
             Chunk.weight fo + Chunk.weight fi +
@@ -389,7 +389,8 @@ module Chunkedseq =
               let cs2 = mk_deep {d with fo=fo2} in
               (cs1, x, cs2)
 	    else if i < wfo + wfi then
-	      let (fi1, x, fi2) = Chunk.split wf (fi, i - wfo) in
+              let j = i - wfo in
+	      let (fi1, x, fi2) = Chunk.split wf (fi, j) in
 	      let cs1 = mk_deep {d with fi=ec; mid=create; bi=ec; bo=fi1} in
 	      let cs2 = mk_deep {d with fo=fi2; fi=ec} in
 	      (cs1, x, cs2)
