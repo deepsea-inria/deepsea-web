@@ -359,11 +359,11 @@ module Chunkedseq =
                if empty mid1'' || empty mid2'' then
                  (mid1'', mid2'')
                else
-                 let (mid1'', c1) = pop_back' Chunk.weight mid1'' in
-                 let (mid2'', c2) = pop_front' Chunk.weight mid2'' in
+                 let (mid1''', c1) = pop_back' Chunk.weight mid1'' in
+                 let (mid2''', c2) = pop_front' Chunk.weight mid2'' in
                  if Chunk.weight c1 + Chunk.weight c2 <= Chunk.k then
                    let c' = Chunk.concat wf (c1, c2) in
-                   (push_back' Chunk.weight (mid1'', c'), mid2'')
+                   (push_back' Chunk.weight (mid1''', c'), mid2''')
                  else
                    (mid1'', mid2'')
              in
