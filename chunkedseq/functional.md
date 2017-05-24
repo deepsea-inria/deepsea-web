@@ -190,7 +190,7 @@ Check
 
 ~~~~~ {.ocaml}
 check : α wf → α chunkedseq → α chunkedseq
-check γ (Shallow c) = Shallow c
+check γ (Shallow c) = assert false
 check γ (Deep (_, {fₒ, fᵢ, m, bᵢ, bₒ}) as s) =
   let w = Chunk.weight fₒ + Chunk.weight fᵢ
         + Chunk.weight bᵢ + Chunk.weight bₒ
