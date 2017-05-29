@@ -8,12 +8,14 @@
 
 FILES=\
 	Shared \
-	Type \
+	TypeSig \
+	CapacitySig \
 	PSeqSig \
 	SeqSig \
 	SizedList \
 	SizedTwoLists \
-	PArray
+	PArray \
+	CircularArray
 
 
 

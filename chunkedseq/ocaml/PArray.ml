@@ -6,8 +6,12 @@
 
 type 'a t = 'a array
 
-let create () = 
-  [||]
+module PolymorphicEmptyArray : sig val empty : 'a t end = struct
+  let empty = (Obj.magic [||])
+end
+
+let empty = 
+  PolymorphicEmptyArray.empty
 
 let length s =
    Array.length s
@@ -60,9 +64,10 @@ let pop_back s =
 let append s1 s2 =
   Array.append s1 s2
 
+(* linear-time *)
 let split_at i s =
    let n = length s in
-   if n = 0 then (create(),s) else begin
+   if n = 0 then (empty,s) else begin
       let x = s.(0) in
       let t1 = Array.make i x in
       Array.blit s 0 t1 0 i;

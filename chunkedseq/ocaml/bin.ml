@@ -1,3 +1,8 @@
+      val create : unit -> 'a Seq.t
+   val create : unit -> t
+   val create : unit -> 'a t
+
+
 (** garbage *)
 
 type 'a split_at_or_length = 
