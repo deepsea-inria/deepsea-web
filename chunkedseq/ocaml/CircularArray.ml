@@ -205,6 +205,7 @@ let transfer_to_front q1 q2 =
 let transfer_to_back q1 q2 =
    transfer_nb_from_front_to_back q1.size q1 q2
 
+
 (*--------------------------------------------------------------------------*)
 
 (** Pop N elements from the front into an array *)
@@ -313,6 +314,11 @@ let get q i =
 let set q i v =
    q.data.(wrap_up (q.head + i)) <- v
 
+
+(*--------------------------------------------------------------------------*)
+
+let carve_back_at i q =
+  assert false (* TODO *)
 
 (*--------------------------------------------------------------------------*)
 

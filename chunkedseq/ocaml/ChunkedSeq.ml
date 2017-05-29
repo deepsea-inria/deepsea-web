@@ -221,4 +221,32 @@ let transfer_to_back s2 s1 =
 let split i s =
   assert false (* TODO: implement *)
 
+
+let iter f s =
+  Chunk.iter f s.fo;
+  Chunk.iter f s.fi;
+  Middle.iter (fun c -> Chunk.iter f c) s.mid;
+  Chunk.iter f s.bi;
+  Chunk.iter f s.bo
+
+let fold_left f a0 s =
+  let a1 = Chunk.fold_left f a0 s.fo in
+  let a2 = Chunk.fold_left f a1 s.fi in
+  let a3 = Middle.fold_left (fun a c -> Chunk.fold_left f a c) a2 s.mid in
+  let a4 = Chunk.fold_left f a3 s.bi in
+  let a5 = Chunk.fold_left f a4 s.bo in
+  a5
+
+let fold_right f s a0 =
+  Chunk.fold_right f s.fo (
+  Chunk.fold_right f s.fi (
+  Middle.fold_right (fun c a -> Chunk.fold_right f c a) s.mid (
+  Chunk.fold_right f s.bi (
+  Chunk.fold_right f s.bo a0
+  ))))
+
+let to_list s =
+  fold_right (fun x a -> x::a) s []
+
+
 end

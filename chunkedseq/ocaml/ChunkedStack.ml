@@ -138,6 +138,9 @@ let fold_right f s a0 =
 let to_list s =
   fold_right (fun x a -> x::a) s []
 
+let transfer_to_back _ _ =
+  assert false
+
 
 (*--------------------------------------------------------------------------*)
 
