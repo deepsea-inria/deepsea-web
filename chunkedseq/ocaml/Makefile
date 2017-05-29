@@ -20,6 +20,8 @@ FILES=\
 	PersistantChunk \
 	ChunkedStack \
 	ChunkedSeq \
+	PChunkedWeightedSeq \
+	PChunkedSeq \
 	Bench
 
 
