@@ -15,7 +15,8 @@ FILES=\
 	SizedList \
 	SizedTwoLists \
 	PArray \
-	CircularArray
+	CircularArray \
+	ChunkedStack
 
 
 

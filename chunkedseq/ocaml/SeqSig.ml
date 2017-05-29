@@ -18,11 +18,9 @@ sig
    val pop_back : 'a t -> 'a
    val append : 'a t -> 'a t -> unit
    val carve_back_at : int -> 'a t -> 'a * 'a t
-   (* 
    val iter : ('a -> unit) -> 'a t -> unit
    val fold_left : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
    val fold_right : ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-   *)
    val to_list : 'a t -> 'a list 
 end
 
