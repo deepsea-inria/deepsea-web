@@ -41,13 +41,6 @@ FILES=\
 #	FFTreeBufferMove \
 #	FFTreeBufferMoveInlined \
 #	FFTreeList \
-#	WeightedType \
-#	BootSeq \
-#	FFTreeListInlined \
-#	Bench
-#	#FFTreeListHybrid \
-#	#FFTreeListNine \
-#
 
 
 #************************************************************************

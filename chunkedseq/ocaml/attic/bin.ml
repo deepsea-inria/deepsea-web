@@ -37,3 +37,11 @@ let rec list_split_at_or_length len n l =
         data = l2;
         back = s.back } )
 
+
+(*-----------------------------------------------------------------------------*)
+
+module Make (Item : MeasuredType.S)
+  : (PureMeasuredSeq.S with type item = Item.t and type meas = int) = 
+struct
+   include FingerTree.Make(ReducerCount(Item))
+end
