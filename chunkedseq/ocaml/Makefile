@@ -10,7 +10,12 @@ FILES=\
 	Shared \
 	Type \
 	PSeqSig \
-	SeqSig 
+	SeqSig \
+	SizedList \
+	SizedTwoLists
+
+
+#	PArray
 
 
 
