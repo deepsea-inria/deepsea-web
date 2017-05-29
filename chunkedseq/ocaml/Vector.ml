@@ -56,13 +56,13 @@ let resize a s =
     if 4 * s < n then (* reallocate into a smaller array *)
       a.data <- Array.sub a.data 0 s
     else
-      Array.fill a.data s (a.size - s) a.dummy
+      Array.fill a.data s (a.size - s) a.default
   else begin
     (* grow *)
     if s > n then begin (* reallocate into a larger array *)
       if s > Sys.max_array_length then invalid_arg "Vector.resize: cannot grow";
       let n' = min (max (2 * n) s) Sys.max_array_length in
-      let a' = Array.make n' a.dummy in
+      let a' = Array.make n' a.default in
       Array.blit a.data 0 a' 0 a.size;
       a.data <- a'
     end
@@ -79,10 +79,10 @@ let clear a =
   resize a 0
 *)
 
-let push_back a v =
+let push_back v a =
   let n = a.size in
   resize a (n+1);
-  Array.Array.set a.data n v
+  Array.set a.data n v
 
 let pop_back a =
   let n = length a - 1 in
@@ -108,20 +108,20 @@ let append a1 a2 =
 
 let iter f a =
   for i = 0 to length a - 1 do 
-    f (Array.get a i)
+    f (Array.get a.data i)
   done
 
 let fold_left f x a =
   let r = ref x in
   for i = 0 to length a - 1 do 
-    r := f !r (Array.get a i) 
+    r := f !r (Array.get a.data i) 
   done;
   !r
 
 let fold_right f a x =
   let r = ref x in
   for i = length a - 1 downto 0 do
-    r := f (Array.get a i) !r 
+    r := f (Array.get a.data i) !r 
   done;
   !r
 

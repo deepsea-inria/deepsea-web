@@ -16,10 +16,11 @@ FILES=\
 	SizedTwoLists \
 	PArray \
 	CircularArray \
+	Vector \
 	PersistantChunk \
 	ChunkedStack \
-	ChunkedSeq
-
+	ChunkedSeq \
+	Bench
 
 
 #	MeasuredType \#
