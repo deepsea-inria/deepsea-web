@@ -16,7 +16,7 @@ sig
    val pop_front : 'a t -> 'a
    val push_back : 'a -> 'a t -> unit
    val pop_back : 'a t -> 'a
-   val append : 'a t -> 'a t -> unit
+   val transfer_to_back : 'a t -> 'a t -> unit
    val carve_back_at : int -> 'a t -> 'a * 'a t
    val iter : ('a -> unit) -> 'a t -> unit
    val fold_left : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b

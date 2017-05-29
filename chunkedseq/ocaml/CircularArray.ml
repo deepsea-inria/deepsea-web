@@ -164,9 +164,9 @@ let copy_data_wrap_src_and_dst t1 i1 t2 i2 n =
 
 (** Transfer N items from the back of a buffer to the front of another buffer *)
 
-let transfer_back_to_front n q1 q2 =
+let transfer_nb_from_back_to_front n q1 q2 =
    if n < 0 || n > q1.size || n + q2.size > capacity 
-      then invalid_arg "CircularArray.transfer_back_to_front";
+      then invalid_arg "CircularArray.transfer_nb_from_back_to_front";
    let h1 = wrap_down (wrap_up (q1.head + q1.size) - n) in
    let h2 = wrap_down (q2.head - n) in
    copy_data_wrap_src_and_dst q1.data h1 q2.data h2 n;
@@ -178,9 +178,9 @@ let transfer_back_to_front n q1 q2 =
 
 (** Transfer N items from the front of a buffer to the back of another buffer *)
 
-let transfer_front_to_back n q1 q2 =
+let transfer_nb_from_front_to_back n q1 q2 =
    if n < 0 || n > q1.size || n + q2.size > capacity 
-      then invalid_arg "CircularArray.transfer_front_to_back";
+      then invalid_arg "CircularArray.transfer_nb_from_front_to_back";
    let h1 = q1.head in
    let h2 = wrap_up (q2.head + q2.size) in
    copy_data_wrap_src_and_dst q1.data h1 q2.data h2 n;
@@ -193,15 +193,17 @@ let transfer_front_to_back n q1 q2 =
 
 (*--------------------------------------------------------------------------*)
 
-(** Transfer all items from a buffer to the front of another buffer *)
+(** Transfer all items from a buffer to the front of another buffer,
+    leaving the original buffer empty *)
 
-let transfer_all_to_front q1 q2 =
-   transfer_back_to_front q1.size q1 q2
+let transfer_to_front q1 q2 =
+   transfer_nb_from_back_to_front q1.size q1 q2
 
-(** Transfer all items from a buffer to the back of another buffer *)
+(** Transfer all items from a buffer to the back of another buffer,
+    leaving the original buffer empty  *)
 
-let transfer_all_to_back q1 q2 =
-   transfer_front_to_back q1.size q1 q2
+let transfer_to_back q1 q2 =
+   transfer_nb_from_front_to_back q1.size q1 q2
 
 (*--------------------------------------------------------------------------*)
 

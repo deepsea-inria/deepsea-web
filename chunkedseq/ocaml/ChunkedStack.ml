@@ -12,7 +12,7 @@
 
 module Make 
   (Capacity : CapacitySig.S) 
-  (Chunk : SeqSig.S)   (* chunks of capacity Capacity.value *)
+  (Chunk : SeqSig.S) (* chunks of capacity Capacity.value *)
   (Middle : SeqSig.S) 
 = struct
 
@@ -25,6 +25,7 @@ let capacity = Capacity.capacity
 let is_full c = 
   Chunk.length c = capacity
 
+(*-----------------------------------------------------------------------------*)
 
 type 'a t = {
    mutable fo : 'a chunk;
