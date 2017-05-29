@@ -89,4 +89,4 @@ kill:
 	killall -v output.out
 
 benchtools:
-	make -C ../benchtools all
+	make -C ~/bench all
