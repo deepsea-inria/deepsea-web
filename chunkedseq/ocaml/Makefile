@@ -12,10 +12,8 @@ FILES=\
 	PSeqSig \
 	SeqSig \
 	SizedList \
-	SizedTwoLists
-
-
-#	PArray
+	SizedTwoLists \
+	PArray
 
 
 

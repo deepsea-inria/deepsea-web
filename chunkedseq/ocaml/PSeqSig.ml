@@ -6,6 +6,7 @@ module type S =
 sig 
    type 'a t
    val empty : 'a t
+   val create : unit -> 'a t
    val is_empty : 'a t -> bool
    val length : 'a t -> int
    val front : 'a t -> 'a
@@ -31,6 +32,7 @@ sig
    type item
    type t
    val empty : t
+   val create : unit -> t
    val is_empty : t -> bool
    val length : t -> int
    val front : t -> item
@@ -59,6 +61,7 @@ struct
    include (Seq :
       sig 
       val empty : 'a Seq.t
+      val create : unit -> 'a Seq.t
       val is_empty : 'a Seq.t -> bool
       val length : 'a Seq.t -> int
       val front : 'a Seq.t -> 'a

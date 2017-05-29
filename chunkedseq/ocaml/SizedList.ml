@@ -12,6 +12,9 @@ let empty = {
    size = 0;
    data = [] }
 
+let create () =
+  empty
+
 let is_empty s = 
    s.size = 0
 

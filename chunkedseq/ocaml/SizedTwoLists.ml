@@ -14,6 +14,9 @@ let empty = {
    front = [];
    back = [] }
 
+let create () =
+  empty
+
 let is_empty s = 
    s.size = 0
 
