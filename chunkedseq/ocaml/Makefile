@@ -16,6 +16,7 @@ FILES=\
 	SizedTwoLists \
 	PArray \
 	CircularArray \
+	PersistantChunk \
 	ChunkedStack \
 	ChunkedSeq
 
