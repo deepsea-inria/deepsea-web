@@ -1,7 +1,7 @@
 module PChunkedSeq =
   struct
 
-    type 'a weight_fn = 'a PChunkedWeightedSeq.Chunk.weight_fn
+    type 'a weight_fn = 'a Chunk.weight_fn
 
     let unit_weight_fn : 'a weight_fn = fun _ -> 1
 
@@ -28,10 +28,13 @@ module PChunkedSeq =
       let (cs1, x, cs2) = PChunkedWeightedSeq.split' unit_weight_fn (cs, i) in
       (cs1, push_back x cs2)
 
-    let fold_left f x cs = assert false
+    let fold_left f x cs =
+      assert false
         
-    let fold_right = PChunkedWeightedSeq.fold_right
+    let fold_right =
+      PChunkedWeightedSeq.fold_right
 
-    let list_of cs = fold_right (fun x y -> x :: y) cs []
+    let list_of cs =
+      fold_right (fun x y -> x :: y) cs []
     
   end

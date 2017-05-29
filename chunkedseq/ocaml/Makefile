@@ -18,7 +18,10 @@ FILES=\
 	CircularArray \
 	PersistantChunk \
 	ChunkedStack \
-	ChunkedSeq
+	ChunkedSeq \
+	Chunk \
+	PChunkedSeq \
+	PChunkedWeightedSeq \
 
 
 
