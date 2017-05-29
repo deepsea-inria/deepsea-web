@@ -7,7 +7,6 @@ module type S =
 sig
    type 'a t 
    val create : 'a -> 'a t
-   val create_def : 'a -> 'a t
    val is_empty : 'a t -> bool
    val length : 'a t -> int
    val back : 'a t -> 'a
@@ -17,7 +16,7 @@ sig
    val push_back : 'a -> 'a t -> unit
    val pop_back : 'a t -> 'a
    val transfer_to_back : 'a t -> 'a t -> unit
-   val carve_back_at : int -> 'a t -> 'a * 'a t
+   val carve_back_at : int -> 'a t -> 'a t
    val iter : ('a -> unit) -> 'a t -> unit
    val fold_left : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
    val fold_right : ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
@@ -39,14 +38,19 @@ end
 (*---------------------------------------------------------------*)
 (** Packaging of a pure sequence as an ephemeral sequence *)
 
-module SeqOfPSeq (Seq : PSeqSig.S) : (SItem with type item = Seq.item) = 
+module SeqOfPSeq (Seq : PSeqSig.S) : S = 
 struct
-   type item = Seq.item
-   type t = Seq.t ref
+   type 'a t = ('a Seq.t) ref
    let create d = 
-      ref (Seq.create())
+      ref Seq.empty
+   let is_empty s =
+      Seq.is_empty !s
    let length s = 
       Seq.length !s
+   let front s =
+      Seq.front !s
+   let back s =
+      Seq.back !s
    let push_front x s = 
       s := Seq.push_front x !s
    let pop_front s = 
@@ -59,11 +63,18 @@ struct
       let (x,r2) = Seq.pop_back !s in
       s := r2;
       x
-   let append s1 s2 = 
-      ref (Seq.append !s1 !s2)
+   let transfer_to_back s1 s2 = 
+      s2 := Seq.append !s1 !s2
    let carve_back_at i s = 
       let (r1,r2) = Seq.split_at i !s in
-      (ref r1, ref r2)
+      s := r1;
+      ref r2
+   let iter f s =
+      Seq.iter f !s
+   let fold_left f i s =
+      Seq.fold_left f i !s
+   let fold_right f s i =
+      Seq.fold_right f !s i
    let to_list s =
       Seq.to_list !s
 end
