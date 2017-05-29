@@ -49,7 +49,7 @@ let length s =
 let is_empty s =
    Chunk.is_empty s.fo 
   
-let push_front x s =
+let push_back x s =
    let co = s.fo in
    if is_full co then begin
       let ci = s.fi in
@@ -57,23 +57,23 @@ let push_front x s =
       if Chunk.is_empty ci then begin
          s.fo <- ci;
       end else begin
-         Middle.push_front ci s.mid;
+         Middle.push_back ci s.mid;
          s.fo <- Chunk.create s.default;
       end 
    end;
-   Chunk.push_front x s.fo
+   Chunk.push_back x s.fo
 
-let pop_front s =
+let pop_back s =
   assert (not (Chunk.is_empty s.fo));
   let co = s.fo in
-  let x = Chunk.pop_front co in
+  let x = Chunk.pop_back co in
   if Chunk.is_empty co then begin
     let ci = s.fi in
     if not (Chunk.is_empty ci) then begin
        s.fi <- co;
        s.fo <- ci
     end else if not (Middle.is_empty s.mid) then begin
-       s.fo <- Middle.pop_front s.mid
+       s.fo <- Middle.pop_back s.mid
     end 
   end;
   x
@@ -81,18 +81,18 @@ let pop_front s =
 (* Alternative code when the front buffer might be left empty 
    while the structure is not empty
 
-  let pop_front s =
+  let pop_back s =
     if Chunk.is_empty s.fo begin
       let ci = s.fi in
       if not (Chunk.is_empty ci) then begin
          s.fi <- s.fo;
          s.fo <- ci
       end else if not (Middle.is_empty s.mid) then begin
-         s.fo <- Middle.pop_front s.mid
+         s.fo <- Middle.pop_back s.mid
       end else 
          raise Not_found
     end;
-    Chunk.pop_front s.fo
+    Chunk.pop_back s.fo
 
   let is_empty () =
        Chunk.is_empty s.fo 
@@ -101,10 +101,10 @@ let pop_front s =
 
 *)
 
-let push_back x s =
+let push_front x s =
   assert false
 
-let pop_back s =
+let pop_front s =
   assert false
 
 let append s1 s2 = 

@@ -5,6 +5,9 @@
 
     [Remark: we could also optimize push-front operations,
      but this would come at some cost.]
+
+    [Remark: this code does not bother writing back dummy values
+    after pop operations]
     
     Implements PSegSig.S *)
 
@@ -23,7 +26,7 @@ let capacity = Capacity.capacity
 
 type 'a support = {
   data : 'a array; (* of size equal to capacity *)
-  mutable max_size : int }
+  mutable max_size : int; }
 
 (** Representation of a persistent chunk.
     The invariant is that the elements in the chunk are 
@@ -62,17 +65,34 @@ let is_empty s =
 
 let front s =
    assert (length s > 0);
-   s.(s.head)
+   let i = s.head in
+   s.support.data.(i)
 
 let back s =
    assert (length s > 0);
-   s.(s.head+s.size-1)
+   let i = s.head + s.size - 1 in
+   s.support.data.(i)
 
 let push_front x s =
+   let m = s.support.max_size in
+   let i = s.head + s.size in
+   if i = m && m < capacity then begin
+      s.support.max_size <- m+1;
+      s.support.data.(i) <- x;
+      { support = s.support;
+        head = s.head;
+        size = s.size + 1; }
+   end else begin
+     let snew = { data = Array.make s.default
+
+   end
+
    let n = length s in
    let t = Array.make (n+1) x in
    Array.blit s 0 t 1 n;
    t
+
+
 
 let pop_front s =
    let n = length s in
@@ -110,16 +130,31 @@ let split_at i s =
       (t1,t2)
    end
 
+
+
+
 let iter f s =
-  Array.iter f s
+   for i = s.head to (s.head + s.size - 1) do
+      let x = Array.get s.support.data i in
+      f x;
+   done
 
-let fold_left f i s =
-  Array.fold_left f i s
+let fold_left f a q =
+   let acc = ref a in
+   for i = s.head to (s.head + s.size - 1) do
+      let x = Array.get s.support.data i in
+      acc := f !acc x;
+   done
+   !acc
 
-let fold_right f s i =
-  Array.fold_right f s i
+let fold_right f q a =
+   let acc = ref a in
+   for i = s.head + s.size - 1 downto s.head do
+      let x = Array.get s.support.data i in
+      acc := f x !acc;
+   done
 
 let to_list s = 
-   Array.to_list s
+   fold_right (fun x a -> x::a) s []
 
 end
