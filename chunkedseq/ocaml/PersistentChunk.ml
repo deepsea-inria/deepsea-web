@@ -1,5 +1,5 @@
 
-(** Representation of a persistant fixed-capacity chunk,
+(** Representation of a persistent fixed-capacity chunk,
     based on arrays, with optimization to save on the number of
     copy-on-write operations on push-back operations.
 

@@ -42,7 +42,7 @@ let pop_front s =
    let x = s.(0) in
    let t = Array.make (n-1) x in
    Array.blit s 1 t 0 (n-1);
-   t
+   x,t
    
 (* linear-time *)
 let push_back x s = 
@@ -58,7 +58,7 @@ let pop_back s =
    let x = s.(n-1) in
    let t = Array.make (n-1) x in
    Array.blit s 0 t 0 (n-1);
-   t
+   x,t
 
 (* linear-time *)
 let append s1 s2 =

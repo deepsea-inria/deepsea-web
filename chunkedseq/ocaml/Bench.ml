@@ -7,6 +7,7 @@ exception Unsupported
 (****************************************************************************)
 
 module type SeqSig = SeqSig.S
+module type PSeqSig = PSeqSig.S
 
 let size_for_static_array = Cmdline.parse_or_default_int "static_array_size" 20000000
   (* enough to fit all items from experiments *)
@@ -17,6 +18,8 @@ let chunk_size = (Cmdline.parse_or_default_int "chunk" 256)
 module Capacity : CapacitySig.S = struct let capacity = chunk_size end
 
 module Chunk : SeqSig = CircularArray.Make(Capacity)
+
+module Chunk256 : SeqSig = CircularArray.Make(struct let capacity = 256 end)
 
 module Middle: SeqSig  = CircularArray.Make(
   struct let capacity = 1 + size_for_static_array / chunk_size end)
@@ -55,7 +58,39 @@ end
 
 (** OCaml Array *)
 
-module TestSizedArray : SeqSig =
+module TestSizedArray =
+struct
+   type 'a t = {
+      data : 'a array;
+      mutable size : int; }
+   let create_capacity nb d = {
+      data = Array.make nb d;
+      size = 0 }
+   let create d = {
+      data = Array.make size_for_static_array d;
+      size = 0 }
+   let push_back x s = 
+      let n = s.size in
+      s.data.(n) <- x;
+      s.size <- n + 1
+   let pop_back s = 
+      let n = s.size - 1 in
+      let x = s.data.(n) in
+      s.size <- n;
+      x
+   let to_list s =
+      let acc = ref [] in
+      for i = s.size - 1 downto 0 do
+        acc := s.data.(i) :: !acc;
+      done;
+      !acc
+   include UnsupportedSingleEnded
+   include UnsupportedExtra
+end
+
+(** OCaml Array of large capacity *)
+
+module TestSizedArrayBig : SeqSig =
 struct
    type 'a t = {
       data : 'a array;
@@ -97,7 +132,7 @@ end
 
 (** Circular Array *)
 
-module TestCircularArray (* : SeqSig *) =
+module TestCircularArrayBig (* : SeqSig *) =
 struct
    include CircularArray.Make 
       (struct let capacity = size_for_static_array end)
@@ -180,13 +215,25 @@ module TestSizedTwoLists : SeqSig = SeqSig.SeqOfPSeq(
 
 (** Persistant Chunk *)
 
-module TestPersistantChunk : SeqSig = SeqSig.SeqOfPSeq(
-  PersistantChunk.Make(Capacity))
+module TestPArray : SeqSig = SeqSig.SeqOfPSeq(
+  PArray)
+
+(** Persistant Chunk *)
+
+module TestPersistentChunk : SeqSig = SeqSig.SeqOfPSeq(
+  PersistentChunk.Make(Capacity))
 
 (** Ephemeral Chunked Stack *)
 
 module TestChunkedStack : SeqSig = struct
   include ChunkedStack.Make(Capacity)(Chunk)(Middle)
+  include UnsupportedBackFront
+end
+
+(** Ephemeral Chunked Stack with capacity 256 *)
+
+module TestChunkedStack256 : SeqSig = struct
+  include ChunkedStack.Make(Capacity)(Chunk256)(Middle)
   include UnsupportedBackFront
 end
 
@@ -202,9 +249,24 @@ end
    
 (** Pure Chunked Seq *)
 
-(* TODO
-module TestPChunkedSeq : SeqSig = SeqSig.SeqOfPSeq(PChunkedSeq)
-*)
+module TestPChunkedSeq : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedSeq)
+
+(** Chunked Stack Copy on Write *)
+
+module PChunkedStackCopyOnWrite : PSeqSig = 
+  PChunkedStack.Make(Capacity)(PArray)(PChunkedSeq)
+
+module TestPChunkedStackCopyOnWrite : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedStackCopyOnWrite)
+
+(** Chunked Stack Persistence *)
+
+module PChunkedStackPersistence : PSeqSig = 
+  PChunkedStack.Make(Capacity)(PersistentChunk.Make(Capacity))(PChunkedSeq)
+
+module TestPChunkedStackPersistence : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedStackPersistence)
 
 
 (****************************************************************************)
@@ -474,6 +536,8 @@ end
 
 (****************************************************************************)
 
+(* todo: test get expected number ! *)
+
 let real_lifo seq nbitems repeat () () = 
    begin
    assert (repeat > 0);
@@ -493,6 +557,45 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
+   end else if seq = "pchunked_seq" then begin
+
+      let r = ref PChunkedSeq.empty in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           r := PChunkedSeq.push_back 1 !r;
+        done;
+        for i = 1 to block do 
+           let (x,t) = PChunkedSeq.pop_back !r in
+           r := t
+        done;
+     done
+
+   end else if seq = "pchunked_stack_copy_on_write" then begin
+
+      let r = ref PChunkedStackCopyOnWrite.empty in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           r := PChunkedStackCopyOnWrite.push_back 1 !r;
+        done;
+        for i = 1 to block do 
+           let (x,t) = PChunkedStackCopyOnWrite.pop_back !r in
+           r := t
+        done;
+     done
+
+   end else if seq = "pchunked_stack_persistence" then begin
+
+      let r = ref PChunkedStackPersistence.empty in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           r := PChunkedStackPersistence.push_back 1 !r;
+        done;
+        for i = 1 to block do 
+           let (x,t) = PChunkedStackPersistence.pop_back !r in
+           r := t
+        done;
+     done
+
    end else if seq = "chunked_stack" then begin
 
       let r = TestChunkedStack.create def in
@@ -502,6 +605,19 @@ let real_lifo seq nbitems repeat () () =
         done;
         for i = 1 to block do
            let _t = TestChunkedStack.pop_back r in
+           ()
+        done;
+     done
+
+   end else if seq = "chunked_stack_256" then begin
+
+      let r = TestChunkedStack256.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestChunkedStack256.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestChunkedStack256.pop_back r in
            ()
         done;
      done
@@ -519,22 +635,35 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "circular_array" then begin
+   end else if seq = "circular_array_big" then begin
 
-      let r = TestCircularArray.create def in
+      let r = TestCircularArrayBig.create def in
       for j = 1 to repeat do
         for i = 1 to block do
-           TestCircularArray.push_back 1 r;
+           TestCircularArrayBig.push_back 1 r;
         done;
         for i = 1 to block do
-           let _t = TestCircularArray.pop_back r in
+           let _t = TestCircularArrayBig.pop_back r in
+           ()
+        done;
+     done
+
+   end else if seq = "sized_array_big" then begin
+
+      let r = TestSizedArrayBig.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestSizedArrayBig.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestSizedArrayBig.pop_back r in
            ()
         done;
      done
 
    end else if seq = "sized_array" then begin
 
-      let r = TestSizedArray.create def in
+      let r = TestSizedArray.create_capacity block def in
       for j = 1 to repeat do
         for i = 1 to block do
            TestSizedArray.push_back 1 r;
@@ -555,13 +684,13 @@ let real_fifo seq nbitems repeat () () =
    printf "length %d\n" block;
    if seq = "circular_array" then begin
 
-      let r = TestCircularArray.create def in
+      let r = TestCircularArrayBig.create def in
       for j = 1 to repeat do
         for i = 1 to block do
-           TestCircularArray.push_back 1 r;
+           TestCircularArrayBig.push_back 1 r;
         done;
         for i = 1 to block do
-           let _t = TestCircularArray.pop_front r in
+           let _t = TestCircularArrayBig.pop_front r in
            ()
         done;
      done
@@ -602,18 +731,23 @@ let _ =
    let seq = Cmdline.parse_string "seq" in
    let seq_module = 
       if seq = "sized_array" then (module TestSizedArray : SeqSig)
+      else if seq = "sized_array_big" then (module TestSizedArrayBig : SeqSig)
       else if seq = "vector" then (module TestVector : SeqSig)
-      else if seq = "circular_array" then (module TestCircularArray : SeqSig) 
+      else if seq = "circular_array_big" then (module TestCircularArrayBig : SeqSig) 
       else if seq = "ocaml_queue" then (module TestOcamlQueue : SeqSig)
       else if seq = "ocaml_list" then (module TestOcamlList : SeqSig)
       else if seq = "sized_list" then (module TestSizedList : SeqSig)
       else if seq = "sized_two_lists" then (module TestSizedTwoLists : SeqSig)
-      else if seq = "persistant_chunk" then (module TestPersistantChunk : SeqSig)
+      else if seq = "parray" then (module TestPArray : SeqSig)
+      else if seq = "persistent_chunk" then (module TestPersistentChunk : SeqSig)
       else if seq = "chunked_stack" then (module TestChunkedStack : SeqSig)
+      else if seq = "chunked_stack_256" then (module TestChunkedStack256 : SeqSig)
       (* TODO
       else if seq = "chunked_seq" then (module TestChunkedSeq : SeqSig)
-      else if seq = "pchunked_seq" then (module TestPChunkedSeq : SeqSig)
       *)
+      else if seq = "pchunked_seq" then (module TestPChunkedSeq : SeqSig)
+      else if seq = "pchunked_stack_copy_on_write" then (module TestPChunkedStackCopyOnWrite : SeqSig)
+      else if seq = "pchunked_stack_persistence" then (module TestPChunkedStackPersistence : SeqSig)
       else failwith "unsupported seq mode"
       in
    let module Seq = (val seq_module : SeqSig) in 

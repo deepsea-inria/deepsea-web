@@ -17,38 +17,16 @@ FILES=\
 	PArray \
 	CircularArray \
 	Vector \
-	PersistantChunk \
-	PersistantChunkBytes \
+	PersistentChunk \
+	PersistentChunkBytes \
 	ChunkedStack \
 	ChunkedSeq \
 	WeightedChunk \
 	PChunkedWeightedSeq \
 	PChunkedSeq \
+	PChunkedStack \
 	Bench
 
-
-#	MeasuredType \#
-#	InhabType \
-#	Size \
-#	Reducer \
-#	PureSeq \
-#	ImpSeq \
-#	PureMeasuredSeq \
-#	MyStream \
-#	CircularArray \
-#	BankersDeque \
-#	BatchedQueue \
-#	SizedList \
-#	SizedListRec \
-#	FingerTree \
-#	FingerTreeLazy \
-#	FingerTreeNbInlined \
-#	FingerTreeNb \
-#	FingerTreeIndirect \
-#	FFTreeBufferCopy \
-#	FFTreeBufferMove \
-#	FFTreeBufferMoveInlined \
-#	FFTreeList \
 
 
 #************************************************************************

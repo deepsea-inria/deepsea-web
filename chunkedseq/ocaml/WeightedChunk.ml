@@ -7,7 +7,7 @@
 
   type 'a chunk = weight * 'a list
 
-  let create = (0, [])
+  let empty = (0, [])
 
   let size (_, xs) = List.length xs
 
@@ -56,9 +56,9 @@
 
   let weight (w, _) = w
 
-  let empty c = (size c = 0)
+  let is_empty c = (size c = 0)
 
-  let full c = (size c = k)
+  let is_full c = (size c = k)
 
   let fold_right : 'a 'b . ('a -> 'b -> 'b) -> 'a chunk -> 'b -> 'b = fun f (_, xs) x ->
     List.fold_right f xs x
