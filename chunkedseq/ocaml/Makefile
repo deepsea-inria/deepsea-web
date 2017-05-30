@@ -25,6 +25,7 @@ FILES=\
 	PChunkedWeightedSeq \
 	PChunkedSeq \
 	PChunkedStack \
+	PChunkedString \
 	Bench
 
 

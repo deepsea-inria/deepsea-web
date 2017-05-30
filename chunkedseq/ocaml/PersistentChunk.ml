@@ -84,7 +84,7 @@ let push_back x s =
    let i = s.head + s.size in
    if i = m && m < capacity then begin
       (* exploit sharing *)
-      s.support.max_size <- m+1;
+      s.support.max_size <- m + 1;
       s.support.data.(i) <- x;
       { support = s.support;
         head = s.head;

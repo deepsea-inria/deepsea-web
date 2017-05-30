@@ -29,10 +29,11 @@ module Chunk16 : SeqSig = CircularArray.Make(Capacity16)
 (* best for ephemeral stack; 128 is ok too *)
 module Chunk256 : SeqSig = CircularArray.Make(Capacity256)
 
-module Middle: SeqSig  = CircularArray.Make(
+module Middle : SeqSig  = CircularArray.Make(
   struct let capacity = 1 + size_for_static_array / chunk_size end)
   (* TODO: change this *)
 
+module PMiddle : PSeqSig = PChunkedSeq
 
 
 (****************************************************************************)
@@ -263,13 +264,13 @@ module TestPChunkedSeq : SeqSig = SeqSig.SeqOfPSeq(
 (** Chunked Stack Copy on Write *)
 
 module PChunkedStackCopyOnWrite : PSeqSig = 
-  PChunkedStack.Make(Capacity)(PArray)(PChunkedSeq)
+  PChunkedStack.Make(Capacity)(PArray)(PMiddle)
 
 module TestPChunkedStackCopyOnWrite : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackCopyOnWrite)
 
 module PChunkedStackCopyOnWrite16 : PSeqSig = 
-  PChunkedStack.Make(Capacity16)(PArray)(PChunkedSeq)
+  PChunkedStack.Make(Capacity16)(PArray)(PMiddle)
 
 module TestPChunkedStackCopyOnWrite16 : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackCopyOnWrite16)
@@ -277,11 +278,16 @@ module TestPChunkedStackCopyOnWrite16 : SeqSig = SeqSig.SeqOfPSeq(
 (** Chunked Stack Persistence *)
 
 module PChunkedStackPersistence : PSeqSig = 
-  PChunkedStack.Make(Capacity)(PersistentChunk.Make(Capacity))(PChunkedSeq)
+  PChunkedStack.Make(Capacity)(PersistentChunk.Make(Capacity))(PMiddle)
 
 module TestPChunkedStackPersistence : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackPersistence)
 
+(** Chunked String with Persistence *)
+
+module TestPChunkedString =
+  PChunkedString.Make(Capacity)(PMiddle)
+(* TODO: fix capacity once and forall *)
 
 
 (****************************************************************************)
@@ -710,7 +716,7 @@ let real_fifo seq nbitems repeat () () =
    assert (repeat > 0);
    let block = nbitems / repeat in
    printf "length %d\n" block;
-   if seq = "circular_array" then begin
+   if seq = "circular_array_big" then begin
 
       let r = TestCircularArrayBig.create def in
       for j = 1 to repeat do
@@ -739,6 +745,38 @@ let real_fifo seq nbitems repeat () () =
    end else failwith "unsupported seq for scenario real_fifo"
 
 
+let real_string_buffer seq nbitems length () () = 
+  let max_word_size = length in
+  let words = Array.init max_word_size (fun i ->
+     Bytes.make i 'x') in
+  let nb = ref 0 in
+  let next_word () =
+     let k = Random.int max_word_size in
+     let w = words.(k) in
+     nb := !nb + k;
+     w in
+
+  if seq = "ocaml_buffer" then begin
+
+      let s = Buffer.create 0 in
+      while !nb < nbitems do
+        let w = next_word() in
+        Buffer.add_bytes s w;
+      done
+
+  end else if seq = "pchunked_string" then begin
+
+      let r = ref TestPChunkedString.empty in
+      while !nb < nbitems do
+        let w = next_word() in
+        r := TestPChunkedString.add_bytes w !r;
+      done
+
+   end else failwith "unsupported seq for scenario real_string_buffer"
+
+
+(* TODO: a string_buffer_debug function *)
+
 
 (****************************************************************************)
 
@@ -756,6 +794,7 @@ let select choices key =
    with Not_found -> failwith (sprintf "not a valid choice: %s\n" key)
 
 let _ =
+   let testname = Cmdline.parse_or_default_string "test" "all" in
    let seq = Cmdline.parse_string "seq" in
    let seq_module = 
       if seq = "sized_array" then (module TestSizedArray : SeqSig)
@@ -777,12 +816,15 @@ let _ =
       else if seq = "pchunked_stack_copy_on_write" then (module TestPChunkedStackCopyOnWrite : SeqSig)
       else if seq = "pchunked_stack_copy_on_write_16" then (module TestPChunkedStackCopyOnWrite16 : SeqSig)
       else if seq = "pchunked_stack_persistence" then (module TestPChunkedStackPersistence : SeqSig)
-      else failwith "unsupported seq mode"
+      else 
+        if    (seq = "ocaml_buffer" || seq = "pchunked_string")
+           && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo" ]
+           then (module TestSizedArray : SeqSig) (* dummy *)
+           else failwith "unsupported seq mode"
       in
    let module Seq = (val seq_module : SeqSig) in 
    let module Test = (Scenari(Seq)) in
 
-   let testname = Cmdline.parse_or_default_string "test" "all" in
    let n = Cmdline.parse_or_default_int "n" 10000000 in 
    let r = Cmdline.parse_or_default_int "r" (-1) in 
    let length = Cmdline.parse_or_default_int "length" (-1) in 
@@ -791,7 +833,9 @@ let _ =
         if r = -1 && length <> -1 then (n / length, length)
         else if r <> -1 && length = -1 then (r, n / r)
         else failwith "need to provide exactly one of length or r argument"
-      end else (r,length)
+      end else if testname = "real_string_buffer" && length < 2 then
+        failwith "invalid value for length"
+      else (r,length)
       in
    (* TODO
    let b = Cmdline.parse_or_default_int "b" 1000 in 
@@ -802,6 +846,7 @@ let _ =
    let testnames = [ 
       "real_lifo", real_lifo seq n r;
       "real_fifo", real_fifo seq n r;
+      "real_string_buffer", real_string_buffer seq n length;
       "fifo_1", Test.fifo_1 n r;
       "lifo_1", Test.lifo_1 n r;
       "fifo_debug_1", Test.fifo_debug_1;
