@@ -19,6 +19,19 @@ cp plots.pdf plots/plots_lifo.pdf && cp results.txt plots/results_lifo.txt
 pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 
+#============================================
+# PERSISTENT LIFO BENCHMARK
+
+# smaller sizes, all structures:
+make opt && prun output.opt -test real_lifo -seq ocaml_list,pchunked_seq,pchunked_stack_copy_on_write16,pchunked_stack_persistence -n 2000000 -length 10,100,1000,10000,100000,1000000
+
+# full sizes, fast structures, plus imperative structures for comparison:
+make opt && prun output.opt -test real_lifo -seq ocaml_list,pchunked_stack_persistence,chunked_stack_256,sized_array -n 20000000 -length 100,1000,10000,100000,1000000,10000000,20000000 -runs 3
+
+cp plots.pdf plots/plots_plifo.pdf && cp results.txt plots/results_plifo.txt
+
+pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+
 
 #============================================
 # EPHEMERAL CHUNK_STACK BEST CHUNK SIZE
@@ -33,34 +46,16 @@ cp plots.pdf plots/plots_chunk_size.pdf && cp results.txt plots/results_chunk_si
 pplot -mode scatter -series chunk --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 
-
-#============================================
-# PERSISTENT LIFO BENCHMARK
-
-# smaller sizes, all structures:
-make opt && prun output.opt -test real_lifo -seq ocaml_list,pchunked_seq,pchunked_stack_copy_on_write,pchunked_stack_persistence -n 2000000 -length 10,100,1000,10000,100000,1000000
-
-# full sizes, only fast structures:
-make opt && prun output.opt -test real_lifo -seq sized_array,ocaml_list,pchunked_stack_persistence -n 20000000 -length 100,1000,10000,100000,1000000,10000000 -runs 3
-
-cp plots.pdf plots/plots_plifo.pdf && cp results.txt plots/results_plifo.txt
-
-pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
-
-
 #============================================
 # PERSISTENT BEST CHUNK SIZE
 
-make opt && prun output.opt -test real_lifo -seq pchunked_stack_copy_on_write,pchunked_stack_persistence -n 10000000 -length 10,1000,100000,10000000,20000000 -chunk 8,16,32,64 && prun output.opt -test real_lifo -seq pchunked_stack_persistence -n 10000000 -length 10,1000,100000,10000000,20000000 -chunk 128,256,512 --append
-
+make opt && prun output.opt -test real_lifo -seq pchunked_stack_copy_on_write,pchunked_stack_persistence -n 10000000 -length 10,1000,100000,10000000 -chunk 8,16,32,64 && prun output.opt -test real_lifo -seq pchunked_stack_persistence -n 10000000 -length 10,1000,100000,10000000 -chunk 128,256,512 --append
 
 # -runs 3
 
-##==> todo: investigate issue with outofbound.
+cp plots.pdf plots/plots_pchunk_size.pdf && cp results.txt plots/results_pchunk_size.txt
 
-cp plots.pdf plots/plots_chunk_size.pdf && cp results.txt plots/results_chunk_size.txt
-
-pplot -mode scatter -series chunk --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+pplot -mode scatter -chart seq -series chunk --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 
 

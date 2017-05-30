@@ -17,9 +17,17 @@ let chunk_size = (Cmdline.parse_or_default_int "chunk" 256)
 
 module Capacity : CapacitySig.S = struct let capacity = chunk_size end
 
+module Capacity16 : CapacitySig.S = struct let capacity = 16 end
+
+module Capacity256 : CapacitySig.S = struct let capacity = 256 end
+
 module Chunk : SeqSig = CircularArray.Make(Capacity)
 
-module Chunk256 : SeqSig = CircularArray.Make(struct let capacity = 256 end)
+(* best for copy on write chunks *)
+module Chunk16 : SeqSig = CircularArray.Make(Capacity16)
+
+(* best for ephemeral stack; 128 is ok too *)
+module Chunk256 : SeqSig = CircularArray.Make(Capacity256)
 
 module Middle: SeqSig  = CircularArray.Make(
   struct let capacity = 1 + size_for_static_array / chunk_size end)
@@ -233,7 +241,7 @@ end
 (** Ephemeral Chunked Stack with capacity 256 *)
 
 module TestChunkedStack256 : SeqSig = struct
-  include ChunkedStack.Make(Capacity)(Chunk256)(Middle)
+  include ChunkedStack.Make(Capacity256)(Chunk256)(Middle)
   include UnsupportedBackFront
 end
 
@@ -260,6 +268,12 @@ module PChunkedStackCopyOnWrite : PSeqSig =
 module TestPChunkedStackCopyOnWrite : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackCopyOnWrite)
 
+module PChunkedStackCopyOnWrite16 : PSeqSig = 
+  PChunkedStack.Make(Capacity16)(PArray)(PChunkedSeq)
+
+module TestPChunkedStackCopyOnWrite16 : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedStackCopyOnWrite16)
+
 (** Chunked Stack Persistence *)
 
 module PChunkedStackPersistence : PSeqSig = 
@@ -267,6 +281,7 @@ module PChunkedStackPersistence : PSeqSig =
 
 module TestPChunkedStackPersistence : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackPersistence)
+
 
 
 (****************************************************************************)
@@ -570,6 +585,19 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
+   end else if seq = "pchunked_stack_copy_on_write_16" then begin
+
+      let r = ref PChunkedStackCopyOnWrite16.empty in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           r := PChunkedStackCopyOnWrite16.push_back 1 !r;
+        done;
+        for i = 1 to block do 
+           let (x,t) = PChunkedStackCopyOnWrite16.pop_back !r in
+           r := t
+        done;
+     done
+
    end else if seq = "pchunked_stack_copy_on_write" then begin
 
       let r = ref PChunkedStackCopyOnWrite.empty in
@@ -747,6 +775,7 @@ let _ =
       *)
       else if seq = "pchunked_seq" then (module TestPChunkedSeq : SeqSig)
       else if seq = "pchunked_stack_copy_on_write" then (module TestPChunkedStackCopyOnWrite : SeqSig)
+      else if seq = "pchunked_stack_copy_on_write_16" then (module TestPChunkedStackCopyOnWrite16 : SeqSig)
       else if seq = "pchunked_stack_persistence" then (module TestPChunkedStackPersistence : SeqSig)
       else failwith "unsupported seq mode"
       in
