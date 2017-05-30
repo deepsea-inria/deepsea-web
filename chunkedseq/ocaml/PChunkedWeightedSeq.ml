@@ -49,25 +49,25 @@ let mk_shallow (c1, c2, c3, c4) =
 
 type 'a weight_fn = 'a Chunk.weight_fn
                        
-let ec = Chunk.create
+let ec = Chunk.empty
 
-let create = Shallow ec
+let empty = Shallow ec
 
-let empty cs =
+let is_empty cs =
   match cs with
-  | Shallow c -> Chunk.empty c
+  | Shallow c -> Chunk.is_empty c
   | _ -> false
 
 let rec push_front' : 'a. wf:('a weight_fn) -> ('a chunkedseq * 'a) -> 'a chunkedseq = fun ~wf (cs, x) ->
   match cs with
   | Shallow c ->
-      if Chunk.full c then
-        push_front' wf (mk_deep {fo=ec; fi=ec; mid=create; bi=ec; bo=c}, x)
+      if Chunk.is_full c then
+        push_front' wf (mk_deep {fo=ec; fi=ec; mid=empty; bi=ec; bo=c}, x)
       else
         Shallow (Chunk.push_front wf (c, x))
   | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
-      if Chunk.full fo then
-        if Chunk.empty fi then
+      if Chunk.is_full fo then
+        if Chunk.is_empty fi then
           push_front' wf (mk_deep {d with fo=ec; fi=fo}, x)
         else
           let mid' = push_front' ~wf:(Chunk.weight) (mid, fi) in
@@ -79,13 +79,13 @@ let rec push_front' : 'a. wf:('a weight_fn) -> ('a chunkedseq * 'a) -> 'a chunke
 let rec push_back' : 'a. wf:('a weight_fn) -> ('a chunkedseq * 'a) -> 'a chunkedseq = fun ~wf (cs, x) ->
   match cs with
   | Shallow c ->
-      if Chunk.full c then
-        push_back' wf (mk_deep {fo=c; fi=ec; mid=create; bi=ec; bo=ec}, x)
+      if Chunk.is_full c then
+        push_back' wf (mk_deep {fo=c; fi=ec; mid=empty; bi=ec; bo=ec}, x)
       else
         Shallow (Chunk.push_back wf (c, x))
   | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
-      if Chunk.full bo then
-        if Chunk.empty bi then
+      if Chunk.is_full bo then
+        if Chunk.is_empty bi then
           push_back' wf (mk_deep {d with bi=bo; bo=ec}, x)
         else
           let mid' = push_back' ~wf:(Chunk.weight) (mid, bi) in
@@ -103,13 +103,13 @@ assert false
         Chunk.weight fo + Chunk.weight fi +
           Chunk.weight bo + Chunk.weight bi
       in
-      if w = 0 && not (empty mid) then
+      if w = 0 && not (is_empty mid) then
         let (mid', fo') = pop_front' ~wf:(Chunk.weight) mid in
         mk_deep {d with fo=fo'; mid=mid'}
-      else if w = 1 && empty mid then
+      else if w = 1 && is_empty mid then
         mk_shallow (fo, fi, bi, bo)
-      else if w = 0 && empty mid then
-        create
+      else if w = 0 && is_empty mid then
+        empty
       else
         cs
 
@@ -122,13 +122,13 @@ and pop_front' : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq * 'a = 
      let (c', x) = Chunk.pop_front wf c in
      (Shallow c', x)
   | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
-     if Chunk.empty fo then
-       if not (Chunk.empty fi) then
+     if Chunk.is_empty fo then
+       if not (Chunk.is_empty fi) then
          pop_front' wf (mk_deep' wf {d with fo=fi; fi=ec;})
-       else if not (empty mid) then
+       else if not (is_empty mid) then
          let (mid', c) = pop_front' ~wf:(Chunk.weight) mid in
          pop_front' wf (mk_deep' wf {d with fo=c; mid=mid'})
-       else if not (Chunk.empty bi) then
+       else if not (Chunk.is_empty bi) then
          pop_front' wf (mk_deep' wf {d with fo=bi; bi=ec})
        else
          let (bo', x) = Chunk.pop_front wf bo in
@@ -143,13 +143,13 @@ and pop_back' : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq * 'a = f
      let (c', x) = Chunk.pop_back wf c in
      (Shallow c', x)
   | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
-     if Chunk.empty bo then
-       if not (Chunk.empty bi) then
+     if Chunk.is_empty bo then
+       if not (Chunk.is_empty bi) then
          pop_back' wf (mk_deep' wf {d with bi=ec; bo=bi})
-       else if not (empty mid) then
+       else if not (is_empty mid) then
          let (mid', c) = pop_back' ~wf:(Chunk.weight) mid in
          pop_back' wf (mk_deep' wf {d with mid=mid'; bo=c})
-       else if not (Chunk.empty fi) then
+       else if not (Chunk.is_empty fi) then
          pop_back' wf (mk_deep' wf {d with fi=ec; bo=fi})
        else
          let (fo', x) = Chunk.pop_back wf fo in
@@ -159,10 +159,10 @@ and pop_back' : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq * 'a = f
        (mk_deep' wf {d with bo=bo'}, x)
 
 and push_buffer_back : 'a. ('a chunk weight_fn) -> ('a chunk chunkedseq * 'a chunk) -> 'a chunk chunkedseq = fun wf (cs, c) ->
-  if Chunk.empty c then
+  if Chunk.is_empty c then
 cs
-  else if empty cs then
-Shallow (Chunk.push_back wf (Chunk.create, c))
+  else if is_empty cs then
+Shallow (Chunk.push_back wf (Chunk.empty, c))
   else
 let (cs', c') = pop_back' wf cs in
 if Chunk.size c + Chunk.size c' <= Chunk.k then
@@ -171,10 +171,10 @@ else
 push_back' wf (cs, c)
                  
 and push_buffer_front : 'a. 'a chunk weight_fn -> ('a chunk chunkedseq * 'a chunk) -> 'a chunk chunkedseq = fun wf (cs, c) ->
-  if Chunk.empty c then
+  if Chunk.is_empty c then
 cs
-  else if empty cs then
-Shallow (Chunk.push_front wf (Chunk.create, c))
+  else if is_empty cs then
+Shallow (Chunk.push_front wf (Chunk.empty, c))
   else
 let (cs', c') = pop_front' wf cs in
 if Chunk.size c + Chunk.size c' <= Chunk.k then
@@ -183,23 +183,23 @@ else
 push_front' wf (cs, c)
                   
 and transfer_contents_back : 'a. 'a weight_fn -> ('a chunkedseq * 'a chunk) -> 'a chunkedseq = fun wf (cs, c) ->
-  if Chunk.empty c then
+  if Chunk.is_empty c then
 cs
   else
 let (c', x) = Chunk.pop_front wf c in
 transfer_contents_back wf (push_back' wf (cs, x), c')
                            
 and transfer_contents_front : 'a. 'a weight_fn -> ('a chunkedseq * 'a chunk) -> 'a chunkedseq = fun wf (cs, c) ->
-  if Chunk.empty c then
+  if Chunk.is_empty c then
 cs
   else
 let (c', x) = Chunk.pop_back wf c in
 transfer_contents_front wf (push_front' wf (cs, x), c')	  
                             
 and concat' : 'a. wf:('a weight_fn) -> 'a chunkedseq * 'a chunkedseq -> 'a chunkedseq = fun ~wf (cs1, cs2) ->
-  if empty cs1 then
+  if is_empty cs1 then
     cs2
-  else if empty cs2 then
+  else if is_empty cs2 then
     cs1
   else
     match (cs1, cs2) with
@@ -214,7 +214,7 @@ and concat' : 'a. wf:('a weight_fn) -> 'a chunkedseq * 'a chunkedseq -> 'a chunk
          let mid2' = push_buffer_front Chunk.weight (mid2, fi2) in
          let mid2'' = push_buffer_front Chunk.weight (mid2', fo2) in
          let (mid1''', mid2''') =
-           if empty mid1'' || empty mid2'' then
+           if is_empty mid1'' || is_empty mid2'' then
              (mid1'', mid2'')
            else
              let (mid1''', c1) = pop_back' Chunk.weight mid1'' in
@@ -240,13 +240,13 @@ and split' : 'a. wf:('a weight_fn) -> ('a chunkedseq * int) -> ('a chunkedseq * 
       let (cs1, x, cs2) =
         if i < wfo then
           let (fo1, x, fo2) = Chunk.split wf (fo, i) in
-          let cs1 = mk_deep {fo=fo1; fi=ec; mid=create; bi=ec; bo=ec} in
+          let cs1 = mk_deep {fo=fo1; fi=ec; mid=empty; bi=ec; bo=ec} in
           let cs2 = mk_deep {d with fo=fo2} in
           (cs1, x, cs2)
   else if i < wfo + wfi then
           let j = i - wfo in
     let (fi1, x, fi2) = Chunk.split wf (fi, j) in
-    let cs1 = mk_deep {d with fi=ec; mid=create; bi=ec; bo=fi1} in
+    let cs1 = mk_deep {d with fi=ec; mid=empty; bi=ec; bo=fi1} in
     let cs2 = mk_deep {d with fo=fi2; fi=ec} in
     (cs1, x, cs2)
         else if i < wfo + wfi + wm then
@@ -259,12 +259,12 @@ and split' : 'a. wf:('a weight_fn) -> ('a chunkedseq * int) -> ('a chunkedseq * 
         else if i < wfo + wfi + wm + wbi then
     let (bi1, x, bi2) = Chunk.split wf (bi, i - wfo - wfi - wm) in
     let cs1 = mk_deep {d with bi=ec; bo=bi1} in
-    let cs2 = mk_deep {d with fo=bi2; fi=ec; mid=create; bi=ec} in
+    let cs2 = mk_deep {d with fo=bi2; fi=ec; mid=empty; bi=ec} in
     (cs1, x, cs2)
         else if i < wfo + wfi + wm + wbi + wbo then
     let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo - wfi - wm - wbi) in
     let cs1 = mk_deep {d with bo=bo1} in
-    let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
+    let cs2 = mk_deep {fo=bo2; fi=ec; mid=empty; bi=ec; bo=ec} in
     (cs1, x, cs2)
   else
           failwith "PChunkedWeightedSeq.split: out of bounds"
