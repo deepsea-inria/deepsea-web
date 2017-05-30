@@ -25,12 +25,10 @@ struct
 
 let capacity = Capacity.capacity
 
-type item = char
-                 
 (** Data that may be shared by several chunks *)
 
 type support = {
-  data : item array; (* of size equal to capacity *)
+  data : Bytes.bytes; (* of size equal to capacity *)
   mutable max_size : int; }
 
 (** Representation of a persistent chunk.
@@ -98,9 +96,9 @@ let push_back x s =
     (* copy-on-write *)
      assert (s.size < capacity);
      let new_size = s.size + 1 in
-     let new_data = Array.make capacity x in
+     let new_data = Bytes.make capacity x in
      (* redundant here: new_data.(s.size) <- x *)
-     Array.blit s.support.data s.head new_data 0 s.size;
+     Bytes.blit s.support.data s.head new_data 0 s.size;
      create_for new_size new_data
    end
 
@@ -116,9 +114,9 @@ let pop_back s =
 let push_front x s = 
    (* copy-on-write *)
    let new_size = s.size + 1 in
-   let new_data = Array.make capacity x in
+   let new_data = Bytes.make capacity x in
    (* redundant here: new_data.(0) <- x *)
-   Array.blit s.support.data s.head new_data 1 s.size;
+   Bytes.blit s.support.data s.head new_data 1 s.size;
    create_for new_size new_data
 
 (* constant time, always, by exploiting sharing *)
@@ -140,15 +138,15 @@ let append s1 s2 =
   if i1 = m1 && m1 + s2.size <= capacity then begin
     (* exploit sharing *)
     s1.support.max_size <- m1 + s2.size;
-    Array.blit d2 s2.head d1 i1 s2.size;
+    Bytes.blit d2 s2.head d1 i1 s2.size;
     { support = s1.support;
       head = s1.head;
       size = new_size; }
   end else begin
     (* copy-on-write *)
-    let new_data = Array.make capacity d1.(0) in
-    Array.blit d1 s1.head new_data 0 s1.size;
-    Array.blit d2 s2.head new_data s1.size s2.size;
+    let new_data = Bytes.make capacity d1.(0) in
+    Bytes.blit d1 s1.head new_data 0 s1.size;
+    Bytes.blit d2 s2.head new_data s1.size s2.size;
     create_for new_size new_data
   end
 
@@ -164,14 +162,14 @@ let split_at i s =
 
 let iter f s =
    for i = s.head to (s.head + s.size - 1) do
-      let x = Array.get s.support.data i in
+      let x = Bytes.get s.support.data i in
       f x;
    done
 
 let fold_left f a s =
    let acc = ref a in
    for i = s.head to (s.head + s.size - 1) do
-      let x = Array.get s.support.data i in
+      let x = Bytes.get s.support.data i in
       acc := f !acc x;
    done;
    !acc
@@ -179,7 +177,7 @@ let fold_left f a s =
 let fold_right f s a =
    let acc = ref a in
    for i = s.head + s.size - 1 downto s.head do
-      let x = Array.get s.support.data i in
+      let x = Bytes.get s.support.data i in
       acc := f x !acc;
    done;
    !acc
