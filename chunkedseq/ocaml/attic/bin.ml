@@ -60,103 +60,8 @@ module FFTreeListHybridInt =
       (Chunk)
       (FingerTreeNbInlined.Make)
 *)
-let real_lifo seq nbitems repeat () () =
-   assert (repeat > 0);
-   let block = nbitems / repeat in
-   printf "length %d\n" block;
-   if seq = "ocaml_list" then begin
 
-      let r = ref [] in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := 1::!r;
-        done;
-        for i = 1 to block do
-           match !r with
-           | [] -> assert false
-           | x::t -> r := t
-        done;
-     done
 
-   end else if seq = "fftree_list" then begin
-
-      let r = ref FFTreeListInt.empty in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := FFTreeListInt.push_front 1 !r;
-        done;
-        for i = 1 to block do
-           let (_,t) = FFTreeListInt.pop_front !r in
-           r := t
-        done;
-     done
-(*
-   end else if seq = "fftree_list_hybrid" then begin
-
-      let r = ref FFTreeListHybridInt.empty in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := FFTreeListHybridInt.push_front 1 !r;
-        done;
-        for i = 1 to block do
-           let (_,t) = FFTreeListHybridInt.pop_front !r in
-           r := t
-        done;
-     done
-*)
-   end else if seq = "fftree_buffer_move" then begin
-
-      let r = Test_FFtree_Buffer_Move.create() in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           Test_FFtree_Buffer_Move.push_front 1 r;
-        done;
-        for i = 1 to block do
-           let _t = Test_FFtree_Buffer_Move.pop_front r in
-           ()
-        done;
-     done
-
-   end else if seq = "fftree_buffer_move_inlined" then begin
-
-      let r = Test_FFtree_Buffer_Move_Inlined.create() in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           Test_FFtree_Buffer_Move_Inlined.push_front 1 r;
-        done;
-        for i = 1 to block do
-           let _t = Test_FFtree_Buffer_Move_Inlined.pop_front r in
-           ()
-        done;
-     done
-
-   end else if seq = "circular_array" then begin
-
-      let r = Test_Circular_Array.create() in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           Test_Circular_Array.push_front 1 r;
-        done;
-        for i = 1 to block do
-           let _t = Test_Circular_Array.pop_front r in
-           ()
-        done;
-     done
-
-   end else if seq = "boot_seq" then begin
-
-      let r = Test_Boot_Seq.create() in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           Test_Boot_Seq.push_front 1 r;
-        done;
-        for i = 1 to block do
-           let _t = Test_Boot_Seq.pop_front r in
-           ()
-        done;
-     done
-
-   end else failwith "unsupported seq for scenario real_lifo"
 
 let real_fifo seq nbitems repeat () () =
    assert (repeat > 0);
@@ -371,9 +276,7 @@ struct
 end
 
 
-      "real_lifo", real_lifo seq n r;
-      "real_fifo", real_fifo seq n r;
-      "real_random_access", real_random_access seq n r g;
+       "real_random_access", real_random_access seq n r g;
 
 
       (* "random_access_debug_1", random_access_debug_1 seq n *) 

@@ -1,0 +1,793 @@
+
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 32
+---
+timeout -1
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 64
+---
+timeout -1
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 128
+---
+timeout -1
+exectime 0.54
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 256
+---
+timeout -1
+exectime 0.54
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 512
+---
+timeout -1
+exectime 0.62
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 1024
+---
+timeout -1
+exectime 0.61
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 32
+---
+timeout -1
+exectime 0.79
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 64
+---
+timeout -1
+exectime 0.75
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 128
+---
+timeout -1
+exectime 0.66
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 256
+---
+timeout -1
+exectime 0.76
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 512
+---
+timeout -1
+exectime 0.90
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 1024
+---
+timeout -1
+exectime 0.68
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 32
+---
+timeout -1
+exectime 1.06
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 64
+---
+timeout -1
+exectime 0.91
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 128
+---
+timeout -1
+exectime 0.82
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 256
+---
+timeout -1
+exectime 0.78
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 512
+---
+timeout -1
+exectime 0.99
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 1024
+---
+timeout -1
+exectime 0.95
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 32
+---
+timeout -1
+exectime 1.50
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 64
+---
+timeout -1
+exectime 1.17
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 128
+---
+timeout -1
+exectime 1.13
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 256
+---
+timeout -1
+exectime 1.08
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 512
+---
+timeout -1
+exectime 1.04
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 1024
+---
+timeout -1
+exectime 0.98
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 32
+---
+timeout -1
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 64
+---
+timeout -1
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 128
+---
+timeout -1
+exectime 0.58
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 256
+---
+timeout -1
+exectime 0.59
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 512
+---
+timeout -1
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 1024
+---
+timeout -1
+exectime 0.65
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 32
+---
+timeout -1
+exectime 0.85
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 64
+---
+timeout -1
+exectime 0.73
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 128
+---
+timeout -1
+exectime 0.72
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 256
+---
+timeout -1
+exectime 0.70
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 512
+---
+timeout -1
+exectime 0.98
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 1024
+---
+timeout -1
+exectime 0.73
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 32
+---
+timeout -1
+exectime 1.11
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 64
+---
+timeout -1
+exectime 1.28
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 128
+---
+timeout -1
+exectime 0.83
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 256
+---
+timeout -1
+exectime 0.82
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 512
+---
+timeout -1
+exectime 1.36
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 1024
+---
+timeout -1
+exectime 1.01
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 32
+---
+timeout -1
+exectime 1.54
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 64
+---
+timeout -1
+exectime 1.28
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 128
+---
+timeout -1
+exectime 1.18
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 256
+---
+timeout -1
+exectime 1.14
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 512
+---
+timeout -1
+exectime 0.99
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 1024
+---
+timeout -1
+exectime 0.95
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 32
+---
+timeout -1
+exectime 0.57
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 64
+---
+timeout -1
+exectime 0.61
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 128
+---
+timeout -1
+exectime 0.60
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 256
+---
+timeout -1
+exectime 0.57
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 512
+---
+timeout -1
+exectime 0.69
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10
+chunk 1024
+---
+timeout -1
+exectime 0.69
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 32
+---
+timeout -1
+exectime 0.76
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 64
+---
+timeout -1
+exectime 0.69
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 128
+---
+timeout -1
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 256
+---
+timeout -1
+exectime 0.65
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 512
+---
+timeout -1
+exectime 0.81
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 1000
+chunk 1024
+---
+timeout -1
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 32
+---
+timeout -1
+exectime 1.02
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 64
+---
+timeout -1
+exectime 0.89
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 128
+---
+timeout -1
+exectime 0.82
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 256
+---
+timeout -1
+exectime 0.76
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 512
+---
+timeout -1
+exectime 0.94
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 100000
+chunk 1024
+---
+timeout -1
+exectime 0.92
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 32
+---
+timeout -1
+exectime 1.42
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 64
+---
+timeout -1
+exectime 1.19
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 128
+---
+timeout -1
+exectime 1.10
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 256
+---
+timeout -1
+exectime 1.04
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 512
+---
+timeout -1
+exectime 1.08
+==========
+machine charghp
+prog output.opt
+test lifo_1
+seq chunked_stack
+n 50000000
+length 10000000
+chunk 1024
+---
+timeout -1
+exectime 1.36
+==========
