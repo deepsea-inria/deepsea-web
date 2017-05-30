@@ -73,11 +73,16 @@ dbg: output.dbg
 output.out: $(SRC)
 	ocamlopt $(LIBX) $(SRC) -o output.out
 
-output.opt: $(SRC)
-	ocamlopt -unsafe -noassert $(LIBX) $(SRC) -o output.opt
-
 output.dbg: $(SRC)
 	ocamlc -g $(LIB) $(SRC) -o output.dbg
+
+output.opt: $(SRC)
+	ocamlopt -O2 -unsafe -noassert $(LIBX) $(SRC) -o output.opt
+
+#-inline-max-depth 4 
+
+
+
 
 
 #************************************************************************

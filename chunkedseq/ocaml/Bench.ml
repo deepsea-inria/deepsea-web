@@ -8,7 +8,8 @@ exception Unsupported
 
 module type SeqSig = SeqSig.S
 
-let size_for_static_array = 10000000 (* enough to fit all items from experiments *)
+let size_for_static_array = Cmdline.parse_or_default_int "static_array_size" 20000000
+  (* enough to fit all items from experiments *)
 
 let chunk_size = (Cmdline.parse_or_default_int "chunk" 256) 
   (* use 3 for debugging *)
@@ -110,10 +111,11 @@ struct
    type 'a t = 'a Queue.t
    let create d = Queue.create ()
    let push_back x s = Queue.push x s
-   let pop_back s = Queue.pop s
+   let pop_front s = Queue.pop s
+   let push_front x s = raise Unsupported
+   let pop_back s = raise Unsupported
    let to_list s =
       List.rev (Queue.fold (fun acc x -> x::acc) [] s)
-   include UnsupportedSingleEnded
    include UnsupportedExtra
 end
 
@@ -207,7 +209,9 @@ module TestPChunkedSeq : SeqSig = SeqSig.SeqOfPSeq(PChunkedSeq)
 
 (****************************************************************************)
 
-let debug = true
+let debug = ((Cmdline.parse_or_default_int "debug" 0) <> 0)
+let gc_major = ((Cmdline.parse_or_default_int "gc_major" 0) <> 0)
+
 
 (* FOR DEBUG
 let show_str r =
@@ -243,6 +247,26 @@ let fifo_debug_1 () () =
       if debug then show q;
    done
 
+let lifo_debug_1 () () = 
+   let q = Seq.create def in
+   let a = ref 0 in
+   for i = 1 to 10 do
+      Seq.push_back (!a) q;
+      incr a;
+      if debug then show q;
+   done;
+   for i = 1 to 10 do
+      let x = Seq.pop_back q in
+      decr a;
+      if (x <> !a) then failwith (sprintf "expected %d, got %d\n" !a x);
+      assert (x = !a);
+      if debug then show q;
+   done
+
+
+(****************************************************************************)
+
+
 (** Push 10k items, then repeat n times: push_back (n/r) items
     followed by pop_front (n/r) items. *)
 
@@ -270,22 +294,6 @@ let fifo_1 nbitems repeat () () =
       done;
    done
 
-let lifo_debug_1 () () = 
-   let q = Seq.create def in
-   let a = ref 0 in
-   for i = 1 to 10 do
-      Seq.push_back (!a) q;
-      incr a;
-      if debug then show q;
-   done;
-   for i = 1 to 10 do
-      let x = Seq.pop_back q in
-      decr a;
-      if (x <> !a) then failwith (sprintf "expected %d, got %d\n" !a x);
-      assert (x = !a);
-      if debug then show q;
-   done
-
 
 (** Push 10k items, then repeat n times: push_back (n/r) items
     followed by pop_back (n/r) items. *)
@@ -296,7 +304,7 @@ let lifo_1 nbitems repeat () () =
    let q = Seq.create def in
    let a = ref 0 in
    for i = 1 to 10000 do
-      Seq.push_front (!a) q;
+      Seq.push_back (!a) q;
       incr a;
    done;
    let nbitems = nbitems - 10000 in
@@ -306,6 +314,7 @@ let lifo_1 nbitems repeat () () =
         Seq.push_back (!a) q;
         incr a;
      done;
+     if gc_major then Gc.major();
      for i = 1 to block do
         let x = Seq.pop_back q in
         decr a;
@@ -469,7 +478,7 @@ let measured_run f =
       f();
       let t2 = Sys.time() in
       printf "exectime %.2f\n" (t2 -. t1);
-   with Unsupported -> printf "exectime NA\n" 
+   with Unsupported -> printf "exectime NA (unsupported)\n" 
    end
 
 let select choices key =
