@@ -4,171 +4,6 @@ prog output.opt
 test real_lifo
 seq ocaml_list
 n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.05
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.08
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.09
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.15
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.53
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 1.10
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 1.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.82
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.46
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.55
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.77
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.63
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.58
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 1.34
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
 length 100
 ---
 timeout -1
@@ -178,469 +13,7 @@ exectime 0.22
 machine charghp
 prog output.opt
 test real_lifo
-seq chunked_stack_256
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.29
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.36
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.39
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.28
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.31
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.32
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.31
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.29
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.28
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.25
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.13
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.13
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.15
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.15
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.17
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.20
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.25
-==========
-machine charghp
-prog output.opt
-test real_lifo
 seq ocaml_list
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.06
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.08
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.09
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.13
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.64
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 1.19
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 1.32
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.88
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.61
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.60
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.88
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.91
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.58
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.83
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.21
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.22
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
 n 20000000
 length 1000
 ---
@@ -651,321 +24,13 @@ exectime 0.23
 machine charghp
 prog output.opt
 test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.35
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.40
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.13
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.14
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.15
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.15
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.15
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.16
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.21
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.05
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.08
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.09
-==========
-machine charghp
-prog output.opt
-test real_lifo
 seq ocaml_list
 n 20000000
 length 10000
 ---
 timeout -1
 length 10000
-exectime 0.13
+exectime 0.26
 ==========
 machine charghp
 prog output.opt
@@ -976,7 +41,7 @@ length 100000
 ---
 timeout -1
 length 100000
-exectime 0.53
+exectime 0.69
 ==========
 machine charghp
 prog output.opt
@@ -987,29 +52,18 @@ length 1000000
 ---
 timeout -1
 length 1000000
-exectime 1.09
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq ocaml_list
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
 exectime 1.25
 ==========
 machine charghp
 prog output.opt
 test real_lifo
-seq vector
+seq ocaml_list
 n 20000000
-length 10
+length 10000000
 ---
 timeout -1
-length 10
-exectime 0.82
+length 10000000
+exectime 1.42
 ==========
 machine charghp
 prog output.opt
@@ -1020,7 +74,7 @@ length 100
 ---
 timeout -1
 length 100
-exectime 0.46
+exectime 0.67
 ==========
 machine charghp
 prog output.opt
@@ -1031,17 +85,6 @@ length 1000
 ---
 timeout -1
 length 1000
-exectime 0.58
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq vector
-n 20000000
-length 10000
----
-timeout -1
-length 10000
 exectime 0.78
 ==========
 machine charghp
@@ -1049,11 +92,22 @@ prog output.opt
 test real_lifo
 seq vector
 n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.99
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
 length 100000
 ---
 timeout -1
 length 100000
-exectime 0.63
+exectime 0.87
 ==========
 machine charghp
 prog output.opt
@@ -1064,7 +118,7 @@ length 1000000
 ---
 timeout -1
 length 1000000
-exectime 0.58
+exectime 0.84
 ==========
 machine charghp
 prog output.opt
@@ -1075,177 +129,78 @@ length 10000000
 ---
 timeout -1
 length 10000000
-exectime 0.83
+exectime 1.12
 ==========
 machine charghp
 prog output.opt
 test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.21
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
+seq pchunked_stack_persistence_256
 n 20000000
 length 100
 ---
 timeout -1
 length 100
-exectime 0.22
+exectime 0.52
 ==========
 machine charghp
 prog output.opt
 test real_lifo
-seq chunked_stack_256
+seq pchunked_stack_persistence_256
 n 20000000
 length 1000
 ---
 timeout -1
 length 1000
-exectime 0.23
+exectime 0.47
 ==========
 machine charghp
 prog output.opt
 test real_lifo
-seq chunked_stack_256
+seq pchunked_stack_persistence_256
 n 20000000
 length 10000
 ---
 timeout -1
 length 10000
-exectime 0.24
+exectime 0.52
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.57
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.72
 ==========
 machine charghp
 prog output.opt
 test real_lifo
 seq chunked_stack_256
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.35
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq chunked_stack_256
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.40
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 100
----
-timeout -1
-length 100
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 1000
----
-timeout -1
-length 1000
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10000
----
-timeout -1
-length 10000
-exectime 0.31
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 100000
----
-timeout -1
-length 100000
-exectime 0.31
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.32
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq circular_array_big
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.32
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10
----
-timeout -1
-length 10
-exectime 0.27
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
 n 20000000
 length 100
 ---
@@ -1256,18 +211,414 @@ exectime 0.37
 machine charghp
 prog output.opt
 test real_lifo
-seq sized_array_big
+seq chunked_stack_256
 n 20000000
 length 1000
 ---
 timeout -1
 length 1000
+exectime 0.38
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.46
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.46
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.70
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 100
+---
+timeout -1
+length 100
 exectime 0.28
 ==========
 machine charghp
 prog output.opt
 test real_lifo
-seq sized_array_big
+seq sized_array
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.29
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.29
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.29
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.30
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.35
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.26
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 1.01
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 1.40
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 1.46
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.69
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.83
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 1.03
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.85
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.80
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 1.07
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.49
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.49
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.50
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.56
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.66
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.71
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.36
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.37
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.39
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.42
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.61
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.27
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.29
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
 n 20000000
 length 10000
 ---
@@ -1278,46 +629,299 @@ exectime 0.30
 machine charghp
 prog output.opt
 test real_lifo
-seq sized_array_big
+seq sized_array
 n 20000000
 length 100000
 ---
 timeout -1
 length 100000
-exectime 0.24
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 1000000
----
-timeout -1
-length 1000000
-exectime 0.25
-==========
-machine charghp
-prog output.opt
-test real_lifo
-seq sized_array_big
-n 20000000
-length 10000000
----
-timeout -1
-length 10000000
-exectime 0.24
+exectime 0.30
 ==========
 machine charghp
 prog output.opt
 test real_lifo
 seq sized_array
 n 20000000
-length 10
+length 1000000
 ---
 timeout -1
-length 10
-exectime 0.13
+length 1000000
+exectime 0.32
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq sized_array
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.35
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.26
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.68
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 1.22
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq ocaml_list
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 1.40
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.78
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.99
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.85
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.79
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq vector
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 1.08
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.49
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.49
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.50
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.57
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence_256
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.70
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 100
+---
+timeout -1
+length 100
+exectime 0.36
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 1000
+---
+timeout -1
+length 1000
+exectime 0.38
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 10000
+---
+timeout -1
+length 10000
+exectime 0.39
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 100000
+---
+timeout -1
+length 100000
+exectime 0.41
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 1000000
+---
+timeout -1
+length 1000000
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq chunked_stack_256
+n 20000000
+length 10000000
+---
+timeout -1
+length 10000000
+exectime 0.62
 ==========
 machine charghp
 prog output.opt
@@ -1328,7 +932,7 @@ length 100
 ---
 timeout -1
 length 100
-exectime 0.13
+exectime 0.27
 ==========
 machine charghp
 prog output.opt
@@ -1339,7 +943,7 @@ length 1000
 ---
 timeout -1
 length 1000
-exectime 0.15
+exectime 0.29
 ==========
 machine charghp
 prog output.opt
@@ -1350,7 +954,7 @@ length 10000
 ---
 timeout -1
 length 10000
-exectime 0.15
+exectime 0.29
 ==========
 machine charghp
 prog output.opt
@@ -1361,7 +965,7 @@ length 100000
 ---
 timeout -1
 length 100000
-exectime 0.15
+exectime 0.29
 ==========
 machine charghp
 prog output.opt
@@ -1372,7 +976,7 @@ length 1000000
 ---
 timeout -1
 length 1000000
-exectime 0.17
+exectime 0.31
 ==========
 machine charghp
 prog output.opt
@@ -1383,5 +987,5 @@ length 10000000
 ---
 timeout -1
 length 10000000
-exectime 0.21
+exectime 0.35
 ==========

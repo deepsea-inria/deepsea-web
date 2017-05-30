@@ -21,6 +21,8 @@ module Capacity16 : CapacitySig.S = struct let capacity = 16 end
 
 module Capacity256 : CapacitySig.S = struct let capacity = 256 end
 
+module Capacity4096 : CapacitySig.S = struct let capacity = 4096 end
+
 module Chunk : SeqSig = CircularArray.Make(Capacity)
 
 (* best for copy on write chunks *)
@@ -29,9 +31,12 @@ module Chunk16 : SeqSig = CircularArray.Make(Capacity16)
 (* best for ephemeral stack; 128 is ok too *)
 module Chunk256 : SeqSig = CircularArray.Make(Capacity256)
 
-module Middle : SeqSig  = CircularArray.Make(
-  struct let capacity = 1 + size_for_static_array / chunk_size end)
-  (* TODO: change this *)
+module Middle : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedSeq)
+(* for debugging:
+  CircularArray.Make(
+    struct let capacity = 1 + size_for_static_array / chunk_size end)
+*)
 
 module PMiddle : PSeqSig = PChunkedSeq
 
@@ -239,8 +244,6 @@ module TestChunkedStack : SeqSig = struct
   include UnsupportedBackFront
 end
 
-(** Ephemeral Chunked Stack with capacity 256 *)
-
 module TestChunkedStack256 : SeqSig = struct
   include ChunkedStack.Make(Capacity256)(Chunk256)(Middle)
   include UnsupportedBackFront
@@ -283,11 +286,19 @@ module PChunkedStackPersistence : PSeqSig =
 module TestPChunkedStackPersistence : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackPersistence)
 
+module PChunkedStackPersistence256 : PSeqSig = 
+  PChunkedStack.Make(Capacity256)(PersistentChunk.Make(Capacity256))(PMiddle)
+
+module TestPChunkedStackPersistence256 : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedStackPersistence256)
+
 (** Chunked String with Persistence *)
 
 module TestPChunkedString =
   PChunkedString.Make(Capacity)(PMiddle)
-(* TODO: fix capacity once and forall *)
+
+module TestPChunkedString4096 =
+  PChunkedString.Make(Capacity4096)(PMiddle)
 
 
 (****************************************************************************)
@@ -365,12 +376,12 @@ let fifo_1 nbitems repeat () () =
    done;
    let nbitems = nbitems - 10000 in
    let block = nbitems / repeat in
-   for j = 1 to repeat do
-      for i = 1 to block do
+   for j = 0 to repeat-1 do
+      for i = 0 to block-1 do
          Seq.push_back (!a) q;
          incr a;
       done;
-      for i = 1 to block do
+      for i = 0 to block-1 do
          let x = Seq.pop_front q in
          assert (x = !b);
          incr b;
@@ -392,13 +403,13 @@ let lifo_1 nbitems repeat () () =
    done;
    let nbitems = nbitems - 10000 in
    let block = nbitems / repeat in
-   for j = 1 to repeat do
-     for i = 1 to block do
+   for j = 0 to repeat-1 do
+     for i = 0 to block-1 do
         Seq.push_back (!a) q;
         incr a;
      done;
      if gc_major then Gc.major();
-     for i = 1 to block do
+     for i = 0 to block-1 do
         let x = Seq.pop_back q in
         decr a;
         assert (x = !a);
@@ -557,6 +568,12 @@ end
 
 (****************************************************************************)
 
+exception Error
+
+let check i j =
+  if i <> j then raise Error
+
+
 (* todo: test get expected number ! *)
 
 let real_lifo seq nbitems repeat () () = 
@@ -567,26 +584,27 @@ let real_lifo seq nbitems repeat () () =
    if seq = "ocaml_list" then begin
 
       let r = ref [] in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := 1::!r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := i::!r;
         done;
-        for i = 1 to block do
+        for i = 0 to block-1 do
            match !r with
            | [] -> assert false
-           | x::t -> r := t
+           | x::t -> check x (block-i-1); r := t
         done;
      done
 
    end else if seq = "pchunked_seq" then begin
 
       let r = ref PChunkedSeq.empty in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := PChunkedSeq.push_back 1 !r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := PChunkedSeq.push_back i !r;
         done;
-        for i = 1 to block do 
+        for i = 0 to block-1 do 
            let (x,t) = PChunkedSeq.pop_back !r in
+           check x (block-i-1);
            r := t
         done;
      done
@@ -594,12 +612,13 @@ let real_lifo seq nbitems repeat () () =
    end else if seq = "pchunked_stack_copy_on_write_16" then begin
 
       let r = ref PChunkedStackCopyOnWrite16.empty in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := PChunkedStackCopyOnWrite16.push_back 1 !r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := PChunkedStackCopyOnWrite16.push_back i !r;
         done;
-        for i = 1 to block do 
+        for i = 0 to block-1 do 
            let (x,t) = PChunkedStackCopyOnWrite16.pop_back !r in
+           check x (block-i-1);
            r := t
         done;
      done
@@ -607,12 +626,13 @@ let real_lifo seq nbitems repeat () () =
    end else if seq = "pchunked_stack_copy_on_write" then begin
 
       let r = ref PChunkedStackCopyOnWrite.empty in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := PChunkedStackCopyOnWrite.push_back 1 !r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := PChunkedStackCopyOnWrite.push_back i !r;
         done;
-        for i = 1 to block do 
+        for i = 0 to block-1 do 
            let (x,t) = PChunkedStackCopyOnWrite.pop_back !r in
+           check x (block-i-1);
            r := t
         done;
      done
@@ -620,12 +640,27 @@ let real_lifo seq nbitems repeat () () =
    end else if seq = "pchunked_stack_persistence" then begin
 
       let r = ref PChunkedStackPersistence.empty in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           r := PChunkedStackPersistence.push_back 1 !r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := PChunkedStackPersistence.push_back i !r;
         done;
-        for i = 1 to block do 
+        for i = 0 to block-1 do 
            let (x,t) = PChunkedStackPersistence.pop_back !r in
+           check x (block-i-1);
+           r := t
+        done;
+     done
+
+   end else if seq = "pchunked_stack_persistence_256" then begin
+
+      let r = ref PChunkedStackPersistence256.empty in
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := PChunkedStackPersistence256.push_back i !r;
+        done;
+        for i = 0 to block-1 do 
+           let (x,t) = PChunkedStackPersistence256.pop_back !r in
+           check x (block-i-1);
            r := t
         done;
      done
@@ -633,78 +668,78 @@ let real_lifo seq nbitems repeat () () =
    end else if seq = "chunked_stack" then begin
 
       let r = TestChunkedStack.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestChunkedStack.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestChunkedStack.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestChunkedStack.pop_back r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestChunkedStack.pop_back r in
+           check x (block-i-1);
         done;
      done
 
    end else if seq = "chunked_stack_256" then begin
 
       let r = TestChunkedStack256.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestChunkedStack256.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestChunkedStack256.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestChunkedStack256.pop_back r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestChunkedStack256.pop_back r in
+           check x (block-i-1);
         done;
      done
 
    end else if seq = "vector" then begin
 
       let r = TestVector.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestVector.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestVector.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestVector.pop_back r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestVector.pop_back r in
+           check x (block-i-1);
         done;
      done
 
    end else if seq = "circular_array_big" then begin
 
       let r = TestCircularArrayBig.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestCircularArrayBig.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestCircularArrayBig.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestCircularArrayBig.pop_back r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestCircularArrayBig.pop_back r in
+           check x (block-i-1);
         done;
      done
 
    end else if seq = "sized_array_big" then begin
 
       let r = TestSizedArrayBig.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestSizedArrayBig.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestSizedArrayBig.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestSizedArrayBig.pop_back r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestSizedArrayBig.pop_back r in
+            check x (block-i-1);
         done;
      done
 
    end else if seq = "sized_array" then begin
 
       let r = TestSizedArray.create_capacity block def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestSizedArray.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestSizedArray.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestSizedArray.pop_back r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestSizedArray.pop_back r in
+            check x (block-i-1);
         done;
      done
 
@@ -719,26 +754,26 @@ let real_fifo seq nbitems repeat () () =
    if seq = "circular_array_big" then begin
 
       let r = TestCircularArrayBig.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestCircularArrayBig.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestCircularArrayBig.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestCircularArrayBig.pop_front r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestCircularArrayBig.pop_front r in
+           check x i;
         done;
      done
 
    end else if seq = "ocaml_queue" then begin
 
       let r = TestOcamlQueue.create def in
-      for j = 1 to repeat do
-        for i = 1 to block do
-           TestOcamlQueue.push_back 1 r;
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           TestOcamlQueue.push_back i r;
         done;
-        for i = 1 to block do
-           let _t = TestOcamlQueue.pop_front r in
-           ()
+        for i = 0 to block-1 do
+           let x = TestOcamlQueue.pop_front r in
+           check x i;
         done;
      done
 
@@ -770,6 +805,14 @@ let real_string_buffer seq nbitems length () () =
       while !nb < nbitems do
         let w = next_word() in
         r := TestPChunkedString.add_bytes w !r;
+      done
+
+  end else if seq = "pchunked_string_4096" then begin
+
+      let r = ref TestPChunkedString4096.empty in
+      while !nb < nbitems do
+        let w = next_word() in
+        r := TestPChunkedString4096.add_bytes w !r;
       done
 
    end else failwith "unsupported seq for scenario real_string_buffer"
@@ -816,8 +859,9 @@ let _ =
       else if seq = "pchunked_stack_copy_on_write" then (module TestPChunkedStackCopyOnWrite : SeqSig)
       else if seq = "pchunked_stack_copy_on_write_16" then (module TestPChunkedStackCopyOnWrite16 : SeqSig)
       else if seq = "pchunked_stack_persistence" then (module TestPChunkedStackPersistence : SeqSig)
+      else if seq = "pchunked_stack_persistence_256" then (module TestPChunkedStackPersistence256 : SeqSig)
       else 
-        if    (seq = "ocaml_buffer" || seq = "pchunked_string")
+        if    (seq = "ocaml_buffer" || seq = "pchunked_string"  || seq = "pchunked_string_4096")
            && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo" ]
            then (module TestSizedArray : SeqSig) (* dummy *)
            else failwith "unsupported seq mode"

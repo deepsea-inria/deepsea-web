@@ -7,30 +7,40 @@ eval `opam config env`
 
 
 #============================================
-# EPHEMERAL LIFO BENCHMARK
+# LIFO BENCHMARKS : EPHEMERAL + PERSISTENT STACKS
 
 # Push 10k items, then repeat n times: push_back (n/r) items
 #  followed by pop_back (n/r) items.
 
-make opt && prun output.opt -test real_lifo -seq ocaml_list,vector,chunked_stack_256,circular_array_big,sized_array_big,sized_array -n 20000000 -length 100,1000,10000,100000,1000000,10000000 -runs 3
+make opt && prun output.opt -test real_lifo -seq ocaml_list,vector,pchunked_stack_persistence_256,chunked_stack_256,sized_array -n 20000000 -length 100,1000,10000,100000,1000000,10000000 -runs 3
+
+  # circular_array_big,sized_array_big
 
 pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 cp plots.pdf plots/plots_lifo.pdf && cp results.txt plots/results_lifo.txt
 
 
+
 #============================================
-# PERSISTENT LIFO BENCHMARK
+# STRING BUFFER BENCHMARK
 
-# smaller sizes, all structures:
-make opt && prun output.opt -test real_lifo -seq ocaml_list,pchunked_seq,pchunked_stack_copy_on_write16,pchunked_stack_persistence -n 2000000 -length 10,100,1000,10000,100000,1000000
+# here length is the maximum length of the small strings that are appended
 
-# full sizes, fast structures, plus imperative structures for comparison:
-make opt && prun output.opt -test real_lifo -seq ocaml_list,pchunked_stack_persistence,chunked_stack_256,sized_array -n 20000000 -length 100,1000,10000,100000,1000000,10000000,20000000 -runs 3
+make opt && prun output.opt -test real_string_buffer -seq ocaml_buffer,pchunked_string_4096 -n 500000000 -length 20,50,500,5000,50000 -chunk 4096 -runs 3
 
-pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topright && evince plots.pdf &
 
-cp plots.pdf plots/plots_plifo.pdf && cp results.txt plots/results_plifo.txt
+cp plots.pdf plots/plots_buffer.pdf && cp results.txt plots/results_buffer.txt
+
+
+
+
+
+
+#============================================
+#============================================
+#============================================
 
 
 #============================================
@@ -68,38 +78,6 @@ pplot -mode scatter -chart seq -series chunk --xlog -x length -y exectime --yzer
 cp plots.pdf plots/plots_pbchunk_size.pdf && cp results.txt plots/results_pbchunk_size.txt
 
 
-#============================================
-# STRING BUFFER BENCHMARK
-
-# here length is the maximum length of the small strings that are appended
-
-make opt && prun output.opt -test real_string_buffer -seq ocaml_buffer,pchunked_string -n 500000000 -length 20,50,500,5000,50000 -chunk 4096 -runs 3
-
-pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topright && evince plots.pdf &
-
-cp plots.pdf plots/plots_buffer.pdf && cp results.txt plots/results_buffer.txt
-
-
-
-
-
-
-#============================================
-#============================================
-# EPHEMERAL FIFO BENCHMARK
-
-# Push 10k items, then repeat n times: push_back (n/r) items
-#  followed by pop_front (n/r) items.
-
-make opt && prun output.opt -test real_fifo -seq circular_array,ocaml_queue -n 20000000 -length 10,100,1000,10000,100000,1000000,10000000 -static_array_size 20000000
-
-pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
-
-
-
-
-#============================================
-#============================================
 
 #============================================
 # EFFECT OF HARD-CODING CHUNK SIZE
@@ -134,8 +112,17 @@ make out opt && prun output.out,output.opt -test lifo_1 -seq ocaml_list,vector,c
 
 pplot -series prog -x seq -y exectime -legend-pos topleft --xtitles-vertical  && evince plots.pdf &
 
-
 #============================================
+# ADDITIONAL PERSISTENT LIFO BENCHMARK
+
+# smaller sizes, all structures:
+make opt && prun output.opt -test real_lifo -seq ocaml_list,pchunked_seq,pchunked_stack_copy_on_write_16,pchunked_stack_persistence -n 2000000 -length 10,100,1000,10000,100000,1000000
+
+pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+
+cp plots.pdf plots/plots_plifo.pdf && cp results.txt plots/results_plifo.txt
+
+
 #============================================
 # UNIT TESTING OF STRUCTURES
 
@@ -147,6 +134,17 @@ make dbg && prun output.dbg -test lifo_debug_1 -seq ocaml_list,parray,persistent
 
 # e.g.
    output.dbg -test lifo_debug_1 -seq pchunked_seq -debug 1
+
+
+#============================================
+# EPHEMERAL FIFO BENCHMARK
+
+# Push 10k items, then repeat n times: push_back (n/r) items
+#  followed by pop_front (n/r) items.
+
+make opt && prun output.opt -test real_fifo -seq circular_array,ocaml_queue -n 20000000 -length 10,100,1000,10000,100000,1000000,10000000 -static_array_size 20000000
+
+pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 
 
