@@ -23,8 +23,9 @@ pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos
 #============================================
 # EPHEMERAL CHUNK_STACK BEST CHUNK SIZE
 
-make opt && prun output.opt -test lifo_1 -seq chunked_stack -n 50000000 -length 10,100,1000,10000,100000,1000000,10000000,20000000 -chunk 32,64,128,256,512,1024 -runs 3
+make opt && prun output.opt -test real_lifo -seq chunked_stack -n 50000000 -length 10,1000,100000,10000000,20000000 -chunk 32,64,128,256,512,1024 -runs 3
 
+# 10,100,1000,10000,100000,1000000,10000000,20000000
 ##==> todo: investigate issue with outofbound.
 
 cp plots.pdf plots/plots_chunk_size.pdf && cp results.txt plots/results_chunk_size.txt
@@ -45,6 +46,21 @@ make opt && prun output.opt -test real_lifo -seq sized_array,ocaml_list,pchunked
 cp plots.pdf plots/plots_plifo.pdf && cp results.txt plots/results_plifo.txt
 
 pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+
+
+#============================================
+# PERSISTENT BEST CHUNK SIZE
+
+make opt && prun output.opt -test real_lifo -seq pchunked_stack_copy_on_write,pchunked_stack_persistence -n 10000000 -length 10,1000,100000,10000000,20000000 -chunk 8,16,32,64 && prun output.opt -test real_lifo -seq pchunked_stack_persistence -n 10000000 -length 10,1000,100000,10000000,20000000 -chunk 128,256,512 --append
+
+
+# -runs 3
+
+##==> todo: investigate issue with outofbound.
+
+cp plots.pdf plots/plots_chunk_size.pdf && cp results.txt plots/results_chunk_size.txt
+
+pplot -mode scatter -series chunk --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 
 
