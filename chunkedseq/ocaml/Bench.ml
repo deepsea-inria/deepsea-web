@@ -780,39 +780,57 @@ let real_fifo seq nbitems repeat () () =
    end else failwith "unsupported seq for scenario real_fifo"
 
 
-let real_string_buffer seq nbitems length () () = 
-  let max_word_size = length in
-  let words = Array.init max_word_size (fun i ->
+let real_string_buffer seq max_word_length nbitems repeat () () = 
+   assert (repeat > 0);
+   let block = nbitems / repeat in
+   printf "length %d\n" block;
+
+  let words = Array.init max_word_length (fun i ->
      Bytes.make i 'x') in
   let nb = ref 0 in
+  let _c = ref 0 in
   let next_word () =
-     let k = Random.int max_word_size in
+     (*let k = Random.int max_word_length in *)
+     let k = !_c in
+     incr _c;
+     if !_c = max_word_length 
+       then _c := 0;
+     
      let w = words.(k) in
      nb := !nb + k;
      w in
 
   if seq = "ocaml_buffer" then begin
 
-      let s = Buffer.create 0 in
-      while !nb < nbitems do
-        let w = next_word() in
-        Buffer.add_bytes s w;
+      for j = 0 to repeat-1 do
+        nb := 0;
+        let s = Buffer.create 0 in
+        while !nb < block do
+          let w = next_word() in
+          Buffer.add_bytes s w;
+        done
       done
 
   end else if seq = "pchunked_string" then begin
 
-      let r = ref TestPChunkedString.empty in
-      while !nb < nbitems do
-        let w = next_word() in
-        r := TestPChunkedString.add_bytes w !r;
+      for j = 0 to repeat-1 do
+        nb := 0;
+        let r = ref TestPChunkedString.empty in
+        while !nb < block do
+          let w = next_word() in
+          r := TestPChunkedString.add_bytes w !r;
+        done
       done
 
   end else if seq = "pchunked_string_4096" then begin
 
-      let r = ref TestPChunkedString4096.empty in
-      while !nb < nbitems do
-        let w = next_word() in
-        r := TestPChunkedString4096.add_bytes w !r;
+      for j = 0 to repeat-1 do
+        nb := 0;
+        let r = ref TestPChunkedString4096.empty in
+        while !nb < block do
+          let w = next_word() in
+          r := TestPChunkedString4096.add_bytes w !r;
+        done
       done
 
    end else failwith "unsupported seq for scenario real_string_buffer"
@@ -871,15 +889,17 @@ let _ =
 
    let n = Cmdline.parse_or_default_int "n" 10000000 in 
    let r = Cmdline.parse_or_default_int "r" (-1) in 
+   let max_word_length = Cmdline.parse_or_default_int "max_word_length" (-1) in 
+   let _ = if testname = "real_string_buffer" && max_word_length < 2 then
+               failwith "invalid value for max_word_length" in
+
    let length = Cmdline.parse_or_default_int "length" (-1) in 
    let (r,length) =
-      if List.mem testname [ "lifo_1"; "fifo_1"; "real_lifo"; "real_fifo" ] then begin
+      if List.mem testname [ "lifo_1"; "fifo_1"; "real_lifo"; "real_fifo"; "real_string_buffer" ] then begin
         if r = -1 && length <> -1 then (n / length, length)
         else if r <> -1 && length = -1 then (r, n / r)
         else failwith "need to provide exactly one of length or r argument"
-      end else if testname = "real_string_buffer" && length < 2 then
-        failwith "invalid value for length"
-      else (r,length)
+      end else (r,length)
       in
    (* TODO
    let b = Cmdline.parse_or_default_int "b" 1000 in 
@@ -890,7 +910,7 @@ let _ =
    let testnames = [ 
       "real_lifo", real_lifo seq n r;
       "real_fifo", real_fifo seq n r;
-      "real_string_buffer", real_string_buffer seq n length;
+      "real_string_buffer", real_string_buffer seq max_word_length n r;
       "fifo_1", Test.fifo_1 n r;
       "lifo_1", Test.lifo_1 n r;
       "fifo_debug_1", Test.fifo_debug_1;

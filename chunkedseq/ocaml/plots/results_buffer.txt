@@ -4,262 +4,358 @@ prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 50
-chunk 4096
+max_word_length 10
+length 500000000
 ---
 timeout -1
-exectime 1.33
+length 500000000
+exectime 1.87
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 500
-chunk 4096
+max_word_length 20
+length 500000000
 ---
 timeout -1
-exectime 0.41
+length 500000000
+exectime 1.24
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 5000
-chunk 4096
+max_word_length 50
+length 500000000
 ---
 timeout -1
-exectime 0.39
+length 500000000
+exectime 0.68
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 50000
-chunk 4096
+max_word_length 500
+length 500000000
 ---
 timeout -1
-exectime 0.76
+length 500000000
+exectime 0.38
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq ocaml_buffer
 n 500000000
-length 50
-chunk 4096
+max_word_length 5000
+length 500000000
 ---
 timeout -1
-exectime 1.49
+length 500000000
+exectime 0.38
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq pchunked_string_4096
 n 500000000
-length 500
-chunk 4096
+max_word_length 10
+length 500000000
 ---
 timeout -1
-exectime 0.42
+length 500000000
+exectime 2.78
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq pchunked_string_4096
 n 500000000
-length 5000
-chunk 4096
+max_word_length 20
+length 500000000
 ---
 timeout -1
+length 500000000
+exectime 1.82
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 50
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 0.66
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 500
+length 500000000
+---
+timeout -1
+length 500000000
 exectime 0.34
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq pchunked_string_4096
 n 500000000
-length 50000
-chunk 4096
+max_word_length 5000
+length 500000000
 ---
 timeout -1
-exectime 0.46
+length 500000000
+exectime 0.30
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 50
-chunk 4096
+max_word_length 10
+length 500000000
 ---
 timeout -1
-exectime 1.52
+length 500000000
+exectime 2.07
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 500
-chunk 4096
+max_word_length 20
+length 500000000
 ---
 timeout -1
-exectime 0.42
+length 500000000
+exectime 1.29
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 5000
-chunk 4096
+max_word_length 50
+length 500000000
 ---
 timeout -1
-exectime 0.40
+length 500000000
+exectime 0.73
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 50000
-chunk 4096
+max_word_length 500
+length 500000000
 ---
 timeout -1
+length 500000000
+exectime 0.37
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq ocaml_buffer
+n 500000000
+max_word_length 5000
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 0.89
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 10
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 2.47
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 20
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 1.16
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 50
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 0.66
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 500
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 0.32
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string_4096
+n 500000000
+max_word_length 5000
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 0.30
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq ocaml_buffer
+n 500000000
+max_word_length 10
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 1.88
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq ocaml_buffer
+n 500000000
+max_word_length 20
+length 500000000
+---
+timeout -1
+length 500000000
+exectime 1.06
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq ocaml_buffer
+n 500000000
+max_word_length 50
+length 500000000
+---
+timeout -1
+length 500000000
 exectime 0.63
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq ocaml_buffer
 n 500000000
-length 50
-chunk 4096
+max_word_length 500
+length 500000000
 ---
 timeout -1
-exectime 1.31
-==========
-machine charghp
-prog output.opt
-test real_string_buffer
-seq pchunked_string
-n 500000000
-length 500
-chunk 4096
----
-timeout -1
-exectime 0.39
-==========
-machine charghp
-prog output.opt
-test real_string_buffer
-seq pchunked_string
-n 500000000
-length 5000
-chunk 4096
----
-timeout -1
+length 500000000
 exectime 0.34
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
-n 500000000
-length 50000
-chunk 4096
----
-timeout -1
-exectime 0.44
-==========
-machine charghp
-prog output.opt
-test real_string_buffer
 seq ocaml_buffer
 n 500000000
-length 50
-chunk 4096
+max_word_length 5000
+length 500000000
 ---
 timeout -1
-exectime 1.32
+length 500000000
+exectime 0.37
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq ocaml_buffer
+seq pchunked_string_4096
 n 500000000
-length 500
-chunk 4096
+max_word_length 10
+length 500000000
 ---
 timeout -1
-exectime 0.42
+length 500000000
+exectime 2.06
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq ocaml_buffer
+seq pchunked_string_4096
 n 500000000
-length 5000
-chunk 4096
+max_word_length 20
+length 500000000
 ---
 timeout -1
-exectime 0.40
+length 500000000
+exectime 1.16
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq ocaml_buffer
+seq pchunked_string_4096
 n 500000000
-length 50000
-chunk 4096
+max_word_length 50
+length 500000000
 ---
 timeout -1
-exectime 0.62
+length 500000000
+exectime 0.66
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq pchunked_string_4096
 n 500000000
-length 50
-chunk 4096
+max_word_length 500
+length 500000000
 ---
 timeout -1
-exectime 1.33
+length 500000000
+exectime 0.32
 ==========
 machine charghp
 prog output.opt
 test real_string_buffer
-seq pchunked_string
+seq pchunked_string_4096
 n 500000000
-length 500
-chunk 4096
+max_word_length 5000
+length 500000000
 ---
 timeout -1
-exectime 0.39
-==========
-machine charghp
-prog output.opt
-test real_string_buffer
-seq pchunked_string
-n 500000000
-length 5000
-chunk 4096
----
-timeout -1
-exectime 0.34
-==========
-machine charghp
-prog output.opt
-test real_string_buffer
-seq pchunked_string
-n 500000000
-length 50000
-chunk 4096
----
-timeout -1
-exectime 0.45
+length 500000000
+exectime 0.30
 ==========

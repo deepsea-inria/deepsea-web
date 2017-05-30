@@ -27,11 +27,20 @@ cp plots.pdf plots/plots_lifo.pdf && cp results.txt plots/results_lifo.txt
 
 # here length is the maximum length of the small strings that are appended
 
-make opt && prun output.opt -test real_string_buffer -seq ocaml_buffer,pchunked_string_4096 -n 500000000 -length 20,50,500,5000,50000 -chunk 4096 -runs 3
+make opt && prun output.opt -test real_string_buffer -seq ocaml_buffer,pchunked_string_4096 -n 500000000 -max_word_length 10,20,50,500,5000 -length 500000000 -runs 3
 
-pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topright && evince plots.pdf &
+pplot -mode bar -chart length -series seq -x max_word_length -y exectime --xtitles-vertical --yzero -legend-pos topright && evince plots.pdf &
 
 cp plots.pdf plots/plots_buffer.pdf && cp results.txt plots/results_buffer.txt
+
+
+# more data
+
+  make opt && prun output.opt -test real_string_buffer -seq ocaml_buffer,pchunked_string_4096 -n 500000000 -max_word_length 20,50,500,5000,50000 -length 10000,100000,1000000,10000000,500000000 -runs 3
+
+  pplot -chart max_word_length -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos bottomright && evince plots.pdf &
+
+
 
 
 
