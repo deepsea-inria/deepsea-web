@@ -18,6 +18,7 @@ FILES=\
 	CircularArray \
 	Vector \
 	PersistentChunk \
+	PersistentChunkBytes \
 	ChunkedStack \
 	ChunkedSeq \
 	WeightedChunk \
