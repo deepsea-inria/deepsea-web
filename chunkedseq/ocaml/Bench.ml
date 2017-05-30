@@ -211,6 +211,7 @@ module TestPChunkedSeq : SeqSig = SeqSig.SeqOfPSeq(PChunkedSeq)
 
 let debug = ((Cmdline.parse_or_default_int "debug" 0) <> 0)
 let gc_major = ((Cmdline.parse_or_default_int "gc_major" 0) <> 0)
+let def = 0
 
 
 (* FOR DEBUG
@@ -228,7 +229,6 @@ let show_list l =
 let show q =
    show_list (Seq.to_list q)
 
-let def = 0
 
 let fifo_debug_1 () () = 
    let q = Seq.create def in
@@ -321,6 +321,7 @@ let lifo_1 nbitems repeat () () =
         assert (x = !a);
      done;
   done
+
 
 (****************************************************************************)
 
@@ -470,6 +471,118 @@ let lifo_1 nbitems repeat () () =
 end
 
 
+
+(****************************************************************************)
+
+let real_lifo seq nbitems repeat () () = 
+   begin
+   assert (repeat > 0);
+   let block = nbitems / repeat in
+   printf "length %d\n" block;
+   if seq = "ocaml_list" then begin
+
+      let r = ref [] in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           r := 1::!r;
+        done;
+        for i = 1 to block do
+           match !r with
+           | [] -> assert false
+           | x::t -> r := t
+        done;
+     done
+
+   end else if seq = "chunked_stack" then begin
+
+      let r = TestChunkedStack.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestChunkedStack.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestChunkedStack.pop_back r in
+           ()
+        done;
+     done
+
+   end else if seq = "vector" then begin
+
+      let r = TestVector.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestVector.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestVector.pop_back r in
+           ()
+        done;
+     done
+
+   end else if seq = "circular_array" then begin
+
+      let r = TestCircularArray.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestCircularArray.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestCircularArray.pop_back r in
+           ()
+        done;
+     done
+
+   end else if seq = "sized_array" then begin
+
+      let r = TestSizedArray.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestSizedArray.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestSizedArray.pop_back r in
+           ()
+        done;
+     done
+
+   end else failwith "unsupported seq for scenario real_lifo"
+  end
+  
+
+let real_fifo seq nbitems repeat () () =
+   assert (repeat > 0);
+   let block = nbitems / repeat in
+   printf "length %d\n" block;
+   if seq = "circular_array" then begin
+
+      let r = TestCircularArray.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestCircularArray.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestCircularArray.pop_front r in
+           ()
+        done;
+     done
+
+   end else if seq = "ocaml_queue" then begin
+
+      let r = TestOcamlQueue.create def in
+      for j = 1 to repeat do
+        for i = 1 to block do
+           TestOcamlQueue.push_back 1 r;
+        done;
+        for i = 1 to block do
+           let _t = TestOcamlQueue.pop_front r in
+           ()
+        done;
+     done
+
+   end else failwith "unsupported seq for scenario real_fifo"
+
+
+
 (****************************************************************************)
 
 let measured_run f =
@@ -524,6 +637,8 @@ let _ =
    let seed = Cmdline.parse_or_default_int "seed" 1 in 
    Random.init seed;
    let testnames = [ 
+      "real_lifo", real_lifo seq n r;
+      "real_fifo", real_fifo seq n r;
       "fifo_1", Test.fifo_1 n r;
       "lifo_1", Test.lifo_1 n r;
       "fifo_debug_1", Test.fifo_debug_1;
