@@ -1,47 +1,9 @@
 open Printf
 open Shared
 
+
+(****************************************************************************)
 exception Unsupported
-
-
-(****************************************************************************)
-
-module type SeqSig = SeqSig.S
-module type PSeqSig = PSeqSig.S
-
-let size_for_static_array = Cmdline.parse_or_default_int "static_array_size" 20000000
-  (* enough to fit all items from experiments *)
-
-let chunk_size = (Cmdline.parse_or_default_int "chunk" 256) 
-  (* use 3 for debugging *)
-
-module Capacity : CapacitySig.S = struct let capacity = chunk_size end
-
-module Capacity16 : CapacitySig.S = struct let capacity = 16 end
-
-module Capacity256 : CapacitySig.S = struct let capacity = 256 end
-
-module Capacity4096 : CapacitySig.S = struct let capacity = 4096 end
-
-module Chunk : SeqSig = CircularArray.Make(Capacity)
-
-(* best for copy on write chunks *)
-module Chunk16 : SeqSig = CircularArray.Make(Capacity16)
-
-(* best for ephemeral stack; 128 is ok too *)
-module Chunk256 : SeqSig = CircularArray.Make(Capacity256)
-
-module Middle : SeqSig = SeqSig.SeqOfPSeq(
-  PChunkedSeq)
-(* for debugging:
-  CircularArray.Make(
-    struct let capacity = 1 + size_for_static_array / chunk_size end)
-*)
-
-module PMiddle : PSeqSig = PChunkedSeq
-
-
-(****************************************************************************)
 
 module UnsupportedBackFront =
 struct
@@ -67,66 +29,102 @@ struct
    let pop_front = (fun _ -> raise Unsupported)
 end
 
+(****************************************************************************)
+
+module type SeqSig = SeqSig.S
+module type PSeqSig = PSeqSig.S
+
+module RefList : SeqSig = SeqSig.SeqOfPSeq(PList)
+
+
+let size_for_static_array = Cmdline.parse_or_default_int "static_array_size" 20000000
+  (* enough to fit all items from experiments *)
+
+let chunk_size = (Cmdline.parse_or_default_int "chunk" 256) 
+  (* use 3 for debugging *)
+
+module Capacity : CapacitySig.S = struct let capacity = chunk_size end
+
+module Capacity16 : CapacitySig.S = struct let capacity = 16 end
+
+module Capacity256 : CapacitySig.S = struct let capacity = 256 end
+
+module Capacity4096 : CapacitySig.S = struct let capacity = 4096 end
+
+
+module ChunkStackArray (Capacity : CapacitySig.S) =
+struct
+   include UnsupportedSingleEnded
+   include UnsupportedExtra
+   include StackArray
+   let create d = make Capacity.capacity d
+end
+
+(*
+  type 'a t = {
+    data : 'a array;
+    mutable size : int; }
+
+  let make capacity d = 
+    { data = Array.make capacity d;
+      size = 0; }
+
+  let length s =
+    s.size 
+
+  let is_empty s =
+    s.size = 0
+
+  let push_back x s = 
+    let n = s.size in
+    s.data.(n) <- x;
+    s.size <- n + 1
+
+  let pop_back s = 
+    let n = s.size - 1 in
+    let x = s.data.(n) in
+    s.size <- n;
+    x
+
+  let to_list s =
+    let acc = ref [] in
+    for i = s.size - 1 downto 0 do
+      acc := s.data.(i) :: !acc;
+    done;
+    !acc
+*)
+
+module Chunk : SeqSig = ChunkStackArray(Capacity) 
+  (* CircularArray.Make(Capacity) *)
+
+(* best for copy on write chunks *)
+module Chunk16 : SeqSig = ChunkStackArray(Capacity16)
+
+(* best for ephemeral stack; 128 is ok too *)
+module Chunk256 : SeqSig = ChunkStackArray(Capacity256)
+
+module PStackMiddle : PSeqSig = PList
+  (* PChunkedSeq *)
+
+module StackMiddle : SeqSig = RefList
+  (* SeqSig.SeqOfPSeq(PChunkedSeq) *)
+(* for debugging:
+  CircularArray.Make(
+    struct let capacity = 1 + size_for_static_array / chunk_size end)
+*)
+
+
+
 
 (****************************************************************************)
 
 (** OCaml Array *)
 
-module TestSizedArray =
+module TestStackArray =
 struct
-   type 'a t = {
-      data : 'a array;
-      mutable size : int; }
-   let create_capacity nb d = {
-      data = Array.make nb d;
-      size = 0 }
-   let create d = {
-      data = Array.make size_for_static_array d;
-      size = 0 }
-   let push_back x s = 
-      let n = s.size in
-      s.data.(n) <- x;
-      s.size <- n + 1
-   let pop_back s = 
-      let n = s.size - 1 in
-      let x = s.data.(n) in
-      s.size <- n;
-      x
-   let to_list s =
-      let acc = ref [] in
-      for i = s.size - 1 downto 0 do
-        acc := s.data.(i) :: !acc;
-      done;
-      !acc
-   include UnsupportedSingleEnded
-   include UnsupportedExtra
-end
-
-(** OCaml Array of large capacity *)
-
-module TestSizedArrayBig : SeqSig =
-struct
-   type 'a t = {
-      data : 'a array;
-      mutable size : int; }
-   let create d = {
-      data = Array.make size_for_static_array d;
-      size = 0 }
-   let push_back x s = 
-      let n = s.size in
-      s.data.(n) <- x;
-      s.size <- n + 1
-   let pop_back s = 
-      let n = s.size - 1 in
-      let x = s.data.(n) in
-      s.size <- n;
-      x
-   let to_list s =
-      let acc = ref [] in
-      for i = s.size - 1 downto 0 do
-        acc := s.data.(i) :: !acc;
-      done;
-      !acc
+   include StackArray
+   let create d = 
+      make size_for_static_array d
    include UnsupportedSingleEnded
    include UnsupportedExtra
 end
@@ -155,7 +153,7 @@ end
 
 (** OCaml Queue *)
 
-module TestOcamlQueue : SeqSig =
+module TestStdlibQueue : SeqSig =
 struct
    type 'a t = 'a Queue.t
    let create d = Queue.create ()
@@ -170,82 +168,37 @@ end
 
 (** OCaml List *)
 
-module TestOcamlList : SeqSig = SeqSig.SeqOfPSeq(struct
-   type 'a t = 'a list
-   let empty = 
-      []
-   let is_empty s =
-      s = []
-   let push_back x s = 
-      x::s
-   let length s =
-      List.length s
-   let pop_back = 
-      (function | a::q -> (a,q) | _ -> failwith "Not_found in pop_front")
-   let pop_front s = (* warning: linear-time, but no stack explosion *)
-      (* todo: use a more clever technique *)
-      let r = list_rev_notrec s in
-      let (x,r') = pop_back r in
-      (x, list_rev_notrec r)
-   let append s1 s2 = (* warning: linear-time, but no stack explosion *)
-      let t1 = ref (list_rev_notrec s1) in
-      let t2 = ref s2 in
-      while !t1 <> [] do
-         let (x,q) = pop_front !t1 in
-         t1 := q;
-         t2 := x::!t2;
-      done;
-      !t2
-   let push_front x s = (* warning: linear-time, but no stack explosion *)
-      append s [x]
-   let split_at i s = (* warning: linear-time, but no stack explosion *)
-      let t = ref s in
-      let r = ref [] in
-      let k = ref i in
-      while !k > 0 do
-         let (x,q) = pop_front !t in
-         t := q;
-         r := x::!r;
-         decr k;
-      done;
-      (list_rev_notrec !r, !t)
-   let iter = List.iter
-   let fold_left = List.fold_left
-   let fold_right = List.fold_right
-   let to_list s = 
-      s
-   include UnsupportedBackFront
-end)
+module TestRefList : SeqSig = RefList
 
-(** Sized List *)
+(** Sized List -- TODO RENAME *)
 
 module TestSizedList : SeqSig = SeqSig.SeqOfPSeq(
   SizedList)
 
-(** Sized Two Lists *)
+(** Sized Two Lists -- TODO RENAME  *)
 
 module TestSizedTwoLists : SeqSig = SeqSig.SeqOfPSeq(
   SizedTwoLists)
 
 (** Persistant Chunk *)
 
-module TestPArray : SeqSig = SeqSig.SeqOfPSeq(
-  PArray)
+module TestPChunkArrayRef : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkArray)
 
 (** Persistant Chunk *)
 
-module TestPersistentChunk : SeqSig = SeqSig.SeqOfPSeq(
-  PersistentChunk.Make(Capacity))
+module TestPChunkStackRef : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkStack.Make(Capacity))
 
 (** Ephemeral Chunked Stack *)
 
 module TestChunkedStack : SeqSig = struct
-  include ChunkedStack.Make(Capacity)(Chunk)(Middle)
+  include ChunkedStack.Make(Capacity)(Chunk)(StackMiddle)
   include UnsupportedBackFront
 end
 
 module TestChunkedStack256 : SeqSig = struct
-  include ChunkedStack.Make(Capacity256)(Chunk256)(Middle)
+  include ChunkedStack.Make(Capacity256)(Chunk256)(StackMiddle)
   include UnsupportedBackFront
 end
 
@@ -254,51 +207,51 @@ end
 
 (* TODO
 module TestChunkedSeq : SeqSig = struct
-  include ChunkedSeq.Make(Capacity)(Chunk)(Middle)
+  include ChunkedSeq.Make(Capacity)(Chunk)(StackMiddle)
   include UnsupportedExtra
 end
 *)
    
 (** Pure Chunked Seq *)
 
-module TestPChunkedSeq : SeqSig = SeqSig.SeqOfPSeq(
+module TestPChunkedSeqRef : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedSeq)
 
 (** Chunked Stack Copy on Write *)
 
 module PChunkedStackCopyOnWrite : PSeqSig = 
-  PChunkedStack.Make(Capacity)(PArray)(PMiddle)
+  PChunkedStack.Make(Capacity)(PChunkArray)(PStackMiddle)
 
 module TestPChunkedStackCopyOnWrite : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackCopyOnWrite)
 
 module PChunkedStackCopyOnWrite16 : PSeqSig = 
-  PChunkedStack.Make(Capacity16)(PArray)(PMiddle)
+  PChunkedStack.Make(Capacity16)(PChunkArray)(PStackMiddle)
 
 module TestPChunkedStackCopyOnWrite16 : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackCopyOnWrite16)
 
 (** Chunked Stack Persistence *)
 
-module PChunkedStackPersistence : PSeqSig = 
-  PChunkedStack.Make(Capacity)(PersistentChunk.Make(Capacity))(PMiddle)
+module PChunkedStackRef : PSeqSig = 
+  PChunkedStack.Make(Capacity)(PChunkStack.Make(Capacity))(PStackMiddle)
 
-module TestPChunkedStackPersistence : SeqSig = SeqSig.SeqOfPSeq(
-  PChunkedStackPersistence)
+module TestPChunkedStackRef : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedStackRef)
 
-module PChunkedStackPersistence256 : PSeqSig = 
-  PChunkedStack.Make(Capacity256)(PersistentChunk.Make(Capacity256))(PMiddle)
+module PChunkedStackRef256 : PSeqSig = 
+  PChunkedStack.Make(Capacity256)(PChunkStack.Make(Capacity256))(PStackMiddle)
 
-module TestPChunkedStackPersistence256 : SeqSig = SeqSig.SeqOfPSeq(
-  PChunkedStackPersistence256)
+module TestPChunkedStackRef256 : SeqSig = SeqSig.SeqOfPSeq(
+  PChunkedStackRef256)
 
 (** Chunked String with Persistence *)
 
 module TestPChunkedString =
-  PChunkedString.Make(Capacity)(PMiddle)
+  PChunkedString.Make(Capacity)(PStackMiddle)
 
 module TestPChunkedString4096 =
-  PChunkedString.Make(Capacity4096)(PMiddle)
+  PChunkedString.Make(Capacity4096)(PStackMiddle)
 
 
 (****************************************************************************)
@@ -459,7 +412,7 @@ let lifo_1 nbitems repeat () () =
 
   type side = Front | Back
 
-  module SeqRef = TestOcamlList 
+  module SeqRef = TestRefList 
   let show_oli s = show_list (SeqRef.to_list s)
 
   (** Perform a sequence of merge operations both on Seq and on 
@@ -581,7 +534,7 @@ let real_lifo seq nbitems repeat () () =
    assert (repeat > 0);
    let block = nbitems / repeat in
    printf "length %d\n" block;
-   if seq = "ocaml_list" then begin
+   if seq = "list_ref" then begin
 
       let r = ref [] in
       for j = 0 to repeat-1 do
@@ -595,7 +548,7 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "pchunked_seq" then begin
+   end else if seq = "pchunked_seq_ref" then begin
 
       let r = ref PChunkedSeq.empty in
       for j = 0 to repeat-1 do
@@ -609,7 +562,7 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "pchunked_stack_copy_on_write_16" then begin
+   end else if seq = "pchunked_stack_copy_on_write_ref_16" then begin
 
       let r = ref PChunkedStackCopyOnWrite16.empty in
       for j = 0 to repeat-1 do
@@ -623,7 +576,7 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "pchunked_stack_copy_on_write" then begin
+   end else if seq = "pchunked_stack_copy_on_write_ref" then begin
 
       let r = ref PChunkedStackCopyOnWrite.empty in
       for j = 0 to repeat-1 do
@@ -637,29 +590,29 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "pchunked_stack_persistence" then begin
+   end else if seq = "pchunked_stack_ref" then begin
 
-      let r = ref PChunkedStackPersistence.empty in
+      let r = ref PChunkedStackRef.empty in
       for j = 0 to repeat-1 do
         for i = 0 to block-1 do
-           r := PChunkedStackPersistence.push_back i !r;
+           r := PChunkedStackRef.push_back i !r;
         done;
         for i = 0 to block-1 do 
-           let (x,t) = PChunkedStackPersistence.pop_back !r in
+           let (x,t) = PChunkedStackRef.pop_back !r in
            check x (block-i-1);
            r := t
         done;
      done
 
-   end else if seq = "pchunked_stack_persistence_256" then begin
+   end else if seq = "pchunked_stack_ref_256" then begin
 
-      let r = ref PChunkedStackPersistence256.empty in
+      let r = ref PChunkedStackRef256.empty in
       for j = 0 to repeat-1 do
         for i = 0 to block-1 do
-           r := PChunkedStackPersistence256.push_back i !r;
+           r := PChunkedStackRef256.push_back i !r;
         done;
         for i = 0 to block-1 do 
-           let (x,t) = PChunkedStackPersistence256.pop_back !r in
+           let (x,t) = PChunkedStackRef256.pop_back !r in
            check x (block-i-1);
            r := t
         done;
@@ -717,28 +670,15 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "sized_array_big" then begin
-
-      let r = TestSizedArrayBig.create def in
-      for j = 0 to repeat-1 do
-        for i = 0 to block-1 do
-           TestSizedArrayBig.push_back i r;
-        done;
-        for i = 0 to block-1 do
-           let x = TestSizedArrayBig.pop_back r in
-            check x (block-i-1);
-        done;
-     done
-
    end else if seq = "sized_array" then begin
 
-      let r = TestSizedArray.create_capacity block def in
+      let r = TestStackArray.make block def in
       for j = 0 to repeat-1 do
         for i = 0 to block-1 do
-           TestSizedArray.push_back i r;
+           TestStackArray.push_back i r;
         done;
         for i = 0 to block-1 do
-           let x = TestSizedArray.pop_back r in
+           let x = TestStackArray.pop_back r in
             check x (block-i-1);
         done;
      done
@@ -766,13 +706,13 @@ let real_fifo seq nbitems repeat () () =
 
    end else if seq = "ocaml_queue" then begin
 
-      let r = TestOcamlQueue.create def in
+      let r = TestStdlibQueue.create def in
       for j = 0 to repeat-1 do
         for i = 0 to block-1 do
-           TestOcamlQueue.push_back i r;
+           TestStdlibQueue.push_back i r;
         done;
         for i = 0 to block-1 do
-           let x = TestOcamlQueue.pop_front r in
+           let x = TestStdlibQueue.pop_front r in
            check x i;
         done;
      done
@@ -800,7 +740,7 @@ let real_string_buffer seq max_word_length nbitems repeat () () =
      nb := !nb + k;
      w in
 
-  if seq = "ocaml_buffer" then begin
+  if seq = "stdlib_buffer" then begin
 
       for j = 0 to repeat-1 do
         nb := 0;
@@ -858,30 +798,29 @@ let _ =
    let testname = Cmdline.parse_or_default_string "test" "all" in
    let seq = Cmdline.parse_string "seq" in
    let seq_module = 
-      if seq = "sized_array" then (module TestSizedArray : SeqSig)
-      else if seq = "sized_array_big" then (module TestSizedArrayBig : SeqSig)
+      if seq = "sized_array" then (module TestStackArray : SeqSig)
       else if seq = "vector" then (module TestVector : SeqSig)
       else if seq = "circular_array_big" then (module TestCircularArrayBig : SeqSig) 
-      else if seq = "ocaml_queue" then (module TestOcamlQueue : SeqSig)
-      else if seq = "ocaml_list" then (module TestOcamlList : SeqSig)
+      else if seq = "stdlib_queue" then (module TestStdlibQueue : SeqSig)
+      else if seq = "list_ref" then (module TestRefList : SeqSig)
       else if seq = "sized_list" then (module TestSizedList : SeqSig)
       else if seq = "sized_two_lists" then (module TestSizedTwoLists : SeqSig)
-      else if seq = "parray" then (module TestPArray : SeqSig)
-      else if seq = "persistent_chunk" then (module TestPersistentChunk : SeqSig)
+      else if seq = "pchunk_array_ref" then (module TestPChunkArrayRef : SeqSig)
+      else if seq = "pchunk_stack_ref" then (module TestPChunkStackRef : SeqSig)
       else if seq = "chunked_stack" then (module TestChunkedStack : SeqSig)
       else if seq = "chunked_stack_256" then (module TestChunkedStack256 : SeqSig)
       (* TODO
       else if seq = "chunked_seq" then (module TestChunkedSeq : SeqSig)
       *)
-      else if seq = "pchunked_seq" then (module TestPChunkedSeq : SeqSig)
-      else if seq = "pchunked_stack_copy_on_write" then (module TestPChunkedStackCopyOnWrite : SeqSig)
-      else if seq = "pchunked_stack_copy_on_write_16" then (module TestPChunkedStackCopyOnWrite16 : SeqSig)
-      else if seq = "pchunked_stack_persistence" then (module TestPChunkedStackPersistence : SeqSig)
-      else if seq = "pchunked_stack_persistence_256" then (module TestPChunkedStackPersistence256 : SeqSig)
+      else if seq = "pchunked_seq_ref" then (module TestPChunkedSeqRef : SeqSig)
+      else if seq = "pchunked_stack_copy_on_write_ref" then (module TestPChunkedStackCopyOnWrite : SeqSig)
+      else if seq = "pchunked_stack_copy_on_write_ref_16" then (module TestPChunkedStackCopyOnWrite16 : SeqSig)
+      else if seq = "pchunked_stack_ref" then (module TestPChunkedStackRef : SeqSig)
+      else if seq = "pchunked_stack_ref_256" then (module TestPChunkedStackRef256 : SeqSig)
       else 
-        if    (seq = "ocaml_buffer" || seq = "pchunked_string"  || seq = "pchunked_string_4096")
+        if    (seq = "stdlib_buffer" || seq = "pchunked_string"  || seq = "pchunked_string_4096")
            && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo" ]
-           then (module TestSizedArray : SeqSig) (* dummy *)
+           then (module TestStackArray : SeqSig) (* dummy *)
            else failwith "unsupported seq mode"
       in
    let module Seq = (val seq_module : SeqSig) in 

@@ -11,7 +11,7 @@ module Make
   (Middle : PSeqSig.S) 
 = struct
 
-module Chunk = PersistentChunkBytes.Make(Capacity)
+module Chunk = PChunkBytesBuffer.Make(Capacity)
 
 (*--------------------------------------------------------------------------*)
 

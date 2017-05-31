@@ -12,13 +12,17 @@ FILES=\
 	CapacitySig \
 	PSeqSig \
 	SeqSig \
+	PList \
 	SizedList \
 	SizedTwoLists \
-	PArray \
+	PChunkArray \
+	StackArray \
 	CircularArray \
 	Vector \
-	PersistentChunk \
-	PersistentChunkBytes \
+	PChunkCirc \
+	PChunkStack \
+	PChunkBytesBuffer \
+	PChunkBytesCirc \
 	ChunkedStack \
 	ChunkedSeq \
 	WeightedChunk \
@@ -63,12 +67,10 @@ output.opt: $(SRC)
 
 
 
-
-
 #************************************************************************
 
 clean:
-	rm -f *.cmxa *.out *.opt *.dbg
+	rm -f *.cmxa output.out *.opt *.dbg *.cmx
 
 kill:
 	killall -v output.out

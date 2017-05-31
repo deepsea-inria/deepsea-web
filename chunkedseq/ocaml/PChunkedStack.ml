@@ -5,7 +5,7 @@
     
     Compared with ephemeral single-ended sequences:
     - no front-inner buffer is used
-    - the chunks used are persistent (e.g. Parray or PersistentChunk)
+    - the chunks used are persistent (e.g. PChunkArray or PChunkStack)
     - the structure is reallocated every time
     - no default value is needed
 *)

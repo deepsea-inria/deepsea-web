@@ -13,7 +13,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** updated by Arthur Charguéraud to match signatures *)
+(** updated by Arthur Charguéraud to match signatures,
+    and to avoid the writing back of default values on pop. *)
 
 
 type 'a t = {
@@ -24,7 +25,9 @@ type 'a t = {
 
 let make n d =
   if n < 0 || n > Sys.max_array_length then invalid_arg "Vector.make";
-  { default = d; size = n; data = Array.make n d; }
+  { default = d; 
+    size = n; 
+    data = Array.make n d; }
 
 let create d =
   make 0 d
@@ -48,6 +51,7 @@ let set a i v =
   Array.Array.set a.data i v
 *)
 
+(* original code, now split in two functions *)
 let resize a s =
   if s < 0 then invalid_arg "Vector.resize";
   let n = Array.length a.data in
@@ -69,6 +73,25 @@ let resize a s =
   end;
   a.size <- s
 
+let resize_push a s =
+   let n = Array.length a.data in
+   if s > n then begin (* reallocate into a larger array *)
+      if s > Sys.max_array_length then invalid_arg "Vector.resize: cannot grow";
+      let n' = min (max (2 * n) s) Sys.max_array_length in
+      let a' = Array.make n' a.default in
+      Array.blit a.data 0 a' 0 a.size;
+      a.data <- a'
+  end;
+  a.size <- s
+
+let resize_pop a s =
+  let n = Array.length a.data in
+  if 4 * s < n && n > 4 (* reallocate into a smaller array *)
+    then a.data <- Array.sub a.data 0 (n/2); 
+      (* cannot go directly to size s, need to halve the size first *)
+      (* plus, we don't bother writing default values in the remaining cells *)
+  a.size <- s
+
 (** stack interface *)
 
 let is_empty a =
@@ -81,14 +104,14 @@ let clear a =
 
 let push_back v a =
   let n = a.size in
-  resize a (n+1);
+  resize_push a (n+1);
   Array.set a.data n v
 
 let pop_back a =
   let n = length a - 1 in
   if n < 0 then raise Not_found;
   let r = Array.get a.data n in
-  resize a n;
+  resize_pop a n;
   r
 
 let push_front a v =
