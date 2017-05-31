@@ -231,7 +231,7 @@ module PChunkedStackCopyOnWrite16 : PSeqSig =
 module TestPChunkedStackCopyOnWrite16 : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackCopyOnWrite16)
 
-(** Chunked Stack Persistence *)
+(** PChunked Stack *)
 
 module PChunkedStackRef : PSeqSig = 
   PChunkedStack.Make(Capacity)(PChunkStack.Make(Capacity))(PStackMiddle)
@@ -245,7 +245,15 @@ module PChunkedStackRef256 : PSeqSig =
 module TestPChunkedStackRef256 : SeqSig = SeqSig.SeqOfPSeq(
   PChunkedStackRef256)
 
-(** Chunked String with Persistence *)
+(** Chunked String *)
+
+module TestChunkedString =
+  ChunkedString.Make(Capacity)(PStackMiddle)
+
+module TestChunkedString4096 =
+  ChunkedString.Make(Capacity4096)(PStackMiddle)
+
+(** PChunked String  *)
 
 module TestPChunkedString =
   PChunkedString.Make(Capacity)(PStackMiddle)
@@ -670,7 +678,7 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "sized_array" then begin
+   end else if seq = "stack_array" then begin
 
       let r = TestStackArray.make block def in
       for j = 0 to repeat-1 do
@@ -718,7 +726,6 @@ let real_fifo seq nbitems repeat () () =
      done
 
    end else failwith "unsupported seq for scenario real_fifo"
-
 
 let real_string_buffer seq max_word_length nbitems repeat () () = 
    assert (repeat > 0);
@@ -773,6 +780,28 @@ let real_string_buffer seq max_word_length nbitems repeat () () =
         done
       done
 
+  end else if seq = "chunked_string" then begin
+
+      for j = 0 to repeat-1 do
+        nb := 0;
+        let s = TestChunkedString.create() in
+        while !nb < block do
+          let w = next_word() in
+          TestChunkedString.add_bytes w s;
+        done
+      done
+
+  end else if seq = "chunked_string_4096" then begin
+
+      for j = 0 to repeat-1 do
+        nb := 0;
+        let s = TestChunkedString4096.create() in
+        while !nb < block do
+          let w = next_word() in
+          TestChunkedString4096.add_bytes w s;
+        done
+      done
+
    end else failwith "unsupported seq for scenario real_string_buffer"
 
 
@@ -798,7 +827,7 @@ let _ =
    let testname = Cmdline.parse_or_default_string "test" "all" in
    let seq = Cmdline.parse_string "seq" in
    let seq_module = 
-      if seq = "sized_array" then (module TestStackArray : SeqSig)
+      if seq = "stack_array" then (module TestStackArray : SeqSig)
       else if seq = "vector" then (module TestVector : SeqSig)
       else if seq = "circular_array_big" then (module TestCircularArrayBig : SeqSig) 
       else if seq = "stdlib_queue" then (module TestStdlibQueue : SeqSig)
@@ -818,7 +847,7 @@ let _ =
       else if seq = "pchunked_stack_ref" then (module TestPChunkedStackRef : SeqSig)
       else if seq = "pchunked_stack_ref_256" then (module TestPChunkedStackRef256 : SeqSig)
       else 
-        if    (seq = "stdlib_buffer" || seq = "pchunked_string"  || seq = "pchunked_string_4096")
+        if    (seq = "stdlib_buffer" || seq = "chunked_string"  || seq = "pchunked_string"  || seq = "chunked_string_4096" || seq = "pchunked_string_4096")
            && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo" ]
            then (module TestStackArray : SeqSig) (* dummy *)
            else failwith "unsupported seq mode"

@@ -16,6 +16,7 @@ FILES=\
 	SizedList \
 	SizedTwoLists \
 	PChunkArray \
+	ChunkBytesBuffer \
 	StackArray \
 	CircularArray \
 	Vector \
@@ -25,6 +26,7 @@ FILES=\
 	PChunkBytesCirc \
 	ChunkedStack \
 	ChunkedSeq \
+	ChunkedString \
 	WeightedChunk \
 	PChunkedWeightedSeq \
 	PChunkedSeq \
