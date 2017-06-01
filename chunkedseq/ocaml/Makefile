@@ -6,7 +6,7 @@
 
 #************************************************************************
 
-FILES=\
+INCS=\
 	Shared \
 	TypeSig \
 	CapacitySig \
@@ -31,14 +31,17 @@ FILES=\
 	PChunkedWeightedSeq \
 	PChunkedSeq \
 	PChunkedStack \
-	PChunkedString \
-	Bench
+	PChunkedString
+
+FILES=$(INCS) Bench
 
 
 
 #************************************************************************
 
 SRC=$(FILES:=.ml)
+
+
 
 LIBX=str.cmxa unix.cmxa
 
@@ -67,8 +70,6 @@ output.opt: $(SRC)
 
 #-inline-max-depth 4 
 
-
-
 #************************************************************************
 
 clean:
@@ -79,3 +80,16 @@ kill:
 
 benchtools:
 	make -C ~/bench all
+
+
+#************************************************************************
+
+# packed.opt: Shared.ml StackPacked.ml
+# 	ocamlopt -O2  $(LIBX) Shared.ml StackPacked.ml -o packed.opt
+# StackArray.ml 
+
+packed.opt: $(INCS:=.ml) StackPacked.ml
+	ocamlopt -O2  $(LIBX) $(INCS:=.ml) StackPacked.ml -o packed.opt
+
+
+# -unsafe -noassert
