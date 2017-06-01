@@ -415,6 +415,29 @@ let test_func seq distrib_mode nb_buckets nb_items () =
       StackArray.push_back (next_item()) t.(b)
     done
 
+   end else if seq = "stack_array_direct" then begin
+
+    let t = StackArray.make nb_items 0 in
+    for i = 0 to nb_items - 1 do
+      StackArray.push_back (next_item()) t
+   done
+
+   end else if seq = "chunked_stack_direct" then begin
+
+    let t = ChunkedStack.create 0 in
+    for i = 0 to nb_items - 1 do
+      ChunkedStack.push_back (next_item()) t
+   done
+
+   end else if seq = "packed_direct" then begin
+
+    let t = ref empty'' in
+    for i = 0 to nb_items - 1 do
+      t := push'' (next_item()) !t
+   done
+
+
+
   end
 
 let _ =
