@@ -17,10 +17,6 @@ module ChunkedseqSpec =
 
     let sub (xs, i) = List.nth xs i
 
-    let back xs = sub (xs, size xs - 1)
-
-    let front = List.hd
-
     let push_back (xs, x) = List.append xs [x]
 
     let push_front (xs, x) = x :: xs
@@ -73,10 +69,6 @@ module Chunk =
                  
     let sub ((_, xs), i) = List.nth xs i
 
-    let back c = sub (c, size c - 1)
-
-    let front (_, xs) = List.hd xs
-
     let push_back wf ((w, xs), x) = (w + wf x, List.append xs [x])
                                       
     let push_front wf ((w, xs), x) = (w + wf x, x :: xs)
@@ -94,7 +86,7 @@ module Chunk =
     let concat _ ((w1, xs1), (w2, xs2)) = (w1 + w2, List.append xs1 xs2)
         
     let split : 'a. ('a weight_fn) -> ('a chunk * weight) -> ('a chunk * 'a * 'a chunk) = fun wf ((_, xs), i) ->
-      let sigma wf (_, xs) =
+      let sigma (_, xs) =
         let sum = List.fold_left (fun x y -> x + y) 0 in
         sum (List.map wf xs)
       in
@@ -110,8 +102,8 @@ module Chunk =
             failwith "Chunk.split: bogus input"
       in
       let (xs1, x, xs2) = f([], xs, 0) in
-      let c1 = (sigma wf (0, xs1), xs1) in
-      let c2 = (sigma wf (0, xs2), xs2) in
+      let c1 = (sigma (0, xs1), xs1) in
+      let c2 = (sigma (0, xs2), xs2) in
       (c1, x, c2)
 
     let weight (w, _) = w
@@ -402,12 +394,14 @@ module Chunkedseq =
               let cs2 = mk_deep {d with fo=c2; fi=ec; mid=mid2} in
               (cs1, x, cs2)
             else if i < wfo + wfi + wm + wbi then
-	      let (bi1, x, bi2) = Chunk.split wf (bi, i - wfo - wfi - wm) in
+              let j = i - wfo - wfi - wm in
+	      let (bi1, x, bi2) = Chunk.split wf (bi, j) in
 	      let cs1 = mk_deep {d with bi=ec; bo=bi1} in
 	      let cs2 = mk_deep {d with fo=bi2; fi=ec; mid=create; bi=ec} in
 	      (cs1, x, cs2)
             else if i < wfo + wfi + wm + wbi + wbo then
-	      let (bo1, x, bo2) = Chunk.split wf (bo, i - wfo - wfi - wm - wbi) in
+              let j = i - wfo - wfi - wm - wbi in
+	      let (bo1, x, bo2) = Chunk.split wf (bo, j) in
 	      let cs1 = mk_deep {d with bo=bo1} in
 	      let cs2 = mk_deep {fo=bo2; fi=ec; mid=create; bi=ec; bo=ec} in
 	      (cs1, x, cs2)

@@ -23,8 +23,6 @@ size [x₀, ..., xₙ]   : α chunkedseq → int = n + 1
 sub (xs₁ ⊕ [xᵢ] ⊕ xs₂ , i)
                      : α chunkedseq ✕ int → α = xᵢ
   such that size xs₁ = i
-back (xs ⊕ [x])      : α chunkedseq → α = x
-front ([x] ⊕ xs)     : α chunkedseq → α = x
 push_front (xs, x)   : α chunkedseq ✕ α → α chunkedseq = [x] ⊕ xs
 push_back (xs, x)    : α chunkedseq ✕ α → α chunkedseq = xs ⊕ [x]
 pop_front ([x] ⊕ xs) : α chunkedseq → (α chunkedseq ✕ α) = (xs, x)
@@ -87,8 +85,6 @@ size (_, [x₀, ..., xₙ])    : α chunk → int = n + 1
 sub ((_, xs₁ ⊕ [xᵢ] ⊕ xs₂) , i)
                            : α chunk ✕ int → α = xᵢ
   such that |xs₁| = i
-back (_, xs ⊕ [x])         : α chunk → α = x
-front (_, [x] ⊕ xs)        : α chunk → α = x
 push_front γ ((w, xs), x)  : α wf → α chunk ✕ α → α chunk = (w', [x] ⊕ xs)
   where w' = γ x + Σ γ xs = γ x + w
 push_back γ ((w, xs), x)   : α wf → α chunk ✕ α → α chunk = (w', xs ⊕ [x])
@@ -345,13 +341,12 @@ sub xs = ...
 
 size xs = weight xs
 
-back xs = ...
-
-front xs = ...
-
 push_front = push_front' γ₀
+
 push_back = push_back' γ₀
+
 ...
+
 split = split' γ₀
 ~~~~~
 
