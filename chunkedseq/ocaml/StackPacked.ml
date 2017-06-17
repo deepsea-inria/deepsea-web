@@ -257,19 +257,54 @@ let push'' x s =
 
 (****************************************************************************)
 
+
+(**
+
+Goal: (1+r)n be the maximum space usage to store n items.
+
+A sequence of length n is in direct representation (single constructor)
+while  n * r <= 4.
+
+After that, it is represented in an array, of size T with.
+  T <= n*(1+r)-4
+
+When the array is full, it is grown to the maximal value of
+  n*(1+r)-4, where n is the number of elements after the push operation.
+
+This resizing continues as long as the following inequality is true.
+  r*r*n <= 10*r+4
+  (reason is, the first buffer will have size x=r*n-10,
+   and we want this buffer to pay for more than its overhead,
+   i.e. r*x>4, to allow buffer size to increase).
+
+When the inequality becomes false, we switch to a linked list of chunks.
+The size of the first chunk, pushing 1 element onto a sequence of n elements,
+is given by:
+  r*(n+1) - 9
+  (this comes from (1+r)*(n+1)-10-n).
+
+After that, the size of chunks increases as follows:
+  k' = (1+r)*k - 4
+  (reason is, the last buffer added 4 overheads, for (1+r)*k credits,
+  so the difference describes the number of additional slots allowed).
+
+*)
+
 type 'a chunk = 'a Chunk.t
 
-
-type 'a w = W0 | WChain of { mutable whead_data : 'a array;
+type 'a w = W0  (* overhead = 0 *)
+  | WChain of { mutable whead_data : 'a array;
               mutable whead_nb : int;
               mutable wback : ('a array) list; 
               mutable wback_nb : int }
-  | W1 of 'a
-  | W2 of 'a * 'a
+    (* overhead = 6 + 4 * length wback + nb empty slots in head buffer *)
+  | W1 of 'a  (* overhead = 1 *)
+  | W2 of 'a * 'a (* idem .. *)
   | W3 of 'a * 'a * 'a
   | W4 of 'a * 'a * 'a * 'a
   | WTable of { mutable wtable_nb : int;
                 mutable wtable_data : 'a array; }
+          (* overhead = 4 *)        
 
  
 
