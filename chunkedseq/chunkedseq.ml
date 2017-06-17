@@ -86,7 +86,7 @@ module Chunk =
     let concat _ ((w1, xs1), (w2, xs2)) = (w1 + w2, List.append xs1 xs2)
         
     let split : 'a. ('a weight_fn) -> ('a chunk * weight) -> ('a chunk * 'a * 'a chunk) = fun wf ((_, xs), i) ->
-      let sigma (_, xs) =
+      let sigma xs =
         let sum = List.fold_left (fun x y -> x + y) 0 in
         sum (List.map wf xs)
       in
@@ -102,8 +102,8 @@ module Chunk =
             failwith "Chunk.split: bogus input"
       in
       let (xs1, x, xs2) = f([], xs, 0) in
-      let c1 = (sigma (0, xs1), xs1) in
-      let c2 = (sigma (0, xs2), xs2) in
+      let c1 = (sigma xs1, xs1) in
+      let c2 = (sigma xs2, xs2) in
       (c1, x, c2)
 
     let weight (w, _) = w
@@ -436,7 +436,6 @@ module ChunkedseqTest =
    let _ = Random.init 1495380101
    let _ =
      let v = truncate (Unix.time ()) in
-     (*Printf.printf "seed = %d\n" v;*)
      Random.init v  
    
     type item = int
@@ -539,18 +538,14 @@ module ChunkedseqTest =
     let print_chunkedseq cs = print_list "," (Printf.printf "%d") (Chunkedseq.list_of cs)
     
     let check t0 = 
-(*      print_trace t0;
-      Printf.printf "\n"; *)
       let ok' r s =
         (match compare_lists (r, s) with
          | Lists_equal ->
             ()
          | Lists_item_mismatch (i, x, y) -> (
-           (*print_trace t0;*)
            let s = Printf.sprintf "item mismatch at %d with x=%d and y=%d\n" i x y in
            failwith s)
          | Lists_unequal_lengths (nr, ns) -> (
-           (*print_trace t0;*)
            let s = Printf.sprintf "unequal lengths |r|=%d and |s|=%d\n" nr ns in
            failwith s))
       in
