@@ -43,6 +43,18 @@ cp plots.pdf plots/plots_buffer.pdf && cp results.txt plots/results_buffer.txt
 
 
 
+#============================================
+# ARRAY OF BUCKETS BENCHMARK
+
+make opt && prun output.opt -test real_test_buckets -seq list,stack_packed_256 -n 10000000 -nb_buckets 1,10,100,1000,10000,100000,1000000,10000000 -runs 1
+
+pplot -mode scatter -series seq --xlog -x nb_buckets -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+
+  # used for single bucket comparison
+  # chunked_stack_256,chunked_stack_256_indirect
+
+
+
 
 
 #============================================
@@ -137,7 +149,7 @@ make dbg && prun output.dbg  -test fifo_debug_1 -seq circular_array,ocaml_queue
 
 make dbg && prun output.dbg -test lifo_debug_1 -seq stack_array,vector,circular_array,list_ref,chunked_stack
 
-make dbg && prun output.dbg -test lifo_debug_1 -seq list_ref,pchunk_array_ref,pchunk_stack_ref,pchunked_seq_ref,pchunked_stack_copy_on_write_ref,pchunked_stack_ref
+make dbg && prun output.dbg -test lifo_debug_1 -seq list_ref,pchunk_array_ref,pchunk_stack_ref,pchunked_seq_ref,pchunked_stack_copy_on_write_ref,pchunked_stack_ref,stack_packed
 
 # e.g.
    output.dbg -test lifo_debug_1 -seq pchunked_seq -debug 1
@@ -152,6 +164,9 @@ make dbg && prun output.dbg -test lifo_debug_1 -seq list_ref,pchunk_array_ref,pc
 make opt && prun output.opt -test real_fifo -seq circular_array,ocaml_queue -n 20000000 -length 10,100,1000,10000,100000,1000000,10000000 -static_array_size 20000000
 
 pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
+
+
+
 
 
 

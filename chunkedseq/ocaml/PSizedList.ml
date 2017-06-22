@@ -116,24 +116,3 @@ let to_list s =
 let rev s =
    { size = s.size;
      data = List.rev s.data }
-
-(** Auxiliary function to bulid a singleton list *)
-
-let singleton x =
-   { size = 1; data = [x] }
-
-(** Auxiliary function to deconstruct a non-empty list *)
-
-let head_and_tail s =
-   match s.data with
-   | [] -> raise Not_found
-   | x::q -> (x, { size = s.size - 1;
-                   data = q })
-
-let of_size_and_list n l = 
-  { size = n; 
-    data = l }
-
-let of_list l =
-   of_size_and_list (List.length l) l
-

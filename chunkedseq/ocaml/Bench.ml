@@ -36,6 +36,8 @@ module type PSeqSig = PSeqSig.S
 
 module RefList : SeqSig = SeqSig.SeqOfPSeq(PList)
 
+module SizedList : SeqSig = SeqSig.SeqOfPSeq(PSizedList)
+
 
 let size_for_static_array = Cmdline.parse_or_default_int "static_array_size" 20000000
   (* enough to fit all items from experiments *)
@@ -103,10 +105,23 @@ module Chunk16 : SeqSig = ChunkStackArray(Capacity16)
 (* best for ephemeral stack; 128 is ok too *)
 module Chunk256 : SeqSig = ChunkStackArray(Capacity256)
 
-module PStackMiddle : PSeqSig = PList
+module PStackMiddle : PSeqSig = PSizedList
   (* PChunkedSeq *)
 
-module StackMiddle : SeqSig = RefList
+module StackMiddle : SeqSig = SizedList
+(*struct
+   include 
+   let transfer_to_back = (fun _ _ -> raise Unsupported)
+   let carve_back_at = (fun _ _ -> raise Unsupported)
+   let iter = (fun _ _ -> raise Unsupported)
+   let fold_left = (fun _ _ _ -> raise Unsupported)
+   let fold_right = (fun _ _ _ -> raise Unsupported)
+   include UnsupportedBackFront
+end*)
+
+
+
+
   (* SeqSig.SeqOfPSeq(PChunkedSeq) *)
 (* for debugging:
   CircularArray.Make(
@@ -173,12 +188,12 @@ module TestRefList : SeqSig = RefList
 (** Sized List -- TODO RENAME *)
 
 module TestSizedList : SeqSig = SeqSig.SeqOfPSeq(
-  SizedList)
+  PSizedList)
 
 (** Sized Two Lists -- TODO RENAME  *)
 
 module TestSizedTwoLists : SeqSig = SeqSig.SeqOfPSeq(
-  SizedTwoLists)
+  PSizedTwoLists)
 
 (** Persistant Chunk *)
 
@@ -202,7 +217,24 @@ module TestChunkedStack256 : SeqSig = struct
   include UnsupportedBackFront
 end
 
+(* ChunkedStack Indirect *)
+
+module TestChunkedStack256Indirect = 
+  StackIndirect.Make(TestChunkedStack256)
+
+(* StackPacked *)
+
+module TestStackPackedRef : SeqSig = SeqSig.SeqOfPSeq(struct
+  include StackPacked.Make(Capacity)
+  include UnsupportedBackFront
+  include UnsupportedSingleEnded
+  include UnsupportedExtra
+end)
+
+module TestStackPacked256 =
+  StackPacked.Make(Capacity256)
    
+
 (** Ephemeral Chunked Seq *)
 
 (* TODO
@@ -652,6 +684,36 @@ let real_lifo seq nbitems repeat () () =
         done;
      done
 
+  (*
+   end else if seq = "chunked_stack_256_indirect" then begin
+
+      let r = ref TestChunkedStack256Indirect.empty in
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := TestChunkedStack256Indirect.push_back i !r;
+        done;
+        for i = 0 to block-1 do 
+           let ((x:int),t) = TestChunkedStack256Indirect.pop_back !r in
+           check x (block-i-1);
+           r := t
+        done;
+     done
+  *)
+
+   end else if seq = "stack_packed_256" then begin
+
+      let r = ref TestStackPacked256.empty in
+      for j = 0 to repeat-1 do
+        for i = 0 to block-1 do
+           r := TestStackPacked256.push_back i !r;
+        done;
+        for i = 0 to block-1 do 
+           let (x,t) = TestStackPacked256.pop_back !r in
+           check x (block-i-1);
+           r := t
+        done;
+     done
+
    end else if seq = "vector" then begin
 
       let r = TestVector.create def in
@@ -810,6 +872,71 @@ let real_string_buffer seq max_word_length nbitems repeat () () =
 
 (****************************************************************************)
 
+
+let real_test_buckets seq nb_items nb_buckets () () =
+
+  let next_item () = 
+    1 in
+  let b = ref 0 in
+  let next_bucket () =
+    let i = !b in 
+    incr b; 
+    if !b = nb_buckets
+      then b := 0;
+    i in
+
+  if seq = "list" then begin
+
+    let t = Array.make nb_buckets [] in
+    for i = 0 to nb_items - 1 do
+      let b = next_bucket() in
+      t.(b) <- next_item() :: t.(b);
+    done
+
+  end else if seq = "chunked_stack_256" then begin
+    (* warning: big memory overhead if nb_buckets is large, might overflow *)
+
+    let t = Array.make nb_buckets (TestChunkedStack256.create 0) in
+    for i = 0 to nb_items - 1 do
+      let b = next_bucket() in
+      TestChunkedStack256.push_back (next_item()) t.(b)
+    done
+
+   end else if seq = "chunked_stack_256_indirect" then begin
+    (* warning: big memory overhead if nb_buckets is large, might overflow *)
+
+    let t = Array.make nb_buckets TestChunkedStack256Indirect.empty in
+    for i = 0 to nb_items - 1 do
+      let b = next_bucket() in
+      t.(b) <- TestChunkedStack256Indirect.push_back (next_item()) t.(b)
+    done;
+    (* if nb_buckets = 1 then 
+      assert (TestChunkedStack256Indirect.length t.(0) = nb_items); *)
+
+   end else if seq = "stack_packed_256" then begin
+
+    let t = Array.make nb_buckets TestStackPacked256.empty in
+    for i = 0 to nb_items - 1 do
+      let b = next_bucket() in
+      t.(b) <- TestStackPacked256.push_back (next_item()) t.(b)
+    done
+
+   (*
+   end else if seq = "stack_array" then begin
+
+    let t = Array.make nb_buckets (StackArray.make 3000000 0) in
+    for i = 0 to nb_items - 1 do
+      let b = next_bucket() in
+      (*bonus: t.(b) <- push (next_item()) t.(b); *)
+      StackArray.push_back (next_item()) t.(b)
+    done
+   *)
+
+   end else failwith "unsupported seq for scenario real_test_buckets"
+
+
+(****************************************************************************)
+
 let measured_run f =
    begin try
       let t1 = Sys.time() in 
@@ -834,6 +961,7 @@ let _ =
       else if seq = "list_ref" then (module TestRefList : SeqSig)
       else if seq = "sized_list" then (module TestSizedList : SeqSig)
       else if seq = "sized_two_lists" then (module TestSizedTwoLists : SeqSig)
+      else if seq = "stack_packed" then (module TestStackPackedRef : SeqSig)
       else if seq = "pchunk_array_ref" then (module TestPChunkArrayRef : SeqSig)
       else if seq = "pchunk_stack_ref" then (module TestPChunkStackRef : SeqSig)
       else if seq = "chunked_stack" then (module TestChunkedStack : SeqSig)
@@ -847,8 +975,8 @@ let _ =
       else if seq = "pchunked_stack_ref" then (module TestPChunkedStackRef : SeqSig)
       else if seq = "pchunked_stack_ref_256" then (module TestPChunkedStackRef256 : SeqSig)
       else 
-        if    (seq = "stdlib_buffer" || seq = "chunked_string"  || seq = "pchunked_string"  || seq = "chunked_string_4096" || seq = "pchunked_string_4096")
-           && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo" ]
+        if    (seq = "stdlib_buffer" || seq = "chunked_string"  || seq = "pchunked_string"  || seq = "chunked_string_4096" || seq = "pchunked_string_4096" || seq = "list" || seq ="stack_packed_256")
+           && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo"; "real_test_buckets" ]
            then (module TestStackArray : SeqSig) (* dummy *)
            else failwith "unsupported seq mode"
       in
@@ -860,7 +988,9 @@ let _ =
    let max_word_length = Cmdline.parse_or_default_int "max_word_length" (-1) in 
    let _ = if testname = "real_string_buffer" && max_word_length < 2 then
                failwith "invalid value for max_word_length" in
-
+   let nb_buckets = Cmdline.parse_or_default_int "nb_buckets" (-1) in 
+   if (testname = "real_test_buckets" && nb_buckets = -1) then 
+     failwith "invalid nb_buckets";
    let length = Cmdline.parse_or_default_int "length" (-1) in 
    let (r,length) =
       if List.mem testname [ "lifo_1"; "fifo_1"; "real_lifo"; "real_fifo"; "real_string_buffer" ] then begin
@@ -879,6 +1009,7 @@ let _ =
       "real_lifo", real_lifo seq n r;
       "real_fifo", real_fifo seq n r;
       "real_string_buffer", real_string_buffer seq max_word_length n r;
+      "real_test_buckets", real_test_buckets seq n nb_buckets;
       "fifo_1", Test.fifo_1 n r;
       "lifo_1", Test.lifo_1 n r;
       "fifo_debug_1", Test.fifo_debug_1;

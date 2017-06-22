@@ -35,7 +35,7 @@ type 'a t = {
    }
     
 let create d = 
-  let def = Chunk.create d in
+    let def = Chunk.create d in
   { fo = Chunk.create d;
     fi = Chunk.create d;
     mid = Middle.create def;

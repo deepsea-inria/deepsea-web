@@ -13,10 +13,12 @@ INCS=\
 	PSeqSig \
 	SeqSig \
 	PList \
-	SizedList \
-	SizedTwoLists \
+	PSizedList \
+	PSizedTwoLists \
 	PChunkArray \
 	ChunkBytesBuffer \
+	StackIndirect \
+	StackPacked \
 	StackArray \
 	CircularArray \
 	Vector \
