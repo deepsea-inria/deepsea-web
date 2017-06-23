@@ -13,7 +13,11 @@ eval `opam config env`
 # Push 10k items, then repeat n times: push_back (n/r) items
 #  followed by pop_back (n/r) items.
 
-make opt && prun output.opt -test real_lifo -seq list_ref,vector,pchunked_stack_ref_256,chunked_stack_256,stack_array -n 20000000 -length 100,1000,10000,100000,1000000,10000000 -runs 5
+make opt && prun output.opt -test real_lifo -seq list_ref,vector,stack_packed_ref_256,chunked_stack_256,stack_array -n 20000000 -length 100,1000,10000,100000,1000000,10000000 -runs 5
+
+# pchunked_stack_ref_256 bug to fix
+# output.opt -test real_lifo -seq pchunked_stack_ref_256 -n 20000000 -length 10000000
+
 
 pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
@@ -65,6 +69,10 @@ pplot -mode scatter -series seq --xlog -x nb_buckets -y exectime --yzero -legend
 #============================================
 # EPHEMERAL CHUNK_STACK BEST CHUNK SIZE
 
+# big sizes
+make opt && prun output.opt -test real_lifo -seq chunked_stack -n 50000000 -length 10,1000,100000,10000000,20000000 -chunk 512,1024,2048,4096
+
+# small sizes
 make opt && prun output.opt -test real_lifo -seq chunked_stack -n 50000000 -length 10,1000,100000,10000000,20000000 -chunk 32,64,128,256,512,1024 -runs 3
 
 # 10,100,1000,10000,100000,1000000,10000000,20000000
@@ -145,11 +153,14 @@ cp plots.pdf plots/plots_plifo.pdf && cp results.txt plots/results_plifo.txt
 #============================================
 # UNIT TESTING OF STRUCTURES
 
-make dbg && prun output.dbg  -test fifo_debug_1 -seq circular_array,ocaml_queue
+make dbg && prun output.dbg  -test fifo_debug_1 -n 1000 -seq circular_array_big,stdlib_queue
 
-make dbg && prun output.dbg -test lifo_debug_1 -seq stack_array,vector,circular_array,list_ref,chunked_stack
+make dbg && prun output.dbg -test lifo_debug_1 -n 1000 -seq stack_array,vector,circular_array_big,list_ref,chunked_stack
 
-make dbg && prun output.dbg -test lifo_debug_1 -seq list_ref,pchunk_array_ref,pchunk_stack_ref,pchunked_seq_ref,pchunked_stack_copy_on_write_ref,pchunked_stack_ref,stack_packed
+  # fixed capacity test
+make dbg && prun output.dbg -test lifo_debug_1 -n 100 -chunk 100 -seq pchunk_stack_ref
+
+make dbg && prun output.dbg -test lifo_debug_1 -n 1000 -seq list_ref,pchunk_array_ref,pchunk_stack_ref,pchunked_seq_ref,pchunked_stack_copy_on_write_ref,pchunked_stack_ref,stack_packed
 
 # e.g.
    output.dbg -test lifo_debug_1 -seq pchunked_seq -debug 1
@@ -161,12 +172,12 @@ make dbg && prun output.dbg -test lifo_debug_1 -seq list_ref,pchunk_array_ref,pc
 # Push 10k items, then repeat n times: push_back (n/r) items
 #  followed by pop_front (n/r) items.
 
-make opt && prun output.opt -test real_fifo -seq circular_array,ocaml_queue -n 20000000 -length 10,100,1000,10000,100000,1000000,10000000 -static_array_size 20000000
+make opt && prun output.opt -test real_fifo -seq circular_array_big,stdlib_queue -n 20000000 -length 10,100,1000,10000,100000,1000000,10000000 -static_array_size 20000000
 
 pplot -mode scatter -series seq --xlog -x length -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
 
 
+#============================================
 
-
-
+make dbg && output.dbg -test lifo_debug_1 -chunk 10 -n 50 -seq stack_packed -debug 1

@@ -76,17 +76,17 @@ let back s =
 
 (* constant time, unless a copy-on-write is needed *)
 let push_back x s =
+   assert (s.size < capacity);
+   let new_size = s.size + 1 in
    let m = s.support.max_size in
    if s.size = m && m < capacity then begin
       (* exploit sharing *)
-      s.support.max_size <- m + 1;
+      s.support.max_size <- new_size; (* = m+1 *)
       s.support.data.(s.size) <- x;
       { support = s.support;
-        size = s.size + 1; }
+        size = new_size; }
    end else begin
     (* copy-on-write *)
-     assert (s.size < capacity);
-     let new_size = s.size + 1 in
      let new_data = Array.make capacity x in
      (* redundant here: new_data.(s.size) <- x *)
      Array.blit s.support.data 0 new_data 0 s.size;

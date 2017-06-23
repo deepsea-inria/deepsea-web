@@ -49,7 +49,7 @@ module Capacity : CapacitySig.S = struct let capacity = chunk_size end
 
 module Capacity16 : CapacitySig.S = struct let capacity = 16 end
 
-module Capacity256 : CapacitySig.S = struct let capacity = 256 end
+module Capacity256 : CapacitySig.S = struct let capacity = (*256*) 4096 end
 
 module Capacity4096 : CapacitySig.S = struct let capacity = 4096 end
 
@@ -317,16 +317,16 @@ let show q =
    show_list (Seq.to_list q)
 
 
-let fifo_debug_1 () () = 
+let fifo_debug_1 n () () = 
    let q = Seq.create def in
    let a = ref 0 in
    let b = ref 0 in
-   for i = 1 to 20 do
+   for i = 1 to n do
       Seq.push_back (!a) q;
       incr a;
       if debug then show q;
    done;
-   for i = 1 to 20 do
+   for i = 1 to n do
       let x = Seq.pop_front q in
       if (x <> !b) then failwith (sprintf "expected %d, got %d\n" !b x);
       assert (x = !b);
@@ -334,15 +334,15 @@ let fifo_debug_1 () () =
       if debug then show q;
    done
 
-let lifo_debug_1 () () = 
+let lifo_debug_1 n () () = 
    let q = Seq.create def in
    let a = ref 0 in
-   for i = 1 to 10 do
+   for i = 1 to n do
       Seq.push_back (!a) q;
       incr a;
       if debug then show q;
    done;
-   for i = 1 to 10 do
+   for i = 1 to n do
       let x = Seq.pop_back q in
       decr a;
       if (x <> !a) then failwith (sprintf "expected %d, got %d\n" !a x);
@@ -700,7 +700,7 @@ let real_lifo seq nbitems repeat () () =
      done
   *)
 
-   end else if seq = "stack_packed_256" then begin
+   end else if seq = "stack_packed_ref_256" then begin
 
       let r = ref TestStackPacked256.empty in
       for j = 0 to repeat-1 do
@@ -774,7 +774,7 @@ let real_fifo seq nbitems repeat () () =
         done;
      done
 
-   end else if seq = "ocaml_queue" then begin
+   end else if seq = "stdlib_queue" then begin
 
       let r = TestStdlibQueue.create def in
       for j = 0 to repeat-1 do
@@ -913,7 +913,7 @@ let real_test_buckets seq nb_items nb_buckets () () =
     (* if nb_buckets = 1 then 
       assert (TestChunkedStack256Indirect.length t.(0) = nb_items); *)
 
-   end else if seq = "stack_packed_256" then begin
+   end else if seq = "stack_packed_ref_256" then begin
 
     let t = Array.make nb_buckets TestStackPacked256.empty in
     for i = 0 to nb_items - 1 do
@@ -961,7 +961,7 @@ let _ =
       else if seq = "list_ref" then (module TestRefList : SeqSig)
       else if seq = "sized_list" then (module TestSizedList : SeqSig)
       else if seq = "sized_two_lists" then (module TestSizedTwoLists : SeqSig)
-      else if seq = "stack_packed" then (module TestStackPackedRef : SeqSig)
+      else if seq = "stack_packed_ref" then (module TestStackPackedRef : SeqSig)
       else if seq = "pchunk_array_ref" then (module TestPChunkArrayRef : SeqSig)
       else if seq = "pchunk_stack_ref" then (module TestPChunkStackRef : SeqSig)
       else if seq = "chunked_stack" then (module TestChunkedStack : SeqSig)
@@ -975,7 +975,7 @@ let _ =
       else if seq = "pchunked_stack_ref" then (module TestPChunkedStackRef : SeqSig)
       else if seq = "pchunked_stack_ref_256" then (module TestPChunkedStackRef256 : SeqSig)
       else 
-        if    (seq = "stdlib_buffer" || seq = "chunked_string"  || seq = "pchunked_string"  || seq = "chunked_string_4096" || seq = "pchunked_string_4096" || seq = "list" || seq ="stack_packed_256")
+        if    (seq = "stdlib_buffer" || seq = "chunked_string"  || seq = "pchunked_string"  || seq = "chunked_string_4096" || seq = "pchunked_string_4096" || seq = "list" || seq ="stack_packed_ref_256")
            && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo"; "real_test_buckets" ]
            then (module TestStackArray : SeqSig) (* dummy *)
            else failwith "unsupported seq mode"
@@ -1012,8 +1012,8 @@ let _ =
       "real_test_buckets", real_test_buckets seq n nb_buckets;
       "fifo_1", Test.fifo_1 n r;
       "lifo_1", Test.lifo_1 n r;
-      "fifo_debug_1", Test.fifo_debug_1;
-      "lifo_debug_1", Test.lifo_debug_1;
+      "fifo_debug_1", Test.fifo_debug_1 n;
+      "lifo_debug_1", Test.lifo_debug_1 n;
       (* TODO
       "split_debug_1", Test.split_debug_1;
       "merge_debug_1", Test.merge_debug_1;
