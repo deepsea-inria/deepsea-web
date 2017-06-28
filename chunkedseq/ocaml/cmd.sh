@@ -58,6 +58,8 @@ cp plots.pdf plots/plots_buffer.pdf && cp results.txt plots/results_buffer.txt
 
 make opt && prun output.opt -test real_test_buckets -seq list,stack_packed_256 -n 10000000 -nb_buckets 1,10,100,1000,10000,100000,1000000,10000000 -runs 1
 
+  # -more buckets: ,30000000,50000000,100000000
+
 pplot -mode scatter -series seq --xlog -x nb_buckets -y exectime --yzero -legend-pos topleft && evince plots.pdf &
 
   # used for single bucket comparison

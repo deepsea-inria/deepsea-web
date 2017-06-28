@@ -75,8 +75,7 @@ output.opt: $(SRC)
 #************************************************************************
 
 clean:
-	rm -f *.cmxa output.out *.opt *.dbg *.cmx
-
+	rm -f *.cmxa output.out *.opt *.dbg *.cmx *.cmi *.cmo *.o *.out
 kill:
 	killall -v output.out
 
