@@ -13,7 +13,7 @@ Note that this ratio applies to growing stacks. If "pop" operations is
 also used, then there are two cases. If all items are pushed, then all
 items are popped, the ratio for shrinking the capacity may be the same
 as that for growing the capacity. Otherwise, one needs a different ratio
-for "pop", leading to more waisted space.
+for "pop", leading to more wasted space.
 
 
 A sequence of length n is in direct representation (single constructor)
@@ -64,7 +64,7 @@ type 'a t =
      overhead = 6 words + 4 * length wback + nb empty slots in head buffer *)
   | SChain of { mutable whead_data : 'a array;
                 mutable whead_nb : int;
-                mutable wback : ('a array) list; 
+                mutable wback : ('a array) list;
                 mutable wback_nb : int }
   (* empty sequence, overhead = 0 word *)
   | S0
@@ -147,39 +147,44 @@ let pop_back s =
   match s with
   | SChain r -> 
     let n = r.whead_nb in
-    (* assert (n >= 1); TODO: revive this *)
+    assert (n >= 1);
     let new_n = n-1 in
     let x = r.whead_data.(new_n) in
-    if new_n = 0 then begin
-      (* TODO: implement change of constructor *)
+    if new_n > 0 then begin
+      r.whead_nb <- new_n;
+      x, s
+    end else begin
       match r.wback with
-      | [] -> () (* TODO: should be dead branch *)
+      | [] -> assert false
+      | [t] -> 
+        let m = Array.length t in
+        assert (m = 18);
+        x, STable { wtable_nb = m; wtable_data = t }
       | t::q -> 
           let new_n' = Array.length t in
           r.whead_data <- t;
           r.whead_nb <- new_n';
           r.wback <- q;
           r.wback_nb <- r.wback_nb - new_n';
-    end else begin
-      r.whead_nb <- new_n;
-    end;
-    x, s  
+          x, s
+    end
   | S0 -> raise Not_found
   | S1 (x1) -> x1, S0
   | S2 (x1,x2) -> x2, S1 (x1)
   | S3 (x1,x2,x3) -> x3, S2 (x1,x2)
   | S4 (x1,x2,x3,x4) -> x4, S3 (x1,x2,x3)
   | STable ({ wtable_nb = n; wtable_data = t } as r) ->
-      assert (n >= 5);
-      if n = 5 then begin 
-         t.(4), S4 (t.(0), t.(1), t.(2), t.(3))
-      end else 
-      let _m = Array.length t in
-      (* TODO: implement table capacity decrease correctly *)
+      assert (5 <= n && n <= 18);
       let new_n = n-1 in
-      let x = t.(new_n) in
-      r.wtable_nb <- new_n; 
-      x, s
+      let x = t.(new_n) in 
+      if new_n = 4 then begin
+        x, S4 (t.(0), t.(1), t.(2), t.(3))
+      end else begin
+        r.wtable_nb <- new_n;
+        if new_n = 6 || new_n = 10
+          then r.wtable_data <- Array.sub t 0 new_n;
+        x, s
+      end
 
 let split_at i s = assert false
 let append s1 s2 = assert false

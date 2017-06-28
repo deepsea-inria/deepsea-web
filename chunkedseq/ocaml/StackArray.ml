@@ -12,6 +12,14 @@ let make capacity d =
   { data = Array.make capacity d;
     size = 0; }
 
+let get s i =
+  assert (i >= 0 && i < s.size);
+  Array.get s.data i
+
+let set s i v =
+  assert (i >= 0 && i < s.size);
+  Array.set s.data i v
+
 let length s =
   s.size 
 

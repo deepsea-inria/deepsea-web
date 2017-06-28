@@ -14,6 +14,8 @@ end
 module UnsupportedExtra =
 struct
    let is_empty = (fun _ -> raise Unsupported)
+   let get = (fun _ _ -> raise Unsupported)
+   let set = (fun _ _ _ -> raise Unsupported)
    let length = (fun _ -> raise Unsupported)
    let transfer_to_back = (fun _ _ -> raise Unsupported)
    let carve_back_at = (fun _ _ -> raise Unsupported)
@@ -148,13 +150,15 @@ end
 
 module TestVector : SeqSig =
 struct
+   include UnsupportedExtra
    type 'a t = 'a Vector.t
+   let get = Vector.get
+   let set = Vector.set
    let create = Vector.create
    let push_back = Vector.push_back
    let pop_back = Vector.pop_back
    let to_list = Vector.to_list
    include UnsupportedSingleEnded
-   include UnsupportedExtra
 end
 
 (** Circular Array *)
@@ -937,6 +941,39 @@ let real_test_buckets seq nb_items nb_buckets () () =
 
 (****************************************************************************)
 
+
+let real_random_access seq nb_items length () () =
+
+   if seq = "vector" then begin
+      
+      let r = TestVector.create def in
+      for i = 0 to length-1 do
+        TestVector.push_back i r;
+      done;
+      for i = 0 to nb_items-1 do
+         let k = i mod length in
+         let x = TestVector.get r k in
+         check x k;
+      done
+
+   end else if seq = "chunked_stack_256" then begin
+
+      let r = TestChunkedStack256.create def in
+      for i = 0 to length-1 do
+        TestChunkedStack256.push_back i r;
+      done;
+      for i = 0 to nb_items-1 do
+         let k = i mod length in
+         let x = TestChunkedStack256.get r k in
+         check x k;
+      done
+  
+    end else failwith "unsupported seq for real_random_access"
+
+
+
+(****************************************************************************)
+
 let measured_run f =
    begin try
       let t1 = Sys.time() in 
@@ -976,7 +1013,7 @@ let _ =
       else if seq = "pchunked_stack_ref_256" then (module TestPChunkedStackRef256 : SeqSig)
       else 
         if    (seq = "stdlib_buffer" || seq = "chunked_string"  || seq = "pchunked_string"  || seq = "chunked_string_4096" || seq = "pchunked_string_4096" || seq = "list" || seq ="stack_packed_ref_256")
-           && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo"; "real_test_buckets" ]
+           && List.mem testname [ "real_string_buffer"; "real_lifo"; "real_fifo"; "real_test_buckets"; "real_random_access" ]
            then (module TestStackArray : SeqSig) (* dummy *)
            else failwith "unsupported seq mode"
       in
@@ -1010,6 +1047,7 @@ let _ =
       "real_fifo", real_fifo seq n r;
       "real_string_buffer", real_string_buffer seq max_word_length n r;
       "real_test_buckets", real_test_buckets seq n nb_buckets;
+      "real_random_access", real_random_access seq n length;
       "fifo_1", Test.fifo_1 n r;
       "lifo_1", Test.lifo_1 n r;
       "fifo_debug_1", Test.fifo_debug_1 n;

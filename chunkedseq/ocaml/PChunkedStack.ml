@@ -13,7 +13,7 @@
 module Make 
   (Capacity : CapacitySig.S) 
   (Chunk : PSeqSig.S) (* chunks of capacity Capacity.value *)
-  (Middle : PSeqSig.S) 
+  (Middle : PSeqSig.S)
 = struct
 
 (*--------------------------------------------------------------------------*)

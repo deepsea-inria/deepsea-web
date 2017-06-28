@@ -8,6 +8,8 @@ sig
    type 'a t 
    val create : 'a -> 'a t
    val is_empty : 'a t -> bool
+   val get : 'a t -> int -> 'a
+   val set : 'a t -> int -> 'a -> unit
    val length : 'a t -> int
    val back : 'a t -> 'a
    val front : 'a t -> 'a 
@@ -45,6 +47,10 @@ struct
       ref Seq.empty
    let is_empty s =
       Seq.is_empty !s
+   let get s = assert false
+      (*Seq.get !s*)
+   let set s i v = assert false
+      (*s := Seq.set s i v*)
    let length s = 
       Seq.length !s
    let front s =

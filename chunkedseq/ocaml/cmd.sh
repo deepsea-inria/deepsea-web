@@ -28,6 +28,12 @@ cp plots.pdf plots/plots_lifo.pdf && cp results.txt plots/results_lifo.txt
 
   # circular_array_big,stack_array_big
 
+# on small sizes
+
+make opt && prun output.opt -test real_lifo -seq list_ref,vector,stack_packed_ref_256,chunked_stack_256,stack_array -n 10000000 -length 1,2,5,10,20,50,100,200,500,1000,100,1000,10000,100000,1000000,10000000
+
+make opt && prun output.opt -test real_lifo -seq list_ref,vector,stack_packed_ref_256,chunked_stack_256,stack_array -n 50000000 -length 1,2,5,10,20,50,100,200,500,1000,100,1000,10000,100000,1000000,10000000,50000000
+
 
 #============================================
 # STRING BUFFER BENCHMARK
@@ -58,6 +64,10 @@ pplot -mode scatter -series seq --xlog -x nb_buckets -y exectime --yzero -legend
   # chunked_stack_256,chunked_stack_256_indirect
 
 
+#============================================
+# RANDOM ACCESS
+
+make opt && prun output.opt -test real_random_access -n 200000000 -length 10000000 -seq vector,chunked_stack_256
 
 
 
@@ -160,10 +170,14 @@ make dbg && prun output.dbg -test lifo_debug_1 -n 1000 -seq stack_array,vector,c
   # fixed capacity test
 make dbg && prun output.dbg -test lifo_debug_1 -n 100 -chunk 100 -seq pchunk_stack_ref
 
-make dbg && prun output.dbg -test lifo_debug_1 -n 1000 -seq list_ref,pchunk_array_ref,pchunk_stack_ref,pchunked_seq_ref,pchunked_stack_copy_on_write_ref,pchunked_stack_ref,stack_packed
+make dbg && prun output.dbg -test lifo_debug_1 -n 1000 -seq list_ref,pchunk_array_ref,pchunk_stack_ref,pchunked_seq_ref,pchunked_stack_copy_on_write_ref,pchunked_stack_ref,stack_packed_ref
 
 # e.g.
    output.dbg -test lifo_debug_1 -seq pchunked_seq -debug 1
+
+
+make dbg && prun output.dbg  -test real_random_access -n 2000 -length 500 -seq vector,chunked_stack_256
+
 
 
 #============================================
