@@ -41,15 +41,13 @@ let init n d f =
 let length a =
   a.size
 
-(*
 let get a i =
-  if i < 0 || i >= a.size then invalid_arg "Vector.get";
-  Array.Array.get a.data i
+  assert (i >= 0 && i < a.size);
+  Array.get a.data i
 
 let set a i v =
-  if i < 0 || i >= a.size then invalid_arg "Vector.set";
-  Array.Array.set a.data i v
-*)
+  assert (i >= 0 && i < a.size);
+  Array.set a.data i v
 
 (* original code, now split in two functions *)
 let resize a s =
