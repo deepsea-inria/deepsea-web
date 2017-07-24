@@ -214,6 +214,9 @@ script.
 $ make graph.pbench
 ~~~~
 
+***Warning.*** In the command-line samples, we assume that `.` is in
+the user's `$PATH`, which can be achieved by setting `PATH=.:$PATH`.
+
 Generation of the synthetic graphs may take a long time. To start
 running our graph generator, specify the number of processors to be
 used by the experiment by passing the argument on the command
@@ -243,9 +246,10 @@ $ graph.pbench accessible -proc 1 -size large -skip plot
 ~~~~
 
 After the command completes, the results of the experiment are going
-to be stored in the `_results` folder. But, we still need to run the
-main body of experiments. The following command starts the experiments
-running.
+to be stored in the `_results` folder.
+
+We are now ready to run the main body of experiments. The following
+command starts the experiments running.
 
 ~~~~
 $ graph.pbench overview -proc $P -size large -skip plot -runs 30 
