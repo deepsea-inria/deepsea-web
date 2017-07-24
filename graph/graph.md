@@ -112,7 +112,8 @@ R            >= 2.4.1      The R tools is used by our scripts to
                            generate plots.
                            ([Home page](http://www.r-project.org/))
                                                
-hwloc        recent        This package is used by pdfs to force
+hwloc        recent        ***Optional dependency*** (See instructions 
+                           below). This package is used by pdfs to force
                            interleaved NUMA allocation; as
                            such this package is optional and only
                            really relevant for NUMA machines.
@@ -180,13 +181,20 @@ $ chmod u+x get.sh
 $ get.sh
 ~~~~
 
-***Linking with hwloc.*** If your system has a non-uniform memory
-model (aka NUMA), then using hwloc may prove crucial to obtain clean
+***Building with hwloc.*** If your system has a non-uniform memory
+model (aka NUMA), then using hwloc may prove crucial to obtain correct
 experimental results. To link correctly with hwloc, all you need to do
-is pass to the script `get.sh` the path to the hwloc installation
-folder. On my system, this folder is located at
-`/usr/lib64/pkgconfig/`. You need to ensure that whatever path you
-substitute for this one on your machine contains the `hwloc.pc`.
+is set an environment variable with the path to the hwloc
+package-configuration folder. On our system, this folder is located at
+`/usr/lib64/pkgconfig/`, but that location may differ for your
+installation.
+
+~~~~
+$ export hwloc_path=/usr/lib64/pkgconfig/
+~~~~
+
+You need to ensure that whatever path you substitute for this one on
+your machine contains a file named `hwloc.pc`.
 
 4. Generating synthetic graphs
 ------------------------------
