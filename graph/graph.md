@@ -77,6 +77,10 @@ source code for our PDFS and our implementation of the DFS of Cong et
 al is stored in the file named
 [dfs.hpp](https://github.com/deepsea-inria/pasl/blob/new-sc15-graph/graph/include/dfs.hpp).
 
+***Note.*** The PDFS source code is located in the `new-sc15-graph`
+branch of the `pasl` repository. Be careful to use only the correct
+branch if you wish to get the PDFS code directly from github.
+
 1. Prerequisites
 ----------------
 
@@ -159,13 +163,6 @@ $ mkdir sc15
 $ cd sc15
 ~~~~
 
-Now, to obtain the quickcheck code, run the following. The transfer
-might take a long time to complete.
-
-~~~~
-$ ipfs get QmUvGoyv8hBprTqjFnhD5m4HGkcxqS4FoNteKEbYmyLj9n -o=quickcheck
-~~~~
-
 The next command downloads the folder storing the graph data. Because
 the size of the folder is about 90GB, the download may take a long
 time.
@@ -211,12 +208,12 @@ $ make graph.pbench
 
 Generation of the synthetic graphs may take a long time. To start
 running our graph generator, specify the number of processors to be
-used by the experiment by passing the argument `-proc p` for a
-positive number `p`. For instance, our system has `p := 40` cores.
+used by the experiment by passing the argument on the command
+line. For instance, our system has 40 cores.
 
 ~~~~
 $ export P=40
-$ graph.pbench generate -proc $P -size large
+$ graph.pbench generate -size large -proc $P
 ~~~~
 
 5. Running the experiment
