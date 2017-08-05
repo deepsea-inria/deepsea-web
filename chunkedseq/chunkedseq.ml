@@ -225,7 +225,7 @@ module Chunkedseq =
     and check : 'a. wf:('a weight_fn) -> 'a chunkedseq -> 'a chunkedseq = fun ~wf cs ->
       match cs with
       | Shallow c ->
-	 assert false
+	        assert false
       | Deep (_, ({fo; fi; mid; bi; bo} as d)) ->
           let w = 
             Chunk.weight fo + Chunk.weight fi +
