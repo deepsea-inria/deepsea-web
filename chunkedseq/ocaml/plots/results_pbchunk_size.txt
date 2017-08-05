@@ -1,0 +1,529 @@
+
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 1024
+---
+timeout -1
+exectime 0.69
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 2048
+---
+timeout -1
+exectime 0.60
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 4096
+---
+timeout -1
+exectime 0.60
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 8192
+---
+timeout -1
+exectime 0.60
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 1024
+---
+timeout -1
+exectime 0.52
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 2048
+---
+timeout -1
+exectime 0.21
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 4096
+---
+timeout -1
+exectime 0.16
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 8192
+---
+timeout -1
+exectime 0.14
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 1024
+---
+timeout -1
+exectime 0.29
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 2048
+---
+timeout -1
+exectime 0.19
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 4096
+---
+timeout -1
+exectime 0.16
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 8192
+---
+timeout -1
+exectime 0.13
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 1024
+---
+timeout -1
+exectime 0.42
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 2048
+---
+timeout -1
+exectime 0.36
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 4096
+---
+timeout -1
+exectime 0.35
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 8192
+---
+timeout -1
+exectime 0.34
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 1024
+---
+timeout -1
+exectime 0.70
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 2048
+---
+timeout -1
+exectime 0.63
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 4096
+---
+timeout -1
+exectime 0.79
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 8192
+---
+timeout -1
+exectime 0.57
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 1024
+---
+timeout -1
+exectime 0.37
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 2048
+---
+timeout -1
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 4096
+---
+timeout -1
+exectime 0.17
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 8192
+---
+timeout -1
+exectime 0.16
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 1024
+---
+timeout -1
+exectime 0.35
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 2048
+---
+timeout -1
+exectime 0.33
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 4096
+---
+timeout -1
+exectime 0.20
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 8192
+---
+timeout -1
+exectime 0.15
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 1024
+---
+timeout -1
+exectime 0.50
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 2048
+---
+timeout -1
+exectime 0.37
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 4096
+---
+timeout -1
+exectime 0.39
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 8192
+---
+timeout -1
+exectime 0.40
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 1024
+---
+timeout -1
+exectime 0.92
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 2048
+---
+timeout -1
+exectime 0.61
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 4096
+---
+timeout -1
+exectime 0.58
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50
+chunk 8192
+---
+timeout -1
+exectime 0.66
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 1024
+---
+timeout -1
+exectime 0.47
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 2048
+---
+timeout -1
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 4096
+---
+timeout -1
+exectime 0.18
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 500
+chunk 8192
+---
+timeout -1
+exectime 0.15
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 1024
+---
+timeout -1
+exectime 0.37
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 2048
+---
+timeout -1
+exectime 0.21
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 4096
+---
+timeout -1
+exectime 0.17
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 5000
+chunk 8192
+---
+timeout -1
+exectime 0.23
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 1024
+---
+timeout -1
+exectime 0.56
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 2048
+---
+timeout -1
+exectime 0.40
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 4096
+---
+timeout -1
+exectime 0.49
+==========
+machine charghp
+prog output.opt
+test real_string_buffer
+seq pchunked_string
+n 200000000
+length 50000
+chunk 8192
+---
+timeout -1
+exectime 0.38
+==========

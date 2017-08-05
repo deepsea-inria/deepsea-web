@@ -1,0 +1,529 @@
+
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10
+chunk 8
+---
+timeout -1
+length 10
+exectime 0.62
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10
+chunk 16
+---
+timeout -1
+length 10
+exectime 0.76
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10
+chunk 32
+---
+timeout -1
+length 10
+exectime 0.88
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10
+chunk 64
+---
+timeout -1
+length 10
+exectime 0.56
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 1000
+chunk 8
+---
+timeout -1
+length 1000
+exectime 0.73
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 1000
+chunk 16
+---
+timeout -1
+length 1000
+exectime 0.70
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 1000
+chunk 32
+---
+timeout -1
+length 1000
+exectime 0.86
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 1000
+chunk 64
+---
+timeout -1
+length 1000
+exectime 1.28
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 100000
+chunk 8
+---
+timeout -1
+length 100000
+exectime 1.03
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 100000
+chunk 16
+---
+timeout -1
+length 100000
+exectime 0.87
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 100000
+chunk 32
+---
+timeout -1
+length 100000
+exectime 1.25
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 100000
+chunk 64
+---
+timeout -1
+length 100000
+exectime 1.32
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10000000
+chunk 8
+---
+timeout -1
+length 10000000
+exectime 1.33
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10000000
+chunk 16
+---
+timeout -1
+length 10000000
+exectime 1.10
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10000000
+chunk 32
+---
+timeout -1
+length 10000000
+exectime 1.31
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_copy_on_write
+n 10000000
+length 10000000
+chunk 64
+---
+timeout -1
+length 10000000
+exectime 1.56
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 8
+---
+timeout -1
+length 10
+exectime 0.30
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 16
+---
+timeout -1
+length 10
+exectime 0.30
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 32
+---
+timeout -1
+length 10
+exectime 0.22
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 64
+---
+timeout -1
+length 10
+exectime 0.25
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 8
+---
+timeout -1
+length 1000
+exectime 0.49
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 16
+---
+timeout -1
+length 1000
+exectime 0.29
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 32
+---
+timeout -1
+length 1000
+exectime 0.44
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 64
+---
+timeout -1
+length 1000
+exectime 0.66
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 8
+---
+timeout -1
+length 100000
+exectime 1.14
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 16
+---
+timeout -1
+length 100000
+exectime 0.55
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 32
+---
+timeout -1
+length 100000
+exectime 0.37
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 64
+---
+timeout -1
+length 100000
+exectime 0.31
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 8
+---
+timeout -1
+length 10000000
+exectime 1.08
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 16
+---
+timeout -1
+length 10000000
+exectime 0.67
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 32
+---
+timeout -1
+length 10000000
+exectime 0.52
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 64
+---
+timeout -1
+length 10000000
+exectime 0.39
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 128
+---
+timeout -1
+length 10
+exectime 0.27
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 256
+---
+timeout -1
+length 10
+exectime 0.34
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10
+chunk 512
+---
+timeout -1
+length 10
+exectime 3.13
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 128
+---
+timeout -1
+length 1000
+exectime 0.19
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 256
+---
+timeout -1
+length 1000
+exectime 0.18
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 1000
+chunk 512
+---
+timeout -1
+length 1000
+exectime 0.21
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 128
+---
+timeout -1
+length 100000
+exectime 0.28
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 256
+---
+timeout -1
+length 100000
+exectime 0.23
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 100000
+chunk 512
+---
+timeout -1
+length 100000
+exectime 0.23
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 128
+---
+timeout -1
+length 10000000
+exectime 0.35
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 256
+---
+timeout -1
+length 10000000
+exectime 0.33
+==========
+machine charghp
+prog output.opt
+test real_lifo
+seq pchunked_stack_persistence
+n 10000000
+length 10000000
+chunk 512
+---
+timeout -1
+length 10000000
+exectime 0.28
+==========

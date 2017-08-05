@@ -77,6 +77,10 @@ source code for our PDFS and our implementation of the DFS of Cong et
 al is stored in the file named
 [dfs.hpp](https://github.com/deepsea-inria/pasl/blob/new-sc15-graph/graph/include/dfs.hpp).
 
+***Note.*** The PDFS source code is located in the `new-sc15-graph`
+branch of the `pasl` repository. Be careful to use only the correct
+branch if you wish to get the PDFS code directly from github.
+
 1. Prerequisites
 ----------------
 
@@ -108,7 +112,8 @@ R            >= 2.4.1      The R tools is used by our scripts to
                            generate plots.
                            ([Home page](http://www.r-project.org/))
                                                
-hwloc        recent        This package is used by pdfs to force
+hwloc        recent        ***Optional dependency*** (See instructions 
+                           below). This package is used by pdfs to force
                            interleaved NUMA allocation; as
                            such this package is optional and only
                            really relevant for NUMA machines.
@@ -159,13 +164,6 @@ $ mkdir sc15
 $ cd sc15
 ~~~~
 
-Now, to obtain the quickcheck code, run the following. The transfer
-might take a long time to complete.
-
-~~~~
-$ ipfs get QmUvGoyv8hBprTqjFnhD5m4HGkcxqS4FoNteKEbYmyLj9n -o=quickcheck
-~~~~
-
 The next command downloads the folder storing the graph data. Because
 the size of the folder is about 90GB, the download may take a long
 time.
@@ -183,13 +181,20 @@ $ chmod u+x get.sh
 $ get.sh
 ~~~~
 
-***Linking with hwloc.*** If your system has a non-uniform memory
-model (aka NUMA), then using hwloc may prove crucial to obtain clean
+***Building with hwloc.*** If your system has a non-uniform memory
+model (aka NUMA), then using hwloc may prove crucial to obtain correct
 experimental results. To link correctly with hwloc, all you need to do
-is pass to the script `get.sh` the path to the hwloc installation
-folder. On my system, this folder is located at
-`/usr/lib64/pkgconfig/`. You need to ensure that whatever path you
-substitute for this one on your machine contains the `hwloc.pc`.
+is set an environment variable with the path to the hwloc
+package-configuration folder. On our system, this folder is located at
+`/usr/lib64/pkgconfig/`, but that location may differ for your
+installation.
+
+~~~~
+$ export hwloc_path=/usr/lib64/pkgconfig/
+~~~~
+
+You need to ensure that whatever path you substitute for this one on
+your machine contains a file named `hwloc.pc`.
 
 4. Generating synthetic graphs
 ------------------------------
@@ -209,14 +214,17 @@ script.
 $ make graph.pbench
 ~~~~
 
+***Warning.*** In the command-line samples, we assume that `.` is in
+the user's `$PATH`, which can be achieved by setting `PATH=.:$PATH`.
+
 Generation of the synthetic graphs may take a long time. To start
 running our graph generator, specify the number of processors to be
-used by the experiment by passing the argument `-proc p` for a
-positive number `p`. For instance, our system has `p := 40` cores.
+used by the experiment by passing the argument on the command
+line. For instance, our system has 40 cores.
 
 ~~~~
 $ export P=40
-$ graph.pbench generate -proc $P -size large
+$ graph.pbench generate -size large -proc $P
 ~~~~
 
 5. Running the experiment
@@ -238,9 +246,10 @@ $ graph.pbench accessible -proc 1 -size large -skip plot
 ~~~~
 
 After the command completes, the results of the experiment are going
-to be stored in the `_results` folder. But, we still need to run the
-main body of experiments. The following command starts the experiments
-running.
+to be stored in the `_results` folder.
+
+We are now ready to run the main body of experiments. The following
+command starts the experiments running.
 
 ~~~~
 $ graph.pbench overview -proc $P -size large -skip plot -runs 30 
