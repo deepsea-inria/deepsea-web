@@ -35,9 +35,9 @@ PROJECT_FILES=$(PROJECT_NAME).bib chunked_seq.pdf
 PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 
 %.pdf : %.md
-	pandoc $< -s -S $(PROJECT_BIBS) -o $@
+	pandoc $< -s  $(PROJECT_BIBS) -o $@
 %.html : %.md
-	pandoc $< -s -S $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET_OPT) -o $@
+	pandoc $< -s  $(PROJECT_BIBS) $(PROJECT_STYLE_SHEET_OPT) -o $@
 
 clean: clean_experiments_doc
 	rm -f $(GENERATED_FILES)
