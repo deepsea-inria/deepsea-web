@@ -1,26 +1,34 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="Theory and practice of chunked sequences" />
   <title>chunkedseq</title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <link rel="stylesheet" href="chunkedseq.css" type="text/css" />
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="chunkedseq.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
 </head>
 <body>
-<div id="header">
+<header>
 <h1 class="title">chunkedseq</h1>
-<h2 class="author">Theory and practice of chunked sequences</h2>
-<h3 class="date"><a href="http://deepsea.inria.fr/">Deepsea project</a></h3>
-</div>
+<p class="author">Theory and practice of chunked sequences</p>
+<p class="date"><a href="http://deepsea.inria.fr/">Deepsea project</a></p>
+</header>
 <h1 id="overview">Overview</h1>
 <p>In this project, we address the question:</p>
 <blockquote>
 <p><em>Can we design asymptotically and practically efficient data structures for sequences that can support a broad range of operations, including push/pop operations on both ends, concatenation, and split at a specified position?</em></p>
 </blockquote>
-<p>In our ESA’14 paper,<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> we present two new algorithms for which we use adaptations of the classic chunking technique for accelerating tree-based representations of sequences by representing sequences as trees of small, fixed-capacity arrays (i.e., chunks). We prove that our algorithms deliver tight amortized, worst-case bounds with small constant factors. We present two C++ implementations of our two algorithms and a number of experiments comparing our implementations to highly tuned and specialized sequence data structures, such as STL deque and STL rope. This work presents the first data structures for shared memory that simultaneously match the semantic and asymptotic profile of the Finger Tree of Hinze and Patterson,<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> deliver strong guarantees with respect to constant-factor performance (as well as asymptotic performance), and compete well with highly tuned but more specialized data structures.</p>
+<p>In our ESA’14 paper,<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> we present two new algorithms for which we use adaptations of the classic chunking technique for accelerating tree-based representations of sequences by representing sequences as trees of small, fixed-capacity arrays (i.e., chunks). We prove that our algorithms deliver tight amortized, worst-case bounds with small constant factors. We present two C++ implementations of our two algorithms and a number of experiments comparing our implementations to highly tuned and specialized sequence data structures, such as STL deque and STL rope. This work presents the first data structures for shared memory that simultaneously match the semantic and asymptotic profile of the Finger Tree of Hinze and Patterson,<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> deliver strong guarantees with respect to constant-factor performance (as well as asymptotic performance), and compete well with highly tuned but more specialized data structures.</p>
 <p>We have made available a long version of our ESA’14 article which includes appendices. In the appendix, there is additional discussion of experiments, extra experimental results, and proofs.</p>
 <ul>
 <li><a href="http://deepsea.inria.fr/chunkedseq/esa-2014-long.pdf">Article</a> (long version)</li>
@@ -31,85 +39,81 @@
 <p>Documentation is available in <a href="doc/chunkedseq.html">HTML</a> or <a href="doc/chunkedseq.pdf">PDF</a> format.</p>
 <h1 id="running-and-extending-our-expriments">Running and extending our expriments</h1>
 <p>We encourage others to evaluate the findings of our empirical study. To this end, we provide the source code of our benchmarks along with the following instructions that show what steps a reviewer can take to repeat our experiments and to interpret the data.</p>
-<p>If you have trouble completing this process, please send email describing the issue to <script type="text/javascript">
-<!--
-h='&#x69;&#110;&#114;&#x69;&#x61;&#46;&#102;&#114;';a='&#64;';n='&#x6d;&#x69;&#x6b;&#x65;&#46;&#114;&#x61;&#x69;&#110;&#x65;&#x79;';e=n+a+h;
-document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#x4d;&#x69;&#x6b;&#x65;&#32;&#82;&#x61;&#x69;&#110;&#x65;&#x79;'+'<\/'+'a'+'>');
-// -->
-</script><noscript>&#x4d;&#x69;&#x6b;&#x65;&#32;&#82;&#x61;&#x69;&#110;&#x65;&#x79;&#32;&#40;&#x6d;&#x69;&#x6b;&#x65;&#46;&#114;&#x61;&#x69;&#110;&#x65;&#x79;&#32;&#x61;&#116;&#32;&#x69;&#110;&#114;&#x69;&#x61;&#32;&#100;&#x6f;&#116;&#32;&#102;&#114;&#x29;</noscript>.</p>
+<p>If you have trouble completing this process, please send email describing the issue to <a href="mailto:mike.rainey@inria.fr">Mike Rainey</a>.</p>
 <h2 id="prerequisites">1. Prerequisites</h2>
-<p>To have enough room to run the experiments, your filesystem should have about 80GB of free space and your machine at least 8GB or RAM. These space requirements are so large because, for our graph-search benchmarks, we use a few very large graphs. In addition to those listed above, the following packages should be installed on your test machine.</p>
-<table>
+<p>To have enough room to run the experiments, your filesystem should have about 80GB of free space and your machine at least 8GB or RAM. These space requirements are so large because, for our graph-search benchmarks, we use a few very large graphs.</p>
+<p>The following packages should be installed on your test machine.</p>
+<table style="width:96%;">
 <colgroup>
-<col width="13%" />
-<col width="18%" />
-<col width="63%" />
+<col style="width: 13%" />
+<col style="width: 18%" />
+<col style="width: 63%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Package</th>
-<th align="left">Version</th>
-<th align="left">Details</th>
+<th>Package</th>
+<th style="text-align: left;">Version</th>
+<th style="text-align: left;">Details</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ocaml</td>
-<td align="left">&gt;= 4.00</td>
-<td align="left">This compiler is required to build our benchmarking scripts. <a href="http://www.ocaml.org/">Source.</a></td>
+<td>ocaml</td>
+<td style="text-align: left;">&gt;= 4.00</td>
+<td style="text-align: left;">This compiler is required to build our benchmarking scripts. <a href="http://www.ocaml.org/">Source.</a></td>
 </tr>
 <tr class="even">
-<td align="left">R</td>
-<td align="left">&gt;= 2.4.1</td>
-<td align="left">This plotting package is required to render plots. <a href="http://www.r-project.org/">Source.</a></td>
+<td>R</td>
+<td style="text-align: left;">&gt;= 2.4.1</td>
+<td style="text-align: left;">This plotting package is required to render plots. <a href="http://www.r-project.org/">Source.</a></td>
 </tr>
 <tr class="odd">
-<td align="left">wget</td>
-<td align="left">(recent)</td>
-<td align="left">The benchmarking script invokes this script to download graph data. <a href="http://www.gnu.org/software/wget/">Source.</a></td>
+<td>wget</td>
+<td style="text-align: left;">(recent)</td>
+<td style="text-align: left;">The benchmarking script invokes this script to download graph data. <a href="http://www.gnu.org/software/wget/">Source.</a></td>
 </tr>
 <tr class="even">
-<td align="left">latex</td>
-<td align="left">(recent)</td>
-<td align="left">Tables of results are generated in and compiled by latex. <a href="http://www.latex-project.org/">Source.</a></td>
+<td>latex</td>
+<td style="text-align: left;">(recent)</td>
+<td style="text-align: left;">Tables of results are generated in and compiled by latex. <a href="http://www.latex-project.org/">Source.</a></td>
 </tr>
 <tr class="odd">
-<td align="left">jemalloc</td>
-<td align="left">&gt;= 3.6.0</td>
-<td align="left">Optionally used by our benchmarking programs to improve performance. <a href="http://www.canonware.com/jemalloc/">Source.</a></td>
+<td>jemalloc</td>
+<td style="text-align: left;">&gt;= 3.6.0</td>
+<td style="text-align: left;">Optionally used by our benchmarking programs to improve performance. <a href="http://www.canonware.com/jemalloc/">Source.</a></td>
 </tr>
 </tbody>
 </table>
 <h2 id="getting-the-source-code">2. Getting the source code</h2>
 <p>You can either download our source files via <a href="http://deepsea.inria.fr/chunkedseq/experiments/chunkedseq_bench.tar.gz">this link</a> or, if you prefer to use wget, you can skip to the next stage.</p>
 <p>You can find relevant files in the following places:</p>
-<table>
+<table style="width:97%;">
 <colgroup>
-<col width="48%" />
-<col width="48%" />
+<col style="width: 48%" />
+<col style="width: 48%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Locations</th>
-<th align="left">Details</th>
+<th>Locations</th>
+<th style="text-align: left;">Details</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>chunkedseq/include/*.hpp</code></td>
-<td align="left">implementation-specific files</td>
+<td><code>chunkedseq/include/*.hpp</code></td>
+<td style="text-align: left;">implementation-specific files</td>
 </tr>
 <tr class="even">
-<td align="left"><code>chunkedseq/bench/bench.cpp</code> <code>chunkedseq/bench/do_fifo.cpp</code></td>
-<td align="left">sequence-specific benchmarking codes</td>
+<td><code>chunkedseq/bench/bench.cpp</code> <code>chunkedseq/bench/do_fifo.cpp</code></td>
+<td style="text-align: left;">sequence-specific benchmarking codes</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>graph/bench/search.cpp</code> <code>graph/include/*.hpp</code></td>
-<td align="left">graph-search benchmarking codes</td>
+<td><code>graph/bench/search.cpp</code> <code>graph/include/*.hpp</code></td>
+<td style="text-align: left;">graph-search benchmarking codes</td>
 </tr>
 <tr class="even">
-<td align="left"><code>chunkedseq/stl/pushpop.cpp</code></td>
-<td align="left">STL worst-case benchmark</td>
+<td><code>chunkedseq/stl/pushpop.cpp</code></td>
+<td style="text-align: left;">STL worst-case benchmark</td>
 </tr>
 </tbody>
 </table>
@@ -129,33 +133,33 @@ $ make chunkedseq.byte</code></pre>
 <p>During the initialization phase, our script builds several binaries and generates input data required by the graph-search experiments. The input data may take about 30GB in total. Our script puts the input data into the folder <code>_data</code>. After initialization completes, the experiments run. During this time, be careful to ensure that the machine is quiet (except for the currently running experiment). Results from the experiments go into a new folder that is created by the script. The name of this folder is reported by the script after the script completes.</p>
 <h2 id="interpreting-results">4. Interpreting results</h2>
 <p>When all of the experiments run to completion, results should be generated by the script and put into the following files.</p>
-<table>
+<table style="width:97%;">
 <colgroup>
-<col width="48%" />
-<col width="48%" />
+<col style="width: 48%" />
+<col style="width: 48%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Locations</th>
-<th align="left">Details</th>
+<th>Locations</th>
+<th style="text-align: left;">Details</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>tables_paper.tex</code>; <code>tables_paper.pdf</code></td>
-<td align="left">report of all experiments, showing runtimes in seconds</td>
+<td><code>tables_paper.tex</code>; <code>tables_paper.pdf</code></td>
+<td style="text-align: left;">report of all experiments, showing runtimes in seconds</td>
 </tr>
 <tr class="even">
-<td align="left"><code>tables_</code><em>exp</em><code>.tex</code>; <code>tables_</code><em>exp</em><code>.pdf</code></td>
-<td align="left">one table for each indidual experiment <em>exp</em></td>
+<td><code>tables_</code><em>exp</em><code>.tex</code>; <code>tables_</code><em>exp</em><code>.pdf</code></td>
+<td style="text-align: left;">one table for each indidual experiment <em>exp</em></td>
 </tr>
 <tr class="odd">
-<td align="left"><code>_results/results_</code><em>exp</em><code>.txt</code></td>
-<td align="left">raw input/output of each run for each individual experiment <em>exp</em></td>
+<td><code>_results/results_</code><em>exp</em><code>.txt</code></td>
+<td style="text-align: left;">raw input/output of each run for each individual experiment <em>exp</em></td>
 </tr>
 <tr class="even">
-<td align="left"><code>plots_chunk_size.pdf</code></td>
-<td align="left">a scatter plot showing the results of the chunk-size experiment</td>
+<td><code>plots_chunk_size.pdf</code></td>
+<td style="text-align: left;">a scatter plot showing the results of the chunk-size experiment</td>
 </tr>
 </tbody>
 </table>
@@ -174,20 +178,20 @@ $ make chunkedseq.byte</code></pre>
 </ul>
 <h1 id="references">References</h1>
 <p>Get the <a href="chunkedseq.bib">bibtex file</a> used to generate these references.</p>
-<div class="references">
+<div id="refs" class="references">
 <div id="ref-chunkedseq14-esa">
-<p>Acar, Umut A., Arthur Charguéraud, and Mike Rainey. 2014. “Theory and Practice of Chunked Sequences.” In <em>ESA 2014</em>, 8737:25–36. LNCS. Springer Berlin Heidelberg. <a href="http://doi.org/10.1007/978-3-662-44777-2_3">doi:10.1007/978-3-662-44777-2_3</a>.</p>
+<p>Acar, Umut A., Arthur Charguéraud, and Mike Rainey. 2014. “Theory and Practice of Chunked Sequences.” In <em>ESA 2014</em>, 8737:25–36. LNCS. Springer Berlin Heidelberg. <a href="https://doi.org/10.1007/978-3-662-44777-2_3" class="uri">https://doi.org/10.1007/978-3-662-44777-2_3</a>.</p>
 </div>
 <div id="ref-finger-trees">
-<p>Hinze, Ralf, and Ross Paterson. 2006. “Finger Trees: A Simple General-Purpose Data Structure.” <em>Journal of Functional Programming</em> 16 (2). New York, NY, USA: Cambridge University Press: 197–217. <a href="http://doi.org/10.1017/S0956796805005769">doi:10.1017/S0956796805005769</a>.</p>
+<p>Hinze, Ralf, and Ross Paterson. 2006. “Finger Trees: A Simple General-Purpose Data Structure.” <em>Journal of Functional Programming</em> 16 (2). New York, NY, USA: Cambridge University Press:197–217. <a href="https://doi.org/10.1017/S0956796805005769" class="uri">https://doi.org/10.1017/S0956796805005769</a>.</p>
 </div>
 </div>
-<div class="footnotes">
+<section class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><span class="citation">(Acar, Charguéraud, and Rainey 2014)</span><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><span class="citation">(Hinze and Paterson 2006)</span><a href="#fnref2">↩</a></p></li>
+<li id="fn1"><p><span class="citation" data-cites="chunkedseq14-esa">(Acar, Charguéraud, and Rainey 2014)</span><a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p><span class="citation" data-cites="finger-trees">(Hinze and Paterson 2006)</span><a href="#fnref2" class="footnote-back">↩</a></p></li>
 </ol>
-</div>
+</section>
 </body>
 </html>
