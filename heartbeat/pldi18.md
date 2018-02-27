@@ -8,14 +8,14 @@ Overview
 A classic challenge in parallel computing is to take a parallel
 program that is written in a high-level style, for example, in
 nested-parallel style with fork-join constructs, and have an optimzied
-version of the program run efficiently on a real machine. One of major
-issues behind the parallel-programming challenge is *granularity
-control*. The issue of granularity control relates to the fact that in
-every parallel system there is a cost to pay to realize any
-opportunity for parallelism that exists in the application. Have the
-program realize too much of the available parallelism, and the program
-will be slowed by threading overheads. But have the program realize
-too little and the program will underutilize the available
+version of the program run efficiently on a real machine. Even today,
+to obtain such an optimized version one must deal with the problem of
+*granularity control*. The reason this problem exists relates to the
+fact that in every parallel system there is a cost to pay to realize
+any opportunity for parallelism that exists in the application. Have
+the program realize too much of the available parallelism, and the
+program will be slowed by threading overheads. But have the program
+realize too little and the program will underutilize the available
 processors. The fundamental challenge is, therefore, to find a
 technique that can consistently strike a balance between the two
 extremes.
