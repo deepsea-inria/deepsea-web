@@ -90,7 +90,7 @@ To streamline this process, we are going to add the benchmarking
 folder to our path.
 
 ~~~~
-$ export PATH=`pwd`/results/bench/:$PATH
+$ export PATH=`pwd`/result/bench/:$PATH
 ~~~~
 
 We can now start generating the graph data. This process requires
