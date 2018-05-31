@@ -9,6 +9,10 @@ PAPER_FILES=
 PROJECT_FILES=$(PROJECT_NAME).bib $(PNG_FILES) $(PAPER_FILES)
 PROJECT_BIBS=--bibliography $(PROJECT_NAME).bib
 
+all:
+	pdfs.pdf pdfs.html
+
+
 %.pdf : %.md
 	pandoc $< -s $(PROJECT_BIBS) -o $@
 %.html : %.md
