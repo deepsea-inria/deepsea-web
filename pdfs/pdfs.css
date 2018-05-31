@@ -64,7 +64,22 @@ dd p {
         margin-top: 0;
 }
 
+h1.title {
+        font-size: 250%;
+        text-align: center;
+        border: none;
+}
 
+.author {
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.date {
+        font-size: 100%;
+        text-align: center;
+        border: none;
+}
 
 table {
     width: 100%; 
