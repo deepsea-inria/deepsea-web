@@ -95,7 +95,7 @@ The benchmarking binaries we are going to use are now reachable from
 `$PATH`.
 
 ~~~~
-$ export PATH=`pwd`/results/bench/:$PATH
+$ export PATH=`pwd`/result/bench/:$PATH
 ~~~~
 
 Generating graph data
@@ -120,11 +120,12 @@ measurements.
 $ graph.pbench baselines -size large
 ~~~~
 
-The next command that needs to be run collects data for each graph to
-determine the number of vertices reachable from the source vertex.
+The next step is to collect metadata on graphs and then measure
+overheads.
 
 ~~~~
 $ graph.pbench accessible -size large -skip plot
+$ graph.pbench overheads -size large -skip plot
 ~~~~
 
 After the command completes, the results of the experiment are going
