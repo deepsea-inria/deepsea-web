@@ -112,11 +112,12 @@ measurements.
 $ graph.pbench baselines -size large
 ~~~~
 
-The next command that needs to be run collects data for each graph to
-determine the number of vertices reachable from the source vertex.
+The next step is to collect metadata on graphs and then measure
+overheads.
 
 ~~~~
 $ graph.pbench accessible -size large -skip plot
+$ graph.pbench overheads -size large -skip plot
 ~~~~
 
 After the command completes, the results of the experiment are going
