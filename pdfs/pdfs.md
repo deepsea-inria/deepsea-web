@@ -120,11 +120,16 @@ measurements.
 $ graph.pbench baselines -size large
 ~~~~
 
-The next step is to collect metadata on graphs and then measure
-overheads.
+The next step is to collect metadata on graphs.
 
 ~~~~
 $ graph.pbench accessible -size large -skip plot
+~~~~
+
+And the next is to collect data on the overheads relating to parallel
+execution.
+
+~~~~
 $ graph.pbench overheads -size large -skip plot
 ~~~~
 
